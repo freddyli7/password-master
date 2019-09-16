@@ -14,6 +14,13 @@ class MasterKeyManager {
     exportMasterkey(callback) {
         callback(this.encryptedMasterKey, this.masterKeyAddress)
     }
+
+    // check master key password
+    unlockMasterKey(password, callback) {
+        return masterkey.unlockMasterkey(password, this.encryptedMasterKey, function (unlockResult) {
+            callback(unlockResult)
+        })
+    }
 }
 
 module.exports = MasterKeyManager;
