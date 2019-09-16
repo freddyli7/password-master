@@ -3,7 +3,6 @@ const masterkey = require("../masterkey");
 const should = require('should');
 const typeConverter = require("../typeConverter");
 
-
 const keyPath = "m/44'/403'/0'/0'/1'";
 
 const masterKey = {
@@ -82,7 +81,7 @@ describe("test derive private key from master key for Ed25519", function () {
         const uint8arrayMasterKeypart = typeConverter.hexStrToUint8Array(masterKey.key);
         const uint8arrayMasterKeychaincode = typeConverter.hexStrToUint8Array(masterKey.chainCode);
         const derivedPrivatekey = oneledger.derivePrivateKeyOLT(uint8arrayMasterKeypart, uint8arrayMasterKeychaincode, keyPath);
-        console.log(derivedPrivatekey);
+        console.log("222--",derivedPrivatekey);
         console.log(typeConverter.uint8arrayToHexStr(derivedPrivatekey));
     })
 });
@@ -91,9 +90,8 @@ describe("test derive public key from private key for Ed25519", function () {
     it("test 1", function () {
         const derivedPrivatekeyHexStr = "64283bbf60f27d27134cd4da3ca58bca15458df99208ff20a08784025d3b9592d3ace5aa8b61cece4ccebdda63d587c89fd12c19ae665b79cbd9c9097638b200";
         const derivedPrivatekeyUint8Array = typeConverter.hexStrToUint8Array(derivedPrivatekeyHexStr);
-        // console.log(derivedPrivatekeyUint8Array.length);
+        console.log(derivedPrivatekeyUint8Array);
         const publicKey = oneledger.derivePublicKeyOLT(derivedPrivatekeyUint8Array);
-        // console.log(publicKey);
         should.equal(publicKey, "06zlqothzs5Mzr3aY9WHyJ/RLBmuZlt5y9nJCXY4sgA=")
     })
 });
@@ -102,7 +100,6 @@ describe("test derive address from public key for Ed25519", function () {
     it("test 1", function () {
         const derivedPublicKey = "06zlqothzs5Mzr3aY9WHyJ/RLBmuZlt5y9nJCXY4sgA=";
         const address = oneledger.deriveAddressOLT(derivedPublicKey);
-        // console.log(address);
         should.equal(address, "b357bdc2ae60dcaf5316924d760f09289d226243")
     })
 });
@@ -127,8 +124,11 @@ describe("test verify signature Ed25519", function () {
         const uint8ArrayKeychaincode = typeConverter.hexStrToUint8Array(masterKey.chainCode);
         // console.log(uint8ArrayKey);
         const derivedPrivateKey = oneledger.derivePrivateKeyOLT(uint8ArrayKeypart, uint8ArrayKeychaincode, keyPath);
+        console.log("333---", derivedPrivateKey);
+
         const publicKey = oneledger.derivePublicKeyOLT(derivedPrivateKey);
-        oneledger.verifySignatureOLT(rawTxmessage, signature, publicKey, function (error, result) {
+        console.log(publicKey);
+        oneledger.verifySignatureOLT(rawTxmessage, signature, "06zlqothzs5Mzr3aY9WHyJ/RLBmuZlt5y9nJCXY4sgA=", function (error, result) {
             console.log(error);
             console.log("result", result);
         });

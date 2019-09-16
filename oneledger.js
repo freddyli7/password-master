@@ -42,6 +42,9 @@ function signForSignatureOLT(message, password, encryptedMasterKey, keyPath, cal
     return masterkey.masterKeyDecryption(password, encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
         if (error) return callback(error);
         const derivedPrivatedkey = derivePrivateKeyOLT(decryptedMasterKey, decryptedMasterChaincode, keyPath);
+        console.log(decryptedMasterKey);
+        console.log(decryptedMasterChaincode);
+        console.log("111---", derivedPrivatedkey);
         callback(null, nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), derivedPrivatedkey)));
     });
 }
