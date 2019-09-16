@@ -131,6 +131,7 @@ describe("test verify signature Ed25519", function () {
         oneledger.verifySignatureOLT(rawTxmessage, signature, "06zlqothzs5Mzr3aY9WHyJ/RLBmuZlt5y9nJCXY4sgA=", function (error, result) {
             console.log(error);
             console.log("result", result);
+            should.ok(result, "signature verify should be true")
         });
     })
 });
