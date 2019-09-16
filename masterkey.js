@@ -8,13 +8,14 @@ const oneledger = require("./oneledger");
 const typeConverter = require("./typeConverter");
 
 /* *****************************   Master key  ***************************** */
-
+// generate 24 mnemonic before creating a new master key
 // generate 24 words mnemonic string
 function mnemonicGenerator24() {
     const entropy = crypto.randomBytes(32);
     return bip39.entropyToMnemonic(entropy);
 }
 
+// generate 24 mnemonic before creating a new master key
 // generate 12 words mnemonic string
 function mnemonicGenerator12() {
     return bip39.generateMnemonic();
@@ -78,6 +79,21 @@ function getMasterAddress(masterPublicKey) {
     return oneledger.deriveAddressOLT(masterPublicKey)
 }
 
+// derive masterkey address based on provided mnemonic
+// return masterkey address
+function recoveryMasterKey(mnemonic) {
+    const {key, chainCode} = masterKeyGenerator(mnemonic);
+    const uint8ArrayPriKey = typeConverter.hexStrToUint8Array(typeConverter.uint8arrayToHexStr(key) + typeConverter.uint8arrayToHexStr(chainCode));
+    return getMasterAddress(getMasterPublicKey(uint8ArrayPriKey))
+}
+
+// password check when import masterkey file
+function unlockMasterkey(password, encryptedMasterKey, callback) {
+    return masterKeyDecryption(password, encryptedMasterKey, function (error, unlockResult) {
+        callback(typeof unlockResult !== "undefined");
+    })
+}
+
 module.exports = {
     mnemonicGenerator24,
     mnemonicGenerator12,
@@ -85,5 +101,7 @@ module.exports = {
     masterKeyEncryption,
     masterKeyDecryption,
     getMasterPublicKey,
-    getMasterAddress
+    getMasterAddress,
+    recoveryMasterKey,
+    unlockMasterkey
 };

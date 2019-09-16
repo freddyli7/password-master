@@ -61,7 +61,7 @@ function signForSignatureETH({nonce, gasPrice, gasLimit, to, value, data}, passw
     });
 }
 
-// TODO
+// TODO not need for now
 function verifySignatureETH() {
 
 }

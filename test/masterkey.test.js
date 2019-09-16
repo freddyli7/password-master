@@ -156,3 +156,26 @@ describe("test derive master key's address", function () {
         console.log(masterAddress);
     })
 });
+
+describe("test recovery master key", function () {
+    it("test 1", function () {
+        const mnemonic = "turtle issue gloom race blast final parent park toss atom aware surprise tribe genuine claim hobby aware alcohol wish index tiny hope have cage";
+        const masterAddress = masterkey.recoveryMasterKey(mnemonic);
+        console.log(masterAddress);
+    })
+});
+
+describe("test unlock master key", function () {
+    it("test 1, wrong password, should get false", function () {
+        const encryptedMasterKey = '{"iv":"RiSLQyrzQyfQWDPJjIIhug==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"TQG4HWB0kxvXTbclS2i8mQ==","ct":"Dn2bUTNh6SasdlVvsIdMqBkyOIUk0Fn6737U3nq3h9DI1O46fFsP8UvilkxKu4iqrKAJ752QfwEjf4MbXG/10pCBD1LzAq00QKpesiHgw2dczL+ect7YfWiN7fpTz8q4"}';
+        masterkey.unlockMasterkey("123456sdfsd", encryptedMasterKey,function (unlockResult) {
+            should.ok(!unlockResult)
+        });
+    });
+    it("test 2, correct password, should get true", function () {
+        const encryptedMasterKey = '{"iv":"RiSLQyrzQyfQWDPJjIIhug==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"TQG4HWB0kxvXTbclS2i8mQ==","ct":"Dn2bUTNh6SasdlVvsIdMqBkyOIUk0Fn6737U3nq3h9DI1O46fFsP8UvilkxKu4iqrKAJ752QfwEjf4MbXG/10pCBD1LzAq00QKpesiHgw2dczL+ect7YfWiN7fpTz8q4"}';
+        masterkey.unlockMasterkey("123456", encryptedMasterKey,function (unlockResult) {
+            should.ok(unlockResult)
+        });
+    });
+});
