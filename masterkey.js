@@ -15,7 +15,7 @@ function mnemonicGenerator24() {
     return mnemonicStrToArray(bip39.entropyToMnemonic(entropy));
 }
 
-// generate 24 mnemonic before creating a new master key
+// generate 12 mnemonic before creating a new master key
 // generate 12 words mnemonic string
 function mnemonicGenerator12() {
     return mnemonicStrToArray(bip39.generateMnemonic());
