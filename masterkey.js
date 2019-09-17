@@ -12,19 +12,46 @@ const typeConverter = require("./typeConverter");
 // generate 24 words mnemonic string
 function mnemonicGenerator24() {
     const entropy = crypto.randomBytes(32);
-    return bip39.entropyToMnemonic(entropy);
+    return mnemonicStrToArray(bip39.entropyToMnemonic(entropy));
 }
 
 // generate 24 mnemonic before creating a new master key
 // generate 12 words mnemonic string
 function mnemonicGenerator12() {
-    return bip39.generateMnemonic();
+    return mnemonicStrToArray(bip39.generateMnemonic());
 }
 
-// seed is 12 or 24 mnemonic words string
+// convert string mnemonic to array with word object as element
+// internal use only
+function mnemonicStrToArray(mnemonicStr) {
+    const mnemonicArray = mnemonicStr.split(" ");
+    let i = 1;
+    const returnArray = [];
+    mnemonicArray.forEach(w => {
+        returnArray[i - 1] = {
+            index: i,
+            word: w
+        };
+        i++;
+    });
+    return returnArray
+}
+
+// convert array mnemonic to string
+// internal use only
+function mnemonicArrayToStr(mnemonicArray) {
+    let mnemonicStr = "";
+    mnemonicArray.forEach(obj => {
+        const { word } = obj || "";
+        mnemonicStr += word + " "
+    });
+    return mnemonicStr.trim()
+}
+
+// seed is 12 or 24 mnemonic words mnemonicArray
 // return key and chainCode which are both 32 bytes Uint8Array
-function masterKeyGenerator(seed) {
-    const hexSeed = typeConverter.stringToHex(seed);
+function masterKeyGenerator(mnemonicArray) {
+    const hexSeed = typeConverter.stringToHex(mnemonicArrayToStr(mnemonicArray));
     const {key, chainCode} = getMasterKeyFromSeed(hexSeed);
     return {key: typeConverter.bufferToUint8Array(key), chainCode: typeConverter.bufferToUint8Array(chainCode)};
 }
@@ -79,10 +106,10 @@ function getMasterAddress(masterPublicKey) {
     return oneledger.deriveAddressOLT(masterPublicKey)
 }
 
-// derive masterkey address based on provided mnemonic
+// derive masterkey address based on provided mnemonic array
 // return masterkey address
-function recoveryMasterKey(mnemonic) {
-    const {key, chainCode} = masterKeyGenerator(mnemonic);
+function recoveryMasterKey(mnemonicArray) {
+    const {key, chainCode} = masterKeyGenerator(mnemonicArray);
     const uint8ArrayPriKey = typeConverter.hexStrToUint8Array(typeConverter.uint8arrayToHexStr(key) + typeConverter.uint8arrayToHexStr(chainCode));
     return getMasterAddress(getMasterPublicKey(uint8ArrayPriKey))
 }
@@ -103,5 +130,7 @@ module.exports = {
     getMasterPublicKey,
     getMasterAddress,
     recoveryMasterKey,
-    unlockMasterkey
+    unlockMasterkey,
+    mnemonicStrToArray,
+    mnemonicArrayToStr
 };

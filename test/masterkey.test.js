@@ -111,6 +111,31 @@ const masterKey = {
 //         151,
 //         206 ]
 
+const mnemonicArray = [ { index: 1, word: 'turtle' },
+    { index: 2, word: 'issue' },
+    { index: 3, word: 'gloom' },
+    { index: 4, word: 'race' },
+    { index: 5, word: 'blast' },
+    { index: 6, word: 'final' },
+    { index: 7, word: 'parent' },
+    { index: 8, word: 'park' },
+    { index: 9, word: 'toss' },
+    { index: 10, word: 'atom' },
+    { index: 11, word: 'aware' },
+    { index: 12, word: 'surprise' },
+    { index: 13, word: 'tribe' },
+    { index: 14, word: 'genuine' },
+    { index: 15, word: 'claim' },
+    { index: 16, word: 'hobby' },
+    { index: 17, word: 'aware' },
+    { index: 18, word: 'alcohol' },
+    { index: 19, word: 'wish' },
+    { index: 20, word: 'index' },
+    { index: 21, word: 'tiny' },
+    { index: 22, word: 'hope' },
+    { index: 23, word: 'have' },
+    { index: 24, word: 'cage' } ];
+
 describe("test encrypt master key", function () {
     it("test 1", function () {
         const masterKeypart = typeConverter.hexStrToUint8Array(masterKey.key);
@@ -159,8 +184,7 @@ describe("test derive master key's address", function () {
 
 describe("test recovery master key", function () {
     it("test 1", function () {
-        const mnemonic = "turtle issue gloom race blast final parent park toss atom aware surprise tribe genuine claim hobby aware alcohol wish index tiny hope have cage";
-        const masterAddress = masterkey.recoveryMasterKey(mnemonic);
+        const masterAddress = masterkey.recoveryMasterKey(mnemonicArray);
         console.log(masterAddress);
     })
 });
@@ -178,4 +202,22 @@ describe("test unlock master key", function () {
             should.ok(unlockResult)
         });
     });
+});
+
+describe("test mnemonic to array", function () {
+    it("test 1", function () {
+        const mnemonic = "turtle issue gloom race blast final parent park toss atom aware surprise tribe genuine claim hobby aware alcohol wish index tiny hope have cage";
+        const list = masterkey.mnemonicStrToArray(mnemonic);
+        console.log(list);
+    })
+});
+
+describe("test mnemonic array to string", function () {
+    it("test 1", function () {
+        const mnemonic = "turtle issue gloom race blast final parent park toss atom aware surprise tribe genuine claim hobby aware alcohol wish index tiny hope have cage";
+
+        const mnemonicStr = masterkey.mnemonicArrayToStr(mnemonicArray);
+        console.log(mnemonicStr);
+        should.equal(mnemonicStr, mnemonic)
+    })
 });
