@@ -115,7 +115,7 @@ function recoveryMasterKey(mnemonicArray) {
 }
 
 // password check when import masterkey file
-function unlockMasterkey(password, encryptedMasterKey, callback) {
+function unlockMasterKey(password, encryptedMasterKey, callback) {
     return masterKeyDecryption(password, encryptedMasterKey, function (error, unlockResult) {
         callback(typeof unlockResult !== "undefined");
     })
@@ -130,7 +130,7 @@ module.exports = {
     getMasterPublicKey,
     getMasterAddress,
     recoveryMasterKey,
-    unlockMasterkey,
+    unlockMasterKey,
     mnemonicStrToArray,
     mnemonicArrayToStr
 };

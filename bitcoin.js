@@ -36,7 +36,7 @@ function deriveP2PKHAddress(publicKey) {
     return bitcoinjs.payments.p2pkh({pubkey}).address;
 }
 
-// TODO
+// TODO not enough data
 function deriveP2PKAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
     return bitcoinjs.payments.p2pk({pubkey}).address;
@@ -49,19 +49,19 @@ function deriveP2WPKHAddress(publicKey) {
     return bitcoinjs.payments.p2wpkh({pubkey}).address;
 }
 
-// TODO : not need for now
+// TODO : no need for now
 function deriveP2WSHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
     return bitcoinjs.payments.p2wsh({pubkey}).address;
 }
 
-// TODO : not need for now
+// TODO : no need for now
 function deriveP2SHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
     return bitcoinjs.payments.p2sh({pubkey}).address;
 }
 
-// TODO : not need for now
+// TODO : no need for now
 function deriveP2MSAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
     return bitcoinjs.payments.p2ms({pubkey}).address;

@@ -37,31 +37,23 @@ function derivePublicKeyETH(privateKey) {
 function deriveAddressETH(publicKey) {
     const bufferPublicKey = typeConverter.hexStrToBuffer(publicKey);
     const wallet = ethwallet.fromPublicKey(bufferPublicKey, true);
-    return wallet.getAddressString();
+    return wallet.getChecksumAddressString()
 }
 
 // encryptedMasterKey is a string, keypath is a string
 // password is plaintext, nonce is an uint, gasPrice is an uint, gasLimit is an uint, to is recipient address, value is an uint (wei), data is a hex string
 // return serialized tx as hex string
-function signForSignatureETH({nonce, gasPrice, gasLimit, to, value, data}, password, encryptedMasterKey, keyPath, callback) {
+function signForSignatureETH(txParams, password, encryptedMasterKey, keyPath, callback) {
     return masterkey.masterKeyDecryption(password, encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
         if (error) return callback(error);
         const derivedPrivatedkey = derivePrivateKeyETH(decryptedMasterKey, keyPath);
-        const txParams = {
-            nonce: nonce,
-            gasPrice: gasPrice,
-            gasLimit: gasLimit,
-            to: to,
-            value: value,
-            data: data,
-        };
         const tx = new EthereumTx(txParams, {chain: 'mainnet', hardfork: 'petersburg'});
         tx.sign(derivedPrivatedkey);
         callback(null, tx.serialize().toString('hex'));
     });
 }
 
-// TODO not need for now
+// TODO no need for now
 function verifySignatureETH() {
 
 }
@@ -71,6 +63,5 @@ module.exports = {
     verifyPrivateKeyETH,
     derivePublicKeyETH,
     deriveAddressETH,
-    signForSignatureETH,
-    verifySignatureETH
+    signForSignatureETH
 };

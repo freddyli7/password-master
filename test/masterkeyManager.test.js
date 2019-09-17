@@ -36,7 +36,7 @@ describe("test new master key", function () {
 describe("test export new master key", function () {
     it("test mnemonic generate", function () {
         const mm = new masterkeyManager(mnemonicArray, "123456");
-        mm.exportMasterkey(function (encryptedMasterKey, masterKeyAddress) {
+        mm.getMasterkeyInfo(function (encryptedMasterKey, masterKeyAddress) {
             console.log(encryptedMasterKey);
             console.log(masterKeyAddress);
         })
