@@ -1,4 +1,4 @@
-const {derivePath, getMasterKeyFromSeed, getPublicKey, isValidPath} = require('ed25519-hd-key');
+const {derivePath, isValidPath} = require('ed25519-hd-key');
 const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const secp256k1 = require('secp256k1');
@@ -30,20 +30,21 @@ function derivePublicKeyBTC(privateKey) {
 }
 
 // publicKey should be 33 bytes hex string with chain prefix
-// return 34 chars length address
+// return 34 chars length base58 encoding P2PKH address
 function deriveP2PKHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
     return bitcoinjs.payments.p2pkh({pubkey}).address;
 }
 
-// TODO not enough data
-function deriveP2PKAddress(publicKey) {
-    const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2pk({pubkey}).address;
+// publicKey should be 33 bytes hex string with chain prefix
+// return 33 bytes hex string public key with chain prefix
+function deriveP2PKPubKey(publicKey) {
+    // const pubkey = typeConverter.hexStrToBuffer(publicKey);
+    // bitcoinjs.payments.p2pk({pubkey}).pubkey;
+    return publicKey
 }
 
-// publicKey should be 33 bytes hex string with chain prefix
-// return 42 chars length address
+// TODO : no need for now
 function deriveP2WPKHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
     return bitcoinjs.payments.p2wpkh({pubkey}).address;
@@ -83,7 +84,7 @@ function signForSignatureBTC(message, password, encryptedMasterKey, keyPath, cal
 }
 
 // verify BTC tx signature
-// message 32 bytes, signature 64 bytes and publicKey 33 bytes  are all hex string
+// message 32 bytes, signature 64 bytes and publicKey 33 bytes are all hex string
 function verifySignatureBTC(message, signature, publicKey) {
     return secp256k1.verify(typeConverter.hexStrToBuffer(message), typeConverter.hexStrToBuffer(signature), typeConverter.hexStrToBuffer(publicKey))
 }
@@ -91,12 +92,10 @@ function verifySignatureBTC(message, signature, publicKey) {
 module.exports = {
     derivePrivateKeyBTC,
     derivePublicKeyBTC,
-    deriveP2WSHAddress,
-    deriveP2WPKHAddress,
-    deriveP2SHAddress,
-    deriveP2MSAddress,
+
     deriveP2PKHAddress,
-    deriveP2PKAddress,
+    deriveP2PKPubKey,
+
     verifyPrivateKeyBTC,
     signForSignatureBTC,
     verifySignatureBTC

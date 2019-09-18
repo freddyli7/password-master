@@ -1,16 +1,17 @@
-const oneledger = require("oneledger");
-const bitcoin = require("bitcoin");
-const ethereum = require("ethereum");
-const masterkey = require("masterkey");
-const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("config");
+const oneledger = require("./oneledger");
+const bitcoin = require("./bitcoin");
+const ethereum = require("./ethereum");
+const masterkey = require("./masterkey");
+const util = require("./util");
+const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
 
 // expose to UI
 // keyType should be string of either "OLT", "BTC-P2PK", "BTC-P2PKH", "ETH"
 // keyIndex should be uint
-// password  and encryptedMasterKey are string
+// password and encryptedMasterKey are string
 // return derived new keypair's keyIndex and address
 function deriveNewKeyPair(keyType, keyIndex, password, encryptedMasterKey, callback) {
-    if (!isPositiveInteger(keyIndex)) return callback(Error("invalid key index"));
+    if (!util.isNonNegativeInteger(keyIndex)) return callback(Error("invalid key index"));
     if (typeof encryptedMasterKey !== "string") return callback(Error("invalid encrypted master key"));
     return masterkey.masterKeyDecryption(password, encryptedMasterKey, (error, masterKey, masterChainCode) => {
         if (error) return callback(Error("Wrong password"));
@@ -23,8 +24,8 @@ function deriveNewKeyPair(keyType, keyIndex, password, encryptedMasterKey, callb
             case "BTC-P2PK":
                 const bitcoinDerivedPriKeyP2PK = bitcoin.derivePrivateKeyBTC(masterKey, bitcoinKeyPath + keyIndex + keyPathSuffix);
                 const bitcoinDerivedPubkeyP2PK = bitcoin.derivePublicKeyBTC(bitcoinDerivedPriKeyP2PK);
-                const bitcoinDerivedP2PKAddress = bitcoin.deriveP2SHAddress(bitcoinDerivedPubkeyP2PK);
-                return callback(null, keyIndex, bitcoinDerivedP2PKAddress);
+                    const bitcoinDerivedP2PKPubkey = bitcoin.deriveP2PKPubKey(bitcoinDerivedPubkeyP2PK);
+                return callback(null, keyIndex, bitcoinDerivedP2PKPubkey);
             case "BTC-P2PKH":
                 const bitcoinDerivedPriKeyP2PKH = bitcoin.derivePrivateKeyBTC(masterKey, bitcoinKeyPath + keyIndex + keyPathSuffix);
                 const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKeyBTC(bitcoinDerivedPriKeyP2PKH);
@@ -41,23 +42,23 @@ function deriveNewKeyPair(keyType, keyIndex, password, encryptedMasterKey, callb
     });
 }
 
-// keyType should be string of either "OLT", "BTC-P2PK", "BTC-P2PKH", "ETH"
+// keyType should be string of either "OLT", "BTC ", "ETH"
 // keyIndex should be uint
-// password  and encryptedMasterKey are string
+// password and encryptedMasterKey are string
 // return signature
 function signTx(message, keyType, keyIndex, password, encryptedMasterKey, callback) {
-    if (!isPositiveInteger(keyIndex)) return callback(Error("invalid key index"));
+    if (!util.isNonNegativeInteger(keyIndex)) return callback(Error("invalid key index"));
     if (typeof encryptedMasterKey !== "string") return callback(Error("invalid encrypted master key"));
     switch (keyType) {
         case "OLT":
-            if (!validateBase64(message)) return callback(Error("invalid encoded tx message"));
+            if (!util.validateBase64(message)) return callback(Error("invalid encoded tx message"));
             const oltkeypath = oneledgerKeyPath + keyIndex + keyPathSuffix;
             return oneledger.signForSignatureOLT(message, password, encryptedMasterKey, oltkeypath, (error, signature) => {
                 if (error) return callback(error);
                 return callback(null, signature)
             });
-        case "BTC-P2PK" || "BTC-P2PKH":
-            if (!validBTCTxMessage(message)) return callback(Error("invalid Bitcoin tx message"));
+        case "BTC":
+            if (!util.validBTCTxMessage(message)) return callback(Error("invalid BitCoin tx message"));
             const btckeypath = bitcoinKeyPath + keyIndex + keyPathSuffix;
             return bitcoin.signForSignatureBTC(message, password, encryptedMasterKey, btckeypath, (error, signature, recovery) => {
                 if (error) return callback(error);
@@ -65,8 +66,12 @@ function signTx(message, keyType, keyIndex, password, encryptedMasterKey, callba
             });
         case "ETH":
             const {nonce, gasPrice, gasLimit, to, value, data} = message;
-            // TODO : check eth message data
-
+            // verify eth tx message data
+            if (!util.isNonNegativeInteger(nonce)) return callback(Error("invalid nonce"));
+            if (!util.isNonNegativeNumber(gasPrice)) return callback(Error("invalid gasPrice"));
+            if (!util.isNonNegativeNumber(value)) return callback(Error("invalid tx value"));
+            if (!util.isPositiveInteger(gasLimit)) return callback(Error("invalid gasLimit"));
+            if (!util.isValidAddress(to)) return callback(Error("invalid tx receiver address"));
             const txParams = {
                 nonce: nonce,
                 gasPrice: gasPrice,
@@ -75,7 +80,7 @@ function signTx(message, keyType, keyIndex, password, encryptedMasterKey, callba
                 value: value,
                 data: data
             };
-            const ethkeypath = bitcoinKeyPath + keyIndex + keyPathSuffix;
+            const ethkeypath = ethereumKeyPath + keyIndex + keyPathSuffix;
             return ethereum.signForSignatureETH(txParams, password, encryptedMasterKey, ethkeypath, (error, signature) => {
                 if (error) return callback(error);
                 return callback(null, signature)
@@ -83,21 +88,6 @@ function signTx(message, keyType, keyIndex, password, encryptedMasterKey, callba
         default:
             return callback(Error("Wrong key type"));
     }
-}
-
-function validateBase64(s) {
-    return /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(s);
-}
-
-function validBTCTxMessage(s) {
-    return Buffer.from(s).length === 64;
-}
-
-// check if input is a positive Integer
-function isPositiveInteger(num) {
-    if (!Number(num) || num <= 0) return false;
-    const strNum = num.toString();
-    return strNum.indexOf(".") === -1
 }
 
 module.exports = {

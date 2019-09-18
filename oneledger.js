@@ -1,4 +1,4 @@
-const {derivePath, getMasterKeyFromSeed, getPublicKey, isValidPath} = require('ed25519-hd-key');
+const {derivePath, getPublicKey, isValidPath} = require('ed25519-hd-key');
 const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const sjcl = require("sjcl");
@@ -42,9 +42,6 @@ function signForSignatureOLT(message, password, encryptedMasterKey, keyPath, cal
     return masterkey.masterKeyDecryption(password, encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
         if (error) return callback(error);
         const derivedPrivatedkey = derivePrivateKeyOLT(decryptedMasterKey, decryptedMasterChaincode, keyPath);
-        console.log(decryptedMasterKey);
-        console.log(decryptedMasterChaincode);
-        console.log("111---", derivedPrivatedkey);
         callback(null, nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), derivedPrivatedkey)));
     });
 }
@@ -61,7 +58,7 @@ function verifySignatureOLT(message, signature, publicKey, callback) {
             nacl.util.decodeBase64(publicKey)
         );
     } catch (err) {
-        return callback(err, null);
+        return callback(err);
     }
     callback(null, verifyResult);
 }

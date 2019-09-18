@@ -13,7 +13,7 @@ class MasterKeyManager {
 
     // export masterkey info for persisting at local file system
     // should be called only when create new master key OR when after user recovery with correct mnemonic words and encrypted with new password
-    getMasterkeyInfo(callback) {
+    getMasterKeyInfo(callback) {
         callback(this.encryptedMasterKey, this.masterKeyAddress)
     }
 

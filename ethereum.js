@@ -1,4 +1,4 @@
-const {derivePath, getMasterKeyFromSeed, getPublicKey, isValidPath} = require('ed25519-hd-key');
+const {derivePath, isValidPath} = require('ed25519-hd-key');
 const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const secp256k1 = require('secp256k1');
