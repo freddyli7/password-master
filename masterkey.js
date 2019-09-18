@@ -42,7 +42,7 @@ function mnemonicStrToArray(mnemonicStr) {
 function mnemonicArrayToStr(mnemonicArray) {
     let mnemonicStr = "";
     mnemonicArray.forEach(obj => {
-        const { word } = obj || "";
+        const {word} = obj || "";
         mnemonicStr += word + " "
     });
     return mnemonicStr.trim()

@@ -1,9 +1,13 @@
-const {mnemonicGenerator24, unlockMasterKey, recoveryMasterKey} = require("./masterkey");
-exports.masterKeyManager = require("./masterkeyManager");
+const {mnemonicGenerator24, mnemonicGenerator12, unlockMasterKey, recoveryMasterKey} = require("./masterkey");
+exports.masterKeyGenerator = require("./masterkeyManager");
 exports.derivedKeyManager = require("./derivedkeyManager");
 
-module.exports.masterKey = {
-    mnemonicGenerator24,
+module.exports.masterKeyUtil = {
     unlockMasterKey,
-    recoveryMasterKey,
+    recoveryMasterKey
+};
+
+module.exports.mnemonicUtil = {
+    mnemonicGenerator12,
+    mnemonicGenerator24
 };
