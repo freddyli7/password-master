@@ -107,33 +107,35 @@ describe("test derive public key from private key for BTC", function () {
 describe("test derive address from public key for BTC", function () {
     it("test p2pk", function () {
         const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
-        const p2PKaddress = bitcoin.deriveP2PKAddress(derivedPublicKeyWithPrefixHex);
-        console.log("p2PKaddress", p2PKaddress);
-    });
-    it("test p2ms", function () {
-        const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
-        const p2MSaddress = bitcoin.deriveP2MSAddress(derivedPublicKeyWithPrefixHex);
-        console.log("p2MSaddress", p2MSaddress);
+        const p2PKPubkey = bitcoin.deriveP2PKPubKey(derivedPublicKeyWithPrefixHex);
+        console.log("p2PKPubkey", p2PKPubkey);
     });
     it("test p2pkh", function () {
         const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
         const p2PKHaddress = bitcoin.deriveP2PKHAddress(derivedPublicKeyWithPrefixHex);
         console.log("p2PKHaddress", p2PKHaddress);
     });
-    it("test p2wpkh", function () {
-        const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
-        const p2WPKHaddress = bitcoin.deriveP2WPKHAddress(derivedPublicKeyWithPrefixHex);
-        console.log("p2WPKHaddress", p2WPKHaddress);
-    });it("test p2wsh", function () {
-        const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
-        const p2WSHaddress = bitcoin.deriveP2WSHAddress(derivedPublicKeyWithPrefixHex);
-        console.log("p2WSHaddress", p2WSHaddress);
-    });
-    it("test p2sh", function () {
-        const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
-        const p2SHaddress = bitcoin.deriveP2SHAddress(derivedPublicKeyWithPrefixHex);
-        console.log("p2SHaddress", p2SHaddress);
-    });
+
+    // it("test p2ms", function () {
+    //     const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
+    //     const p2MSaddress = bitcoin.deriveP2MSAddress(derivedPublicKeyWithPrefixHex);
+    //     console.log("p2MSaddress", p2MSaddress);
+    // });
+    //
+    // it("test p2wpkh", function () {
+    //     const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
+    //     const p2WPKHaddress = bitcoin.deriveP2WPKHAddress(derivedPublicKeyWithPrefixHex);
+    //     console.log("p2WPKHaddress", p2WPKHaddress);
+    // });it("test p2wsh", function () {
+    //     const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
+    //     const p2WSHaddress = bitcoin.deriveP2WSHAddress(derivedPublicKeyWithPrefixHex);
+    //     console.log("p2WSHaddress", p2WSHaddress);
+    // });
+    // it("test p2sh", function () {
+    //     const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
+    //     const p2SHaddress = bitcoin.deriveP2SHAddress(derivedPublicKeyWithPrefixHex);
+    //     console.log("p2SHaddress", p2SHaddress);
+    // });
 });
 
 const rawTxmessageBTC = "072a8543e388c4155ccbcd325f129000214095725598721cea986fcd0fc38d6a";

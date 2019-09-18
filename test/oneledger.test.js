@@ -105,30 +105,20 @@ describe("test derive address from public key for Ed25519", function () {
 });
 
 const rawTxmessage = 'eyJ0eF90eXBlIjoyLCJ0eF9kYXRhIjoiZXlKUGQyNWxjaUk2SWpCNE1qZ3dabVkxT0dNMk5UYzNaRGhrWkRBeE5XVmlNelkzTUdRMU1UY3paVFl4WVRnNE1HWmxZU0lzSWtGalkyOTFiblFpT2lJd2VESTRNR1ptTlRoak5qVTNOMlE0WkdRd01UVmxZak0yTnpCa05URTNNMlUyTVdFNE9EQm1aV0VpTENKT1lXMWxJam9pZEdWemRHUnZiV0ZwYmpFeElpd2lVSEpwWTJVaU9uc2lZM1Z5Y21WdVkza2lPaUpQVEZRaUxDSjJZV3gxWlNJNklqRXdNREF3TURBd01EQXdNREF3TURBd01EQXdNREFpZlgwPSIsImZlZSI6eyJQcmljZSI6eyJjdXJyZW5jeSI6Ik9MVCIsInZhbHVlIjoiMTAwMDAwMDAwMDAwMDAwMDAwMCJ9LCJHYXMiOjF9LCJtZW1vIjoiNGM1MzQ4ZTctYWNjOS0xMWU5LTlhN2MtNDIwMTBhMGEwMDA5In0=';
+const encryptedKey = '{"iv":"FQ7rNQuP4jAWLad0XlITpA==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"oKcc/KRYrq/UEK3K9ei0CQ==","ct":"D5abDXBSI24d2EONm4TrMOpC89zA3y9/3rB0UJ60MEgCI3RWgxOpUWBLmB6qYCFaaeMZSSW+uASR9JAyaBoVOOF+cJNB+3A3hClmdeGnyRXjT3DmV6Uz0vrKOxgzgsAK"}';
+
 describe("test sign tx using Ed25519", function () {
     it("test 1", function () {
-        const uint8ArrayKeypart = typeConverter.hexStrToUint8Array(masterKey.key);
-        const uint8ArrayKeychaincode = typeConverter.hexStrToUint8Array( masterKey.chainCode);
-        const encryptedMasterKey = masterkey.masterKeyEncryption("123456", uint8ArrayKeypart, uint8ArrayKeychaincode);
-        oneledger.signForSignatureOLT(rawTxmessage, "123456", encryptedMasterKey, keyPath, function (error, signature) {
-            console.log(error);
-            console.log("signature", signature);
+        oneledger.signForSignatureOLT(rawTxmessage, "kp1pwd", encryptedKey, keyPath, function (error, signature) {
+            console.log(signature);
         });
     })
 });
 
 describe("test verify signature Ed25519", function () {
     it("test 1", function () {
-        const signature = "NiNW4XxOsuMIK6lPR7vqWTjw58BYTcXlHZA8x2lPeXtRZRc0gsPt8ZWAzyQ1TnzYMcK/y8SZfPTUlGDXya99Cw==";
-        const uint8ArrayKeypart = typeConverter.hexStrToUint8Array(masterKey.key);
-        const uint8ArrayKeychaincode = typeConverter.hexStrToUint8Array(masterKey.chainCode);
-        // console.log(uint8ArrayKey);
-        const derivedPrivateKey = oneledger.derivePrivateKeyOLT(uint8ArrayKeypart, uint8ArrayKeychaincode, keyPath);
-        console.log("333---", derivedPrivateKey);
-
-        const publicKey = oneledger.derivePublicKeyOLT(derivedPrivateKey);
-        console.log(publicKey);
-        oneledger.verifySignatureOLT(rawTxmessage, signature, "06zlqothzs5Mzr3aY9WHyJ/RLBmuZlt5y9nJCXY4sgA=", function (error, result) {
+        const signature = "q/gFCS92GCi+5+3ObWrkzJ9bBrEKzSkDEWG4QrZdAlPvA0Y0mwZfXNlFUbonT/YUhHNX85jzeyuRQOpQLNGjCw==";
+        oneledger.verifySignatureOLT(rawTxmessage, signature,"ui/ElT/FTzpVqHc/nvRqXAPmhPwsd4O0kuyQT9dqUjo=", function (error, result) {
             console.log(error);
             console.log("result", result);
             should.ok(result, "signature verify should be true")

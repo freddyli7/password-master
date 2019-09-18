@@ -215,7 +215,6 @@ describe("test mnemonic to array", function () {
 describe("test mnemonic array to string", function () {
     it("test 1", function () {
         const mnemonic = "turtle issue gloom race blast final parent park toss atom aware surprise tribe genuine claim hobby aware alcohol wish index tiny hope have cage";
-
         const mnemonicStr = masterkey.mnemonicArrayToStr(mnemonicArray);
         console.log(mnemonicStr);
         should.equal(mnemonicStr, mnemonic)
