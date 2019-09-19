@@ -27,20 +27,24 @@ function bufferToUint8Array(input) {
     return Uint8Array.from(input)
 }
 
-function stringToHex(input){
+function stringToHex(input) {
     return Buffer.from(input, 'utf8').toString('hex')
 }
 
-function hexToString(input){
+function hexToString(input) {
     return Buffer.from(input, 'hex').toString('utf-8')
 }
 
 function stringToUint8Array(input) {
     const uintarray = new Uint8Array(input.length);
-    for(let i = 0, j = input.length; i < j; ++i){
+    for (let i = 0, j = input.length; i < j; ++i) {
         uintarray[i] = input.charCodeAt(i);
     }
     return uintarray
+}
+
+function hexStrConcatenation({str1, str2}) {
+    return `${str1}${str2}`
 }
 
 module.exports = {
@@ -51,5 +55,6 @@ module.exports = {
     bufferToUint8Array,
     hexStrToBuffer,
     stringToHex,
-    hexToString
+    hexToString,
+    hexStrConcatenation
 };

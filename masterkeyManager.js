@@ -7,7 +7,11 @@ class MasterKeyManager {
     constructor(mnemonicArray, password) {
         const {key, chainCode} = masterkey.masterKeyGenerator(mnemonicArray);
         this.encryptedMasterKey = masterkey.masterKeyEncryption(password, key, chainCode);
-        const uint8ArrayPriKey = typeConverter.hexStrToUint8Array(typeConverter.uint8arrayToHexStr(key) + typeConverter.uint8arrayToHexStr(chainCode));
+        const hexData = {
+            str1 : typeConverter.uint8arrayToHexStr(key),
+            str2 : typeConverter.uint8arrayToHexStr(chainCode)
+        };
+        const uint8ArrayPriKey = typeConverter.hexStrToUint8Array(typeConverter.hexStrConcatenation(hexData));
         this.masterKeyAddress = masterkey.getMasterAddress(masterkey.getMasterPublicKey(uint8ArrayPriKey))
     }
 

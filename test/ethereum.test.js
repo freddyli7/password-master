@@ -80,7 +80,7 @@ const masterKey = {
 describe("test derive private key for ETH", function () {
     it("test 1", function () {
         const uint8arrayMasterKey = typeConverter.hexStrToUint8Array(masterKey.key + masterKey.chainCode);
-        const derivedPrivateKey = ethereum.derivePrivateKeyETH(uint8arrayMasterKey, keyPath);
+        const derivedPrivateKey = ethereum.derivePrivateKey(uint8arrayMasterKey, keyPath);
         console.log(derivedPrivateKey);
     })
 });
@@ -88,7 +88,7 @@ describe("test derive private key for ETH", function () {
 describe("test verify private key for ETH", function () {
     it("test 1", function () {
         const uint8arrayPrivateKey = typeConverter.hexStrToUint8Array("64283bbf60f27d27134cd4da3ca58bca15458df99208ff20a08784025d3b9592");
-        const derivedPrivateKey = ethereum.verifyPrivateKeyETH(uint8arrayPrivateKey, keyPath);
+        const derivedPrivateKey = ethereum.verifyPrivateKey(uint8arrayPrivateKey, keyPath);
         console.log(derivedPrivateKey);
     })
 });
@@ -96,7 +96,7 @@ describe("test verify private key for ETH", function () {
 describe("test derive uncompressed public key for ETH", function () {
     it("test 1", function () {
         const uint8arrayPrivateKey = typeConverter.hexStrToUint8Array("64283bbf60f27d27134cd4da3ca58bca15458df99208ff20a08784025d3b9592");
-        const derivedPublicKey = ethereum.derivePublicKeyETH(uint8arrayPrivateKey);
+        const derivedPublicKey = ethereum.derivePublicKey(uint8arrayPrivateKey);
         console.log(derivedPublicKey);
     })
 });
@@ -104,7 +104,7 @@ describe("test derive uncompressed public key for ETH", function () {
 describe("test derive address for ETH", function () {
     it("test 1", function () {
         const hexPublicKey = "907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb7180b73f0cecf37ae303d79d44e0487b56f553e06eb7e9ac1c3f1ed09e653ba7";
-        const address = ethereum.deriveAddressETH(hexPublicKey);
+        const address = ethereum.deriveAddress(hexPublicKey);
         console.log(address);
     })
 });
@@ -122,7 +122,7 @@ describe("test sign tx for ETH", function () {
             value: 1,
             data: '0x7f4e616d65526567000000000000000000000000000000000000000000000000003057307f4e616d6552656700000000000000000000000000000000000000000000000000573360455760415160566000396000f20036602259604556330e0f600f5933ff33560f601e5960003356576000335700604158600035560f602b590033560f60365960003356573360003557600035335700',
         };
-        ethereum.signForSignatureETH(txParams, "123456", encryptedMasterKey, keyPath, function (error, signedSeralizedTx) {
+        ethereum.signForSignature(txParams, "123456", encryptedMasterKey, keyPath, function (error, signedSeralizedTx) {
             console.log(error);
             console.log(signedSeralizedTx);
         });

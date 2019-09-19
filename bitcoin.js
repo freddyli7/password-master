@@ -11,21 +11,21 @@ const masterkey = require("./masterkey");
 // derive private key from master key, master key is just key part which is a Uint8Array, total should be 32 bytes for BTC
 // keyPath is a string includes chainId, sideChainId, keyIndex
 // return key which is a 32 bytes Uint8Array
-function derivePrivateKeyBTC(masterKey, keyPath) {
+function derivePrivateKey(masterKey, keyPath) {
     const hexMasterKey = typeConverter.uint8arrayToHexStr(masterKey);
     const {key} = derivePath(keyPath, hexMasterKey);
     return typeConverter.bufferToUint8Array(key)
 }
 
 // verify BTC private key
-function verifyPrivateKeyBTC(privateKey) {
+function verifyPrivateKey(privateKey) {
     const key = typeConverter.hexStrToBuffer(privateKey);
     return secp256k1.privateKeyVerify(key)
 }
 
 // privateKey should be 32 bytes Uint8Array (just key part) for BTC
 // return derived privateKey's public Key which is a 33 bytes hex string with chain prefix 0x02 or 0x03
-function derivePublicKeyBTC(privateKey) {
+function derivePublicKey(privateKey) {
     return typeConverter.bufferToHexStr(secp256k1.publicKeyCreate(privateKey));
 }
 
@@ -71,12 +71,12 @@ function deriveP2MSAddress(publicKey) {
 // encryptedMasterKey is a string, keypath is a string
 // message should be 32 bytes hex string, password is plaintext
 // return signature which is a 64 bytes buffer, and recovery which is a number
-function signForSignatureBTC(message, password, encryptedMasterKey, keyPath, callback) {
+function signForSignature(message, password, encryptedMasterKey, keyPath, callback) {
     // decrypt master key
     return masterkey.masterKeyDecryption(password, encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
         if (error) return callback(error);
         // derive private key
-        const derivedPrivatedkey = derivePrivateKeyBTC(decryptedMasterKey, keyPath);
+        const derivedPrivatedkey = derivePrivateKey(decryptedMasterKey, keyPath);
         // sign with derived private key to get signature
         const {signature, recovery} = secp256k1.sign(typeConverter.hexStrToBuffer(message), derivedPrivatedkey);
         callback(null, signature, recovery);
@@ -85,18 +85,18 @@ function signForSignatureBTC(message, password, encryptedMasterKey, keyPath, cal
 
 // verify BTC tx signature
 // message 32 bytes, signature 64 bytes and publicKey 33 bytes are all hex string
-function verifySignatureBTC(message, signature, publicKey) {
+function verifySignature(message, signature, publicKey) {
     return secp256k1.verify(typeConverter.hexStrToBuffer(message), typeConverter.hexStrToBuffer(signature), typeConverter.hexStrToBuffer(publicKey))
 }
 
 module.exports = {
-    derivePrivateKeyBTC,
-    derivePublicKeyBTC,
+    derivePrivateKey,
+    derivePublicKey,
 
     deriveP2PKHAddress,
     deriveP2PKPubKey,
 
-    verifyPrivateKeyBTC,
-    signForSignatureBTC,
-    verifySignatureBTC
+    verifyPrivateKey,
+    signForSignature,
+    verifySignature
 };

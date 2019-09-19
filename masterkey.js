@@ -4,7 +4,7 @@ const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const sjcl = require("sjcl");
 const crypto = require("crypto");
-const oneledger = require("./oneledger");
+const requestErrors = require("./errorType").requestErrors;
 const typeConverter = require("./typeConverter");
 
 /* *****************************   Master key  ***************************** */
@@ -12,40 +12,28 @@ const typeConverter = require("./typeConverter");
 // generate 24 words mnemonic string
 function mnemonicGenerator24() {
     const entropy = crypto.randomBytes(32);
-    return mnemonicStrToArray(bip39.entropyToMnemonic(entropy));
+    return mnemonicStrToArray(bip39.entropyToMnemonic(entropy))
 }
 
 // generate 12 mnemonic before creating a new master key
 // generate 12 words mnemonic string
 function mnemonicGenerator12() {
-    return mnemonicStrToArray(bip39.generateMnemonic());
+    return mnemonicStrToArray(bip39.generateMnemonic())
 }
 
 // convert string mnemonic to array with word object as element
 // internal use only
 function mnemonicStrToArray(mnemonicStr) {
     const mnemonicArray = mnemonicStr.split(" ");
-    let i = 1;
-    const returnArray = [];
-    mnemonicArray.forEach(w => {
-        returnArray[i - 1] = {
-            index: i,
-            word: w
-        };
-        i++;
-    });
-    return returnArray
+    return mnemonicArray.map((word, idx) => ({index: idx + 1, word}))
 }
 
 // convert array mnemonic to string
 // internal use only
 function mnemonicArrayToStr(mnemonicArray) {
-    let mnemonicStr = "";
-    mnemonicArray.forEach(obj => {
-        const {word} = obj || "";
-        mnemonicStr += word + " "
-    });
-    return mnemonicStr.trim()
+    return mnemonicArray.map(({word}) => {
+        return word || ''
+    }).join(' ')
 }
 
 // seed is 12 or 24 mnemonic words mnemonicArray
@@ -53,14 +41,18 @@ function mnemonicArrayToStr(mnemonicArray) {
 function masterKeyGenerator(mnemonicArray) {
     const hexSeed = typeConverter.stringToHex(mnemonicArrayToStr(mnemonicArray));
     const {key, chainCode} = getMasterKeyFromSeed(hexSeed);
-    return {key: typeConverter.bufferToUint8Array(key), chainCode: typeConverter.bufferToUint8Array(chainCode)};
+    return {key: typeConverter.bufferToUint8Array(key), chainCode: typeConverter.bufferToUint8Array(chainCode)}
 }
 
 // encrypt master key
 // password 'plaintext', masterKey is a 32 bytes uint8array, masterChainCode is a 32 bytes uint8array
 // return encrypted master key 'string'
 function masterKeyEncryption(password, masterKey, masterChainCode) {
-    const uint8ArrayMasterkey = typeConverter.hexStrToUint8Array(typeConverter.uint8arrayToHexStr(masterKey) + typeConverter.uint8arrayToHexStr(masterChainCode));
+    const hexData = {
+        str1: typeConverter.uint8arrayToHexStr(masterKey),
+        str2: typeConverter.uint8arrayToHexStr(masterChainCode)
+    };
+    const uint8ArrayMasterkey = typeConverter.hexStrToUint8Array(typeConverter.hexStrConcatenation(hexData));
     let strMasterKey = nacl.util.encodeBase64(uint8ArrayMasterkey);
     let saltBits = sjcl.random.randomWords(4);
     let salt = sjcl.codec.base64.fromBits(saltBits);
@@ -72,7 +64,7 @@ function masterKeyEncryption(password, masterKey, masterChainCode) {
         cipher: "aes",
         adata: "",
         salt: salt
-    });
+    })
 }
 
 // decrypt master Key
@@ -83,34 +75,43 @@ function masterKeyDecryption(password, encryptedMasterKey, callback) {
     try {
         decryptedMasterKey = sjcl.decrypt(password, encryptedMasterKey);
     } catch (err) {
-        return callback(Error("Wrong password"));
+        return callback(requestErrors.WrongPassword);
     }
-    callback(null, nacl.util.decodeBase64(decryptedMasterKey).slice(0, 32), nacl.util.decodeBase64(decryptedMasterKey).slice(32));
+    callback(null, nacl.util.decodeBase64(decryptedMasterKey).slice(0, 32), nacl.util.decodeBase64(decryptedMasterKey).slice(32))
 }
 
 // derive masterkey's publickey
 // masterkey is 64 bytes uint8array of key+chainCode
 // return 32 bytes base64 string publickey
-// same algorithm as Ed25519 key
 // only use this function to derive master address
 function getMasterPublicKey(masterKey) {
-    return oneledger.derivePublicKeyOLT(masterKey)
+    return typeConverter.uint8ArrayToBase64str(nacl.sign.keyPair.fromSecretKey(masterKey).publicKey)
 }
 
 // derive master key's address from master key's public key
 // master public key should be a 32 bytes base64 string
 // return 20 bytes hex string
-// same algorithm as Ed25519 key
+// same algorithm as Ed25519 oneledger key
 // store master address to verify mnemonic word when user wants to recovery
 function getMasterAddress(masterPublicKey) {
-    return oneledger.deriveAddressOLT(masterPublicKey)
+    let base64PublicKey = sjcl.codec.base64.toBits(masterPublicKey);
+    let hash = new sjcl.hash.sha256();
+    hash.update(base64PublicKey);
+    let hashResult = hash.finalize();
+    let hashedData = sjcl.codec.hex.fromBits(hashResult);
+    hash.reset();
+    return hashedData.substring(0, 40)
 }
 
 // derive masterkey address based on provided mnemonic array
 // return masterkey address
 function recoveryMasterKey(mnemonicArray) {
     const {key, chainCode} = masterKeyGenerator(mnemonicArray);
-    const uint8ArrayPriKey = typeConverter.hexStrToUint8Array(typeConverter.uint8arrayToHexStr(key) + typeConverter.uint8arrayToHexStr(chainCode));
+    const hexData = {
+        str1: typeConverter.uint8arrayToHexStr(key),
+        str2: typeConverter.uint8arrayToHexStr(chainCode)
+    };
+    const uint8ArrayPriKey = typeConverter.hexStrToUint8Array(typeConverter.hexStrConcatenation(hexData));
     return getMasterAddress(getMasterPublicKey(uint8ArrayPriKey))
 }
 

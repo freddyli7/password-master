@@ -82,7 +82,7 @@ const masterKey = {
 describe("test derive private key from master key for BTC", function () {
     it("test 1", function () {
         const uint8arrayMasterKey = typeConverter.hexStrToUint8Array(masterKey.key);
-        const derivedPrivatekey = bitcoin.derivePrivateKeyBTC(uint8arrayMasterKey, keyPath);
+        const derivedPrivatekey = bitcoin.derivePrivateKey(uint8arrayMasterKey, keyPath);
         console.log(derivedPrivatekey);
         console.log(typeConverter.uint8arrayToHexStr(derivedPrivatekey));
     })
@@ -91,7 +91,7 @@ describe("test derive private key from master key for BTC", function () {
 describe("test verify private key for BTC", function () {
     it("test 1", function () {
         const derivedPrivatekey = typeConverter.hexStrToUint8Array("cd76dbfcbf5092c6b521dc8c00e9d1481efab3b4483d351a98066ad8d1257514");
-        const ok = bitcoin.verifyPrivateKeyBTC(derivedPrivatekey);
+        const ok = bitcoin.verifyPrivateKey(derivedPrivatekey);
         should.ok(ok, "verify private key of BTC should be true")
     })
 });
@@ -99,7 +99,7 @@ describe("test verify private key for BTC", function () {
 describe("test derive public key from private key for BTC", function () {
     it("test 1", function () {
         const derivedPrivatekey = typeConverter.hexStrToUint8Array("cd76dbfcbf5092c6b521dc8c00e9d1481efab3b4483d351a98066ad8d1257514");
-        const publicKey = bitcoin.derivePublicKeyBTC(derivedPrivatekey);
+        const publicKey = bitcoin.derivePublicKey(derivedPrivatekey);
         console.log(publicKey);
     })
 });
@@ -144,7 +144,7 @@ describe("test sign tx for BTC", function () {
         const uint8ArrayKeypart = typeConverter.hexStrToUint8Array(masterKey.key);
         const uint8ArrayKeychaincode = typeConverter.hexStrToUint8Array(masterKey.chainCode);
         const encryptedMasterKey = masterkey.masterKeyEncryption("123456", uint8ArrayKeypart, uint8ArrayKeychaincode);
-        bitcoin.signForSignatureBTC(rawTxmessageBTC, "123456", encryptedMasterKey, keyPath, function (error, signature, recovery) {
+        bitcoin.signForSignature(rawTxmessageBTC, "123456", encryptedMasterKey, keyPath, function (error, signature, recovery) {
             console.log(signature);
             console.log(typeConverter.bufferToHexStr(signature));
             console.log(recovery);
@@ -156,7 +156,7 @@ describe("test verify signature for BTC", function () {
     it("test 1", function () {
         const signatureBTChex = "ff6fbf5bbece2e46595fe484bcc9fcfe33d43b20e610cdbe2c98e32dca5bb3a2489f0f47fa4b2ec00f436ff1039bcf571aee2b7a150e6c045fde259558eb2468";
         const publicKeyhex = "024cbb9c068cdc3f69e14bfc0788f19500a1f19950af317e5b349e3aa1f71032e0";
-        const ok = bitcoin.verifySignatureBTC(rawTxmessageBTC, signatureBTChex, publicKeyhex);
+        const ok = bitcoin.verifySignature(rawTxmessageBTC, signatureBTChex, publicKeyhex);
         should.ok(ok, "verify signature should be true")
     })
 });
