@@ -2,7 +2,6 @@ const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 
 /* *****************************  Type converter for HD vault  ***************************** */
-
 function uint8arrayToHexStr(input) {
     return Buffer.from(input).toString('hex')
 }
@@ -25,6 +24,10 @@ function uint8ArrayToBase64str(input) {
 
 function bufferToUint8Array(input) {
     return Uint8Array.from(input)
+}
+
+function uint8ArrayToBuffer(input) {
+    return hexStrToBuffer(uint8arrayToHexStr(input))
 }
 
 function stringToHex(input) {
@@ -53,6 +56,7 @@ module.exports = {
     uint8ArrayToBase64str,
     bufferToHexStr,
     bufferToUint8Array,
+    uint8ArrayToBuffer,
     hexStrToBuffer,
     stringToHex,
     hexToString,

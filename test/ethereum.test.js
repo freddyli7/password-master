@@ -1,10 +1,9 @@
 const masterkey = require("../masterkey");
 const typeConverter = require("../typeConverter");
 const ethereum = require("../ethereum");
-
 const should = require('should');
 
-const keyPath = "m/44'/403'/0'/0'/1'";
+const keyPath = "m/44'/60'/0'/0/0";
 
 const masterKey = {
     key: "8401fbb9a7f7118da334a2bef549c6a6bb652093e6f74b11b1974fcf65ca36b4",
@@ -79,33 +78,37 @@ const masterKey = {
 
 describe("test derive private key for ETH", function () {
     it("test 1", function () {
-        const uint8arrayMasterKey = typeConverter.hexStrToUint8Array(masterKey.key + masterKey.chainCode);
+        const uint8arrayMasterKey = typeConverter.hexStrToUint8Array(masterKey.key);
         const derivedPrivateKey = ethereum.derivePrivateKey(uint8arrayMasterKey, keyPath);
         console.log(derivedPrivateKey);
+        console.log(typeConverter.bufferToHexStr(derivedPrivateKey));
     })
 });
 
 describe("test verify private key for ETH", function () {
     it("test 1", function () {
-        const uint8arrayPrivateKey = typeConverter.hexStrToUint8Array("64283bbf60f27d27134cd4da3ca58bca15458df99208ff20a08784025d3b9592");
-        const derivedPrivateKey = ethereum.verifyPrivateKey(uint8arrayPrivateKey, keyPath);
-        console.log(derivedPrivateKey);
+        const uint8arrayPrivateKey = typeConverter.hexStrToUint8Array("ea136de6b7570a214fac5275cc89e484a2d87da28c530f867a282c2c530bcde2");
+        const result = ethereum.verifyPrivateKey(uint8arrayPrivateKey, keyPath);
+        console.log(result);
+        should.ok(result)
     })
 });
 
 describe("test derive uncompressed public key for ETH", function () {
     it("test 1", function () {
-        const uint8arrayPrivateKey = typeConverter.hexStrToUint8Array("64283bbf60f27d27134cd4da3ca58bca15458df99208ff20a08784025d3b9592");
+        const uint8arrayPrivateKey = typeConverter.hexStrToUint8Array("ea136de6b7570a214fac5275cc89e484a2d87da28c530f867a282c2c530bcde2");
         const derivedPublicKey = ethereum.derivePublicKey(uint8arrayPrivateKey);
         console.log(derivedPublicKey);
+        should.equal(derivedPublicKey.length, 128)
     })
 });
 
 describe("test derive address for ETH", function () {
     it("test 1", function () {
-        const hexPublicKey = "907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb7180b73f0cecf37ae303d79d44e0487b56f553e06eb7e9ac1c3f1ed09e653ba7";
+        const hexPublicKey = "ae1e3eb43b11ad4f49869a75e5dc1aaf197857b3792f03756838b7237adb287d8102ef69499ca466e824461a7fdf132627a5d2238fc8dda9abc3af145a6026e0";
         const address = ethereum.deriveAddress(hexPublicKey);
         console.log(address);
+        should.equal(address.length, 42)
     })
 });
 

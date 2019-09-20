@@ -22,11 +22,18 @@ const signatureKeyType = {
     ETH : "ETH"
 };
 
+const bitcoinNetworkType = {
+    BITCOIN : "BITCOIN",
+    TESTNET : "TESTNET",
+    REGTEST : "REGTEST"
+};
+
 module.exports = {
     oneledgerKeyPath,
     bitcoinKeyPath,
     ethereumKeyPath,
     keyPathSuffix,
     derivedKeyType,
-    signatureKeyType
+    signatureKeyType,
+    bitcoinNetworkType
 };

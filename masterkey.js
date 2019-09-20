@@ -1,5 +1,5 @@
 const bip39 = require('bip39');
-const {derivePath, getMasterKeyFromSeed, getPublicKey, isValidPath} = require('ed25519-hd-key');
+const {getMasterKeyFromSeed} = require('ed25519-hd-key');
 const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const sjcl = require("sjcl");

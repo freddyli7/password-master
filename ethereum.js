@@ -1,4 +1,3 @@
-const {derivePath, isValidPath} = require('ed25519-hd-key');
 const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const secp256k1 = require('secp256k1');
@@ -6,16 +5,16 @@ const ethwallet = require('ethereumjs-wallet');
 const EthereumTx = require('ethereumjs-tx').Transaction;
 const typeConverter = require("./typeConverter");
 const masterkey = require("./masterkey");
+const HDWallet = require('ethereum-hdwallet');
 
 /* *****************************   Secp256k1 For ETH  ***************************** */
 
-// derive private key from master key, master key is just key part which is a Uint8Array, total should be 32 bytes for ETH
-// keyPath is a string includes chainId, sideChainId, keyIndex
-// return key which is a 32 bytes Uint8Array
+// derive private key from 32 bytes Uint8Array seed which is the key part of master key
+// keyPath is a string
+// return key which is a 32 bytes buffer
 function derivePrivateKey(masterKey, keyPath) {
-    const hexMasterKey = typeConverter.uint8arrayToHexStr(masterKey);
-    const {key} = derivePath(keyPath, hexMasterKey);
-    return typeConverter.bufferToUint8Array(key)
+    const ethHDWallet = HDWallet.fromSeed(masterKey);
+    return ethHDWallet.derive(keyPath).getPrivateKey();
 }
 
 // verify ETH private key

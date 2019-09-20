@@ -41,13 +41,10 @@ function deriveAddress(publicKey) {
 // encryptedMasterKey is a string, keyPath is a string
 // return base64 signature
 function signForSignature(message, password, encryptedMasterKey, keyPath, callback) {
-    // decrypt master key
     return masterkey.masterKeyDecryption(password, encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
         if (error) return callback(error);
-        // derive private key seed
         const priKeySeed = deriveSeed(decryptedMasterKey, keyPath);
         const {privateKey} = deriveKeyPair(priKeySeed);
-        // sign with derived private key to get signature
         callback(null, nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), nacl.util.decodeBase64(privateKey))));
     });
 }

@@ -80,7 +80,8 @@ describe("test derive private key seed from master key for Ed25519", function ()
     it("test 1", function () {
         const uint8arrayMasterKeypart = typeConverter.hexStrToUint8Array(masterKey.key);
         const derivedPrivatekeySeed = oneledger.deriveSeed(uint8arrayMasterKeypart, keyPath);
-        console.log("seed--32 bytes",derivedPrivatekeySeed);
+        console.log("seed--32 bytes", derivedPrivatekeySeed.length);
+        should.equal(derivedPrivatekeySeed.length, 32);
         console.log(typeConverter.uint8arrayToHexStr(derivedPrivatekeySeed));
     })
 });
@@ -123,7 +124,7 @@ describe("test sign tx using Ed25519", function () {
 describe("test verify signature Ed25519", function () {
     it("test 1", function () {
         const signature = "BU5Ln408zXshIgyKRprOLU2R0oVY398+hMOpM6sumTq6ElGH+uiocKeCvQOPd345Y4VxB9lu0fJrM8Z8xWP7Cw==";
-        oneledger.verifySignature(rawTxmessage, signature,"X1VcXi+DXSkPbmIkleAaNYVOfW19ZV3lztXSmdlCkR8=", function (error, result) {
+        oneledger.verifySignature(rawTxmessage, signature, "X1VcXi+DXSkPbmIkleAaNYVOfW19ZV3lztXSmdlCkR8=", function (error, result) {
             console.log(error);
             console.log("result", result);
             should.ok(result, "signature verify should be true")

@@ -4,8 +4,9 @@ const typeConverter = require("../typeConverter");
 
 describe("test mnemonic generate", function () {
     it("test mnemonic generate", function () {
-        const mnemonic = masterkey.mnemonicGenerator24();
-        console.log(mnemonic);
+        const mnemonicArray = masterkey.mnemonicGenerator24();
+        console.log(mnemonicArray);
+        should.equal(mnemonicArray.length, 24)
     })
 });
 
@@ -147,16 +148,16 @@ describe("test encrypt master key", function () {
 
 describe("test decrypt master key", function () {
     it("test with wrong password", function () {
-        const encryptedMasterKey = '{"iv":"RiSLQyrzQyfQWDPJjIIhug==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"TQG4HWB0kxvXTbclS2i8mQ==","ct":"Dn2bUTNh6SasdlVvsIdMqBkyOIUk0Fn6737U3nq3h9DI1O46fFsP8UvilkxKu4iqrKAJ752QfwEjf4MbXG/10pCBD1LzAq00QKpesiHgw2dczL+ect7YfWiN7fpTz8q4"}';
+        const encryptedMasterKey = '{"iv":"SBjpiMl2sE37QHonGoltLA==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"+/y5tyeECgoakr8fkYXX6w==","ct":"zwUJHt8pdHiNrApgPlP+Mds01M/77I5E/Ms+8lxZQEHE084/N0ttT77Wpow4i7MtvihF6wkfnKfICkrUQ1jSRTYQHIyt26YQhmyRIkXhmUlnrOoyvd1eoNDYkhlNa7a4"}';
         masterkey.masterKeyDecryption("12345", encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
-            // console.log(error.toString());
+            // console.log(error.message());
             should.equal(decryptedMasterKey, null);
             should.equal(decryptedMasterChaincode, null);
             should.equal(error.message, "Wrong password");
         });
     });
     it("test with correct password", function () {
-        const encryptedMasterKey = '{"iv":"RiSLQyrzQyfQWDPJjIIhug==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"TQG4HWB0kxvXTbclS2i8mQ==","ct":"Dn2bUTNh6SasdlVvsIdMqBkyOIUk0Fn6737U3nq3h9DI1O46fFsP8UvilkxKu4iqrKAJ752QfwEjf4MbXG/10pCBD1LzAq00QKpesiHgw2dczL+ect7YfWiN7fpTz8q4"}';
+        const encryptedMasterKey = '{"iv":"SBjpiMl2sE37QHonGoltLA==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"+/y5tyeECgoakr8fkYXX6w==","ct":"zwUJHt8pdHiNrApgPlP+Mds01M/77I5E/Ms+8lxZQEHE084/N0ttT77Wpow4i7MtvihF6wkfnKfICkrUQ1jSRTYQHIyt26YQhmyRIkXhmUlnrOoyvd1eoNDYkhlNa7a4"}';
         masterkey.masterKeyDecryption("123456", encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
             console.log(decryptedMasterKey.length);
             console.log(decryptedMasterChaincode.length);
@@ -171,6 +172,7 @@ describe("test derive master key's 32 bytes public key", function () {
         const uint8Arraykey = typeConverter.hexStrToUint8Array(masterKey.key + masterKey.chainCode);
         const masterPublicKey = masterkey.getMasterPublicKey(uint8Arraykey);
         console.log(masterPublicKey);
+        should.equal(masterPublicKey.length, 44)
     })
 });
 
@@ -179,13 +181,23 @@ describe("test derive master key's address", function () {
         const masterPublicKey = "AY4I6oNz1kI7bntGeeG64NBx+FEGkfvVQYP+ZUwll84=";
         const masterAddress = masterkey.getMasterAddress(masterPublicKey);
         console.log(masterAddress);
+        should.equal(masterAddress.length, 40)
     })
 });
 
 describe("test recovery master key", function () {
     it("test 1", function () {
+        // recovery address from mnemonic words
         const masterAddress = masterkey.recoveryMasterKey(mnemonicArray);
         console.log(masterAddress);
+        // address from masterkey generator
+        const {key, chainCode} = masterkey.masterKeyGenerator(mnemonicArray);
+        const hexData = {
+            str1 : typeConverter.uint8arrayToHexStr(key),
+            str2 : typeConverter.uint8arrayToHexStr(chainCode)
+        };
+        const uint8ArrayPriKey = typeConverter.hexStrToUint8Array(typeConverter.hexStrConcatenation(hexData));
+        should.equal(masterAddress, masterkey.getMasterAddress(masterkey.getMasterPublicKey(uint8ArrayPriKey)))
     })
 });
 

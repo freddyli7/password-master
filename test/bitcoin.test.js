@@ -4,7 +4,7 @@ const bitcoin = require("../bitcoin");
 
 const should = require('should');
 
-const keyPath = "m/44'/403'/0'/0'/1'";
+const keyPath = "m/44'/0'/0'/0/1";
 
 const masterKey = {
     key: "8401fbb9a7f7118da334a2bef549c6a6bb652093e6f74b11b1974fcf65ca36b4",
@@ -80,38 +80,42 @@ const masterKey = {
 /* *****************************   Secp256k1 For BTC  ***************************** */
 
 describe("test derive private key from master key for BTC", function () {
-    it("test 1", function () {
+    it("test with wrong bitcoin network", function () {
         const uint8arrayMasterKey = typeConverter.hexStrToUint8Array(masterKey.key);
-        const derivedPrivatekey = bitcoin.derivePrivateKey(uint8arrayMasterKey, keyPath);
-        console.log(derivedPrivatekey);
-        console.log(typeConverter.uint8arrayToHexStr(derivedPrivatekey));
-    })
-});
-
-describe("test verify private key for BTC", function () {
-    it("test 1", function () {
-        const derivedPrivatekey = typeConverter.hexStrToUint8Array("cd76dbfcbf5092c6b521dc8c00e9d1481efab3b4483d351a98066ad8d1257514");
-        const ok = bitcoin.verifyPrivateKey(derivedPrivatekey);
-        should.ok(ok, "verify private key of BTC should be true")
-    })
+        const uint8arrayMasterChainCode = typeConverter.hexStrToUint8Array(masterKey.chainCode);
+        bitcoin.derivePrivateKey(uint8arrayMasterKey, uint8arrayMasterChainCode, keyPath, "BITCOIN111", (error, derivedprikey) => {
+            console.log(error.message);
+            should.equal(error.code, "-11011");
+        });
+    });
+    it("test with valid bitcoin network", function () {
+        const uint8arrayMasterKey = typeConverter.hexStrToUint8Array(masterKey.key);
+        const uint8arrayMasterChainCode = typeConverter.hexStrToUint8Array(masterKey.chainCode);
+        bitcoin.derivePrivateKey(uint8arrayMasterKey, uint8arrayMasterChainCode, keyPath, "BITCOIN", (error, derivedprikey) => {
+            console.log(derivedprikey.length);
+            console.log(typeConverter.bufferToHexStr(derivedprikey));
+            should.ok(bitcoin.verifyPrivateKey(derivedprikey));
+        });
+    });
 });
 
 describe("test derive public key from private key for BTC", function () {
     it("test 1", function () {
-        const derivedPrivatekey = typeConverter.hexStrToUint8Array("cd76dbfcbf5092c6b521dc8c00e9d1481efab3b4483d351a98066ad8d1257514");
+        const derivedPrivatekey = typeConverter.hexStrToUint8Array("79aae56fd5b68194fe66955efe2d04bd8fd9c7efb881d3a700e644ce29297f90");
         const publicKey = bitcoin.derivePublicKey(derivedPrivatekey);
         console.log(publicKey);
+        should.equal(publicKey, "0350c1446da5894951e31bd8a7fa738d2551b9ce3ac24b0d830c09a94e81c6ca3e");
     })
 });
 
 describe("test derive address from public key for BTC", function () {
     it("test p2pk", function () {
-        const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
+        const derivedPublicKeyWithPrefixHex = "0350c1446da5894951e31bd8a7fa738d2551b9ce3ac24b0d830c09a94e81c6ca3e";
         const p2PKPubkey = bitcoin.deriveP2PKPubKey(derivedPublicKeyWithPrefixHex);
         console.log("p2PKPubkey", p2PKPubkey);
     });
     it("test p2pkh", function () {
-        const derivedPublicKeyWithPrefixHex = "03907c8e2e382ce85096c81d5fa0c86de0e76c38e54f2b60b999a9fd7ff610f5cb";
+        const derivedPublicKeyWithPrefixHex = "0350c1446da5894951e31bd8a7fa738d2551b9ce3ac24b0d830c09a94e81c6ca3e";
         const p2PKHaddress = bitcoin.deriveP2PKHAddress(derivedPublicKeyWithPrefixHex);
         console.log("p2PKHaddress", p2PKHaddress);
     });
@@ -144,7 +148,14 @@ describe("test sign tx for BTC", function () {
         const uint8ArrayKeypart = typeConverter.hexStrToUint8Array(masterKey.key);
         const uint8ArrayKeychaincode = typeConverter.hexStrToUint8Array(masterKey.chainCode);
         const encryptedMasterKey = masterkey.masterKeyEncryption("123456", uint8ArrayKeypart, uint8ArrayKeychaincode);
-        bitcoin.signForSignature(rawTxmessageBTC, "123456", encryptedMasterKey, keyPath, function (error, signature, recovery) {
+        const data = {
+            message: rawTxmessageBTC,
+            password: "123456",
+            encryptedMasterKey,
+            keyPath,
+            network: "BITCOIN"
+        };
+        bitcoin.signForSignature(data, function (error, signature, recovery) {
             console.log(signature);
             console.log(typeConverter.bufferToHexStr(signature));
             console.log(recovery);
@@ -154,8 +165,8 @@ describe("test sign tx for BTC", function () {
 
 describe("test verify signature for BTC", function () {
     it("test 1", function () {
-        const signatureBTChex = "ff6fbf5bbece2e46595fe484bcc9fcfe33d43b20e610cdbe2c98e32dca5bb3a2489f0f47fa4b2ec00f436ff1039bcf571aee2b7a150e6c045fde259558eb2468";
-        const publicKeyhex = "024cbb9c068cdc3f69e14bfc0788f19500a1f19950af317e5b349e3aa1f71032e0";
+        const signatureBTChex = "9ec9f4ef7e0e87b2a2ad994c288f1a479ac7018f9b10647fda0e6be654af67e44515689534a92cb0ea69f9326be65140ff2ad936824e4785e932d0db328a995f";
+        const publicKeyhex = "0350c1446da5894951e31bd8a7fa738d2551b9ce3ac24b0d830c09a94e81c6ca3e";
         const ok = bitcoin.verifySignature(rawTxmessageBTC, signatureBTChex, publicKeyhex);
         should.ok(ok, "verify signature should be true")
     })

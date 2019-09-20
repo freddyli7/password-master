@@ -37,7 +37,7 @@ describe("test derive private key for ETH", function () {
         mm.unlockMasterKey("123456", ok => {
             console.log(ok);
         });
-        // get masterkey info when new masterkey is generated OR when user recovery with new password
+        // get masterkey info after new masterkey is generated OR when user recovery with new password
         mm.getMasterKeyInfo((encryptedMasterKey, masterAddress) => {
             console.log(encryptedMasterKey, masterAddress);
         });
@@ -56,7 +56,6 @@ describe("test derive private key for ETH", function () {
             console.log(address);
         });
         // sign tx with derived new key
-
         const messageOLT = 'eyJ0eF90eXBlIjoyLCJ0eF9kYXRhIjoiZXlKUGQyNWxjaUk2SWpCNE1qZ3dabVkxT0dNMk5UYzNaRGhrWkRBeE5XVmlNelkzTUdRMU1UY3paVFl4WVRnNE1HWmxZU0lzSWtGalkyOTFiblFpT2lJd2VESTRNR1ptTlRoak5qVTNOMlE0WkdRd01UVmxZak0yTnpCa05URTNNMlUyTVdFNE9EQm1aV0VpTENKT1lXMWxJam9pZEdWemRHUnZiV0ZwYmpFeElpd2lVSEpwWTJVaU9uc2lZM1Z5Y21WdVkza2lPaUpQVEZRaUxDSjJZV3gxWlNJNklqRXdNREF3TURBd01EQXdNREF3TURBd01EQXdNREFpZlgwPSIsImZlZSI6eyJQcmljZSI6eyJjdXJyZW5jeSI6Ik9MVCIsInZhbHVlIjoiMTAwMDAwMDAwMDAwMDAwMDAwMCJ9LCJHYXMiOjF9LCJtZW1vIjoiNGM1MzQ4ZTctYWNjOS0xMWU5LTlhN2MtNDIwMTBhMGEwMDA5In0=';
         const signData = {
             messageOLT,
