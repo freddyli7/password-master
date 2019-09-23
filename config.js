@@ -1,13 +1,34 @@
 const masterkey = "m/";
-const bip44 = "44'/";
-const oneledgerCoinType = "403'/0'/0'/";
-const bitcoinCoinType = "0'/0'/0/";
-const ethereumCoinType = "60'/0'/0/";
-
-const oneledgerKeyPath = masterkey + bip44 + oneledgerCoinType;
-const bitcoinKeyPath = masterkey + bip44 + bitcoinCoinType;
-const ethereumKeyPath = masterkey + bip44 + ethereumCoinType;
+const bip44purpose = "44'/";
 const keyPathSuffix = "'";
+
+const oltCoinType = "403'/0'/0'/";
+const bitCoinType = "0'/0'/0/";
+const ethCoinType = "60'/0'/0/";
+
+const oneledgerKeyPath = masterkey + bip44purpose + oltCoinType;
+const bitcoinKeyPath = masterkey + bip44purpose + bitCoinType;
+const ethereumKeyPath = masterkey + bip44purpose + ethCoinType;
+
+// with btc external and internal change
+// const oltCoinType = "403'/";
+// const bitCoinType = "0'/";
+// const ethCoinType = "60'/";
+//
+// const oltAccount = "0'/";
+// const btcAccount = "0'/";
+// const ethAccount = "0'/";
+//
+// const oltChange = "0'/";
+// const btcChangeExternal = "0/";
+// const btcChangeInternal = "1/";
+// const ethChange = "0/";
+//
+//
+// const oneledgerKeyPath = masterkey + bip44purpose + oltCoinType + oltAccount + oltChange;
+// const externalBitcoinKeyPath = masterkey + bip44purpose + bitCoinType + btcAccount + btcChangeExternal;
+// const internalBitcoinKeyPath = masterkey + bip44purpose + bitCoinType + btcAccount + btcChangeInternal;
+// const ethereumKeyPath = masterkey + bip44purpose + ethCoinType + ethAccount + ethChange;
 
 const derivedKeyType = {
     OLT : "OLT",

@@ -6,6 +6,7 @@ const EthereumTx = require('ethereumjs-tx').Transaction;
 const typeConverter = require("./typeConverter");
 const masterkey = require("./masterkey");
 const HDWallet = require('ethereum-hdwallet');
+const requestErrors = require("./errorType").requestErrors;
 
 /* *****************************   Secp256k1 For ETH  ***************************** */
 
@@ -26,9 +27,9 @@ function verifyPrivateKey(privateKey) {
 // private key should be a 32 bytes Uint8Array
 // return uncompressed 64 bytes hex string public key
 function derivePublicKey(privateKey) {
-    // slice(1) is to drop type byte which is hardcoded as 04 Ethereum
-    const uncompressedPubKey = secp256k1.publicKeyCreate(privateKey, false).slice(1);
-    return typeConverter.bufferToHexStr(uncompressedPubKey)
+    // slice(1) is to drop type byte which is hardcoded as 04 Ethereum, but not dropped here
+    const compressedPubKey = secp256k1.publicKeyCreate(privateKey, true).slice(0);
+    return typeConverter.bufferToHexStr(compressedPubKey)
 }
 
 // publickey should be a 64 bytes hex string
@@ -48,13 +49,9 @@ function signForSignature(txParams, password, encryptedMasterKey, keyPath, callb
         const derivedPrivatedkey = derivePrivateKey(decryptedMasterKey, keyPath);
         const tx = new EthereumTx(txParams, {chain: 'mainnet', hardfork: 'petersburg'});
         tx.sign(derivedPrivatedkey);
+        if (!tx.verifySignature()) return callback(requestErrors.InvalidETHSignature);
         callback(null, tx.serialize().toString('hex'));
     });
-}
-
-// TODO no need for now
-function verifySignature() {
-
 }
 
 module.exports = {

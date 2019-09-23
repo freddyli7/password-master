@@ -23,6 +23,10 @@ const requestErrors = {
     InvalidBTCNetworkType: {
         code: -11011,
         message: "Wrong BitCoin network type, valid network type should be either BITCOIN, TESTNET or REGTEST"
+    },
+    InvalidETHSignature: {
+        code: -11012,
+        message: "Invalid ETH tx signature"
     }
 };
 

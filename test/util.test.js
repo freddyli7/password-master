@@ -1,7 +1,7 @@
 const util = require("../util");
 const should = require('should');
 
-const nonNetagiveNumberTestcases = [
+const nonNegativeNumberTestcases = [
     {
         name: "test1",
         input: 1,
@@ -45,9 +45,9 @@ const nonNetagiveNumberTestcases = [
 ];
 
 describe("test is non negative number", function () {
-    for (let i = 0; i < nonNetagiveNumberTestcases.length; i++) {
-        it(nonNetagiveNumberTestcases[i].name, function () {
-            should.equal(util.isNonNegativeNumber(nonNetagiveNumberTestcases[i].input), nonNetagiveNumberTestcases[i].expect);
+    for (let i = 0; i < nonNegativeNumberTestcases.length; i++) {
+        it(nonNegativeNumberTestcases[i].name, function () {
+            should.equal(util.isNonNegativeNumber(nonNegativeNumberTestcases[i].input), nonNegativeNumberTestcases[i].expect);
         })
     }
 });

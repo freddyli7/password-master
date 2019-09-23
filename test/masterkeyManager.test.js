@@ -26,10 +26,16 @@ const mnemonicArray = [{index: 1, word: 'turtle'},
     {index: 23, word: 'have'},
     {index: 24, word: 'cage'}];
 
+const masterkeyPassword = "123456";
+const wrongMasterkeyPassword = "safa41231asdrf";
+
 describe("test new master key", function () {
     it("test mnemonic generate", function () {
-        const mm = new masterkeyManager(mnemonicArray, "123456");
-        console.log(mm);
+        const mobj = new masterkeyManager(mnemonicArray, masterkeyPassword);
+        // console.log(mobj);
+        const masterkey = JSON.parse(mobj.encryptedMasterKey);
+        should.equal(masterkey.ct.length, 128, "encrypted masterkey ct part should be 128 chars");
+        should.equal(mobj.masterKeyAddress.length, 40, "masterkey address should be 40 chars")
     })
 });
 
@@ -37,8 +43,11 @@ describe("test export new master key", function () {
     it("test mnemonic generate", function () {
         const mm = new masterkeyManager(mnemonicArray, "123456");
         mm.getMasterKeyInfo(function (encryptedMasterKey, masterKeyAddress) {
-            console.log(encryptedMasterKey);
-            console.log(masterKeyAddress);
+            // console.log(encryptedMasterKey);
+            // console.log(masterKeyAddress);
+            const masterkey = JSON.parse(encryptedMasterKey);
+            should.equal(masterkey.ct.length, 128, "encrypted masterkey ct part should be 128 chars");
+            should.equal(masterKeyAddress.length, 40, "masterkey address should be 40 chars")
         })
     })
 });
@@ -46,13 +55,13 @@ describe("test export new master key", function () {
 describe("test unlock master key", function () {
     it("test 1, wrong password, should get false", function () {
         const mm = new masterkeyManager(mnemonicArray, "123456");
-        mm.unlockMasterKey("123456sdfsd", function (unlockResult) {
+        mm.unlockMasterKey(wrongMasterkeyPassword, function (unlockResult) {
             should.ok(!unlockResult)
         });
     });
     it("test 2, correct password, should get true", function () {
         const mm = new masterkeyManager(mnemonicArray, "123456");
-        mm.unlockMasterKey("123456", function (unlockResult) {
+        mm.unlockMasterKey(masterkeyPassword, function (unlockResult) {
             should.ok(unlockResult)
         });
     });

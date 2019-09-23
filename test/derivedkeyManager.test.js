@@ -1,73 +1,74 @@
 const derivekeyManager = require("../derivedkeyManager");
 const should = require("should");
 const encryptedMasterKey = '{"iv":"RiSLQyrzQyfQWDPJjIIhug==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"TQG4HWB0kxvXTbclS2i8mQ==","ct":"Dn2bUTNh6SasdlVvsIdMqBkyOIUk0Fn6737U3nq3h9DI1O46fFsP8UvilkxKu4iqrKAJ752QfwEjf4MbXG/10pCBD1LzAq00QKpesiHgw2dczL+ect7YfWiN7fpTz8q4"}';
+const masterkeyPassword = "123456";
 
 describe("test derive new key", function () {
-    it("test derive new oneledger key", function () {
+    it("test derive new oneledger account", function () {
         const kamap = new Map();
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 5000; i++) {
             const data = {
                 keyType: "OLT",
                 keyIndex: i,
-                password: "123456",
+                password: masterkeyPassword,
                 encryptedMasterKey
             };
             derivekeyManager.deriveNewKeyPair(data, (error, keyIndex, address) => {
-                if (error) should.fail(null, null, error.message());
+                if (error) should.fail(error, null, "derive new keypair should be ok but : " + error.message());
                 kamap.set(address, keyIndex)
             });
         }
-        should.equal(kamap.size, 1000, "should generate 1000 different addresses")
+        should.equal(kamap.size, 5000, "should generate 5000 different addresses")
     }).timeout(20000);
-    it("test derive new BTC-P2PK pubkey", function () {
+    it("test derive new BTC-P2PK account", function () {
         const kamap = new Map();
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const data = {
                 keyType: "BTC-P2PK",
                 keyIndex: i,
-                password: "123456",
+                password: masterkeyPassword,
                 encryptedMasterKey,
                 network : "BITCOIN"
             };
-            derivekeyManager.deriveNewKeyPair(data, (error, keyIndex, address) => {
-                if (error) should.fail(null, null, error.message());
-                kamap.set(address, keyIndex)
+            derivekeyManager.deriveNewKeyPair(data, (error, keyIndex, pubkey) => {
+                if (error) should.fail(error, null, "derive new keypair should be ok but : " + error.message());
+                kamap.set(pubkey, keyIndex)
             });
         }
-        should.equal(kamap.size, 1000, "should generate 1000 different addresses")
+        should.equal(kamap.size, 10000, "should generate 10000 different public key")
     }).timeout(20000);
-    it("test derive new BTC-P2PKH address", function () {
+    it("test derive new BTC-P2PKH account", function () {
         const kamap = new Map();
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const data = {
                 keyType: "BTC-P2PKH",
                 keyIndex: i,
-                password: "123456",
+                password: masterkeyPassword,
                 encryptedMasterKey,
                 network : "BITCOIN"
             };
             derivekeyManager.deriveNewKeyPair(data, (error, keyIndex, address) => {
-                if (error) should.fail(null, null, error.message());
+                if (error) should.fail(error, null, "derive new keypair should be ok but : " + error.message());
                 kamap.set(address, keyIndex)
             });
         }
-        should.equal(kamap.size, 1000, "should generate 1000 different addresses")
+        should.equal(kamap.size, 10000, "should generate 10000 different addresses")
     }).timeout(20000);
-    it("test derive new ETH pubkey", function () {
+    it("test derive new ETH account", function () {
         const kamap = new Map();
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const data = {
                 keyType: "ETH",
                 keyIndex: i,
-                password: "123456",
+                password: masterkeyPassword,
                 encryptedMasterKey
             };
             derivekeyManager.deriveNewKeyPair(data, (error, keyIndex, address) => {
-                if (error) should.fail(null, null, error.message());
+                if (error) should.fail(error, null, "derive new keypair should be ok but : " + error.message());
                 kamap.set(address, keyIndex)
             });
         }
-        should.equal(kamap.size, 1000, "should generate 1000 different addresses")
+        should.equal(kamap.size, 10000, "should generate 10000 different addresses")
     }).timeout(20000);
 });
 
@@ -84,55 +85,55 @@ const txParamsETH = {
 describe("test sign tx", function () {
     it("test sign tx with OLT derived key", function () {
         const ismap = new Map();
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 5000; i++) {
             const data = {
                 message: messageOLT,
                 keyType: "OLT",
                 keyIndex: i,
-                password: "123456",
+                password: masterkeyPassword,
                 encryptedMasterKey
             };
             derivekeyManager.signTx(data, (error, signature) => {
-                if (error) should.fail(null, null, error.message());
+                if (error) should.fail(error, null, "sign tx should be ok but : " + error.message());
                 ismap.set(signature, i)
             });
         }
-        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
-    }).timeout(20000);
+        should.equal(ismap.size, 5000, "should generate 5000 different signatures")
+    }).timeout(200000);
     it("test sign tx with BTC derived key", function () {
         const ismap = new Map();
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const data = {
                 message: rawTxmessageBTC,
                 keyType: "BTC",
                 keyIndex: i,
-                password: "123456",
+                password: masterkeyPassword,
                 encryptedMasterKey,
                 network : "BITCOIN"
             };
             derivekeyManager.signTx(data, (error, signature) => {
-                if (error) should.fail(error, undefined, error.message);
+                if (error) should.fail(error, null, "sign tx should be ok but : " + error.message);
                 ismap.set(signature, i)
             });
         }
-        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+        should.equal(ismap.size, 10000, "should generate 10000 different signatures")
     }).timeout(20000);
     it("test sign tx with ETH derived key", function () {
         const ismap = new Map();
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const data = {
                 message: txParamsETH,
                 keyType: "ETH",
                 keyIndex: i,
-                password: "123456",
+                password: masterkeyPassword,
                 encryptedMasterKey
             };
             derivekeyManager.signTx(data, (error, signature) => {
-                if (error) should.fail(null, null, error.message);
+                if (error) should.fail(error, null, "sign tx should be ok but : " + error.message);
                 ismap.set(signature, i)
             });
         }
-        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+        should.equal(ismap.size, 10000, "should generate 10000 different signatures")
     }).timeout(20000);
 });
 
