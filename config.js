@@ -1,3 +1,5 @@
+// BIP 44 Path levels for BTC and ETH, OLT uses all hardened path on every level
+// m / purpose' / coin_type' / account' / change / address_index
 const masterkey = "m/";
 const bip44purpose = "44'/";
 const keyPathSuffix = "'";
@@ -20,7 +22,9 @@ const ethereumKeyPath = masterkey + bip44purpose + ethCoinType;
 // const ethAccount = "0'/";
 //
 // const oltChange = "0'/";
-// const btcChangeExternal = "0/";
+// External chain is used for addresses that are meant to be visible outside of the wallet (e.g. for receiving payments)
+// const btcChangeExternal = "0/"; // only expose external ones
+// Internal chain is used for addresses which are not meant to be visible outside of the wallet and is used for return transaction change.
 // const btcChangeInternal = "1/";
 // const ethChange = "0/";
 //
