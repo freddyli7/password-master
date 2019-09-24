@@ -30,6 +30,8 @@ function derivePrivateKey(masterKey, masterChainCode, keyPath, network, callback
         default:
             return callback(requestErrors.InvalidBTCNetworkType);
     }
+    // derive bitcoin master key from seed
+    // const node = bip32.fromSeed(typeConverter.uint8ArrayToBuffer(masterKey), networkDetermined);
     const node = bip32.fromPrivateKey(typeConverter.uint8ArrayToBuffer(masterKey), typeConverter.uint8ArrayToBuffer(masterChainCode), networkDetermined);
     const keyPair = node.derivePath(keyPath);
     return callback(null, keyPair.privateKey)

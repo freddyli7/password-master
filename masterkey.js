@@ -39,7 +39,7 @@ function mnemonicArrayToStr(mnemonicArray) {
 // seed is 12 or 24 mnemonic words mnemonicArray
 // return key and chainCode which are both 32 bytes Uint8Array
 function masterKeyGenerator(mnemonicArray) {
-    const hexSeed = typeConverter.stringToHex(mnemonicArrayToStr(mnemonicArray));
+    const hexSeed = bip39.mnemonicToSeedSync(mnemonicArrayToStr(mnemonicArray));
     const {key, chainCode} = getMasterKeyFromSeed(hexSeed);
     return {key: typeConverter.bufferToUint8Array(key), chainCode: typeConverter.bufferToUint8Array(chainCode)}
 }

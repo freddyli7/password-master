@@ -14,14 +14,14 @@ describe("test master key generation", function () {
     it("test master key generation with different mnemonic", function () {
         let k, c = "";
         const kcmap = new Map();
-        for (let i = 0; i < 100000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const seed = masterkey.mnemonicGenerator24();
             const {key, chainCode} = masterkey.masterKeyGenerator(seed);
             if (key.length !== 32) should.fail(key.length, 32, 'key length is wrong, should be 32');
             if (chainCode.length !== 32) should.fail(chainCode.length, 32, 'chainCode length is wrong, should be 32');
             if (i > 0) {
-                if (k === typeConverter.uint8arrayToHexStr(key)) should.fail(typeConverter.uint8arrayToHexStr(key), k, 'key is different');
-                if (c === typeConverter.uint8arrayToHexStr(chainCode)) should.fail(typeConverter.uint8arrayToHexStr(chainCode), c, 'chainCode is different');
+                if (k === typeConverter.uint8arrayToHexStr(key)) should.fail(typeConverter.uint8arrayToHexStr(key), k, 'key is the same');
+                if (c === typeConverter.uint8arrayToHexStr(chainCode)) should.fail(typeConverter.uint8arrayToHexStr(chainCode), c, 'chainCode is the same');
             }
             k = typeConverter.uint8arrayToHexStr(key);
             c = typeConverter.uint8arrayToHexStr(chainCode);
@@ -29,13 +29,13 @@ describe("test master key generation", function () {
             // console.log(k);
             // console.log(c);
         }
-        should.equal(kcmap.size, 100000, "100000 master key should be different")
-    }).timeout(10000);
+        should.equal(kcmap.size, 10000, "10000 master key should be different")
+    }).timeout(200000);
     it("test master key generation with the same mnemonic", function () {
         let k, c = "";
         const kcmap = new Map();
         const seed = masterkey.mnemonicGenerator24();
-        for (let i = 0; i < 100000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const {key, chainCode} = masterkey.masterKeyGenerator(seed);
             if (key.length !== 32) should.fail(key.length, 32, 'key or chainCode length is wrong, should be 32');
             if (chainCode.length !== 32) should.fail(chainCode.length, 32, 'chainCode length is wrong, should be 32');
@@ -49,8 +49,8 @@ describe("test master key generation", function () {
             // console.log(c);
             kcmap.set(k, c);
         }
-        should.equal(kcmap.size, 1, "100000 master key should be the same")
-    }).timeout(10000);
+        should.equal(kcmap.size, 1, "10000 master key should be the same")
+    }).timeout(200000);
 });
 
 const masterKey = {
