@@ -1,12 +1,18 @@
 const typeConverter = require("../typeConverter");
-const masterkey = require("../masterkey");
+const masterKeySeed = require("../masterKeySeed");
+const {getMasterKeyFromSeed} = require('ed25519-hd-key');
+
 const should = require('should');
 
 describe("test connect two hex strings", function () {
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 1000; i++) {
         it("test " + i, function () {
-            const {key, chainCode} = masterkey.masterKeyGenerator(masterkey.mnemonicGenerator24());
-            should.equal(typeConverter.hexStrConcatenation({key, chainCode}), typeConverter.hexStrConcatenation(typeConverter.uint8arrayToHexStr(key) + typeConverter.uint8arrayToHexStr(chainCode)));
+            const seed = masterKeySeed.masterKeySeedGenerator(masterKeySeed.mnemonicGenerator24());
+            const {key, chainCode} = getMasterKeyFromSeed(typeConverter.bufferToHexStr(seed));
+            should.equal(typeConverter.hexStrConcatenation({
+                key,
+                chainCode
+            }), typeConverter.hexStrConcatenation(typeConverter.uint8arrayToHexStr(key) + typeConverter.uint8arrayToHexStr(chainCode)));
         })
     }
 });

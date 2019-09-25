@@ -1,7 +1,7 @@
 {
   "name": "hd-vault",
   "version": "1.0.0",
-  "description": "HD wallet support for Oneledger, Bitcoin and Ethereum",
+  "description": "HD wallet support for OneLedger, BitCoin and Ethereum",
   "main": "main.js",
   "scripts": {
     "test": "nyc mocha"

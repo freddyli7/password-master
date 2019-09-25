@@ -1,2 +1,3 @@
 # hd-vault
-HD wallet support for Oneledger, Bitcoin and Ethereum.
+
+HD wallet support for OneLedger, BitCoin and Ethereum.

@@ -1,7 +1,7 @@
 const requestErrors = {
     WrongPassword: {code: -11000, message: "Wrong password"},
     InvalidKeyIndex: {code: -11001, message: "invalid keyIndex, keyIndex should should be a non-negative integer"},
-    InvalidEncryptedMasterKey: {code: -11002, message: "invalid encrypted master key"},
+    InvalidEncryptedMasterKeySeed: {code: -11002, message: "invalid encrypted master key seed"},
     InvalidEncodedTxMessage: {code: -11003, message: "invalid encoded tx message"},
     InvalidBTCtxMessage: {code: -11004, message: "invalid BitCoin tx message"},
     InvalidNonce: {code: -11005, message: "invalid nonce, nonce should be a non-negative integer"},

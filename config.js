@@ -12,6 +12,7 @@ const oneledgerKeyPath = masterkey + bip44purpose + oltCoinType;
 const bitcoinKeyPath = masterkey + bip44purpose + bitCoinType;
 const ethereumKeyPath = masterkey + bip44purpose + ethCoinType;
 
+// TODO : when needs the support of BitCoin External and Internal change for the keyPath, uncomment below part
 // with btc external and internal change
 // const oltCoinType = "403'/";
 // const bitCoinType = "0'/";
