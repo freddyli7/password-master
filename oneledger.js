@@ -1,30 +1,41 @@
-const {derivePath, getMasterKeyFromSeed, getPublicKey, isValidPath} = require('ed25519-hd-key');
+const {derivePath, isValidPath, getMasterKeyFromSeed} = require('ed25519-hd-key');
 const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const sjcl = require("sjcl");
 const typeConverter = require("./typeConverter");
-const masterkey = require("./masterkey");
+const masterKeySeed = require("./masterKeySeed");
 
 /* *****************************   Ed25519 For Oneledger  ***************************** */
-
-// derive private keys from master key, master key and master chainCode are both 32 bytes Uint8Array for Ed25519
-// keyPath is a string includes chainId, sideChainId, keyIndex
-// return key + chainCode which is a 64 bytes Uint8Array
-function derivePrivateKeyOLT(masterKey, masterChainCode, keyPath) {
-    const {key, chainCode} = derivePath(keyPath, typeConverter.uint8arrayToHexStr(masterKey) + typeConverter.uint8arrayToHexStr(masterChainCode));
-    return typeConverter.hexStrToUint8Array(typeConverter.uint8arrayToHexStr(key) + typeConverter.uint8arrayToHexStr(chainCode));
+// derive 32 bytes masterKey from masterKeySeed
+// input : masterKeySeed is a 64 bytes hex string
+// return : masterKey which is a 32 bytes Uint8Array
+function deriveMasterKey(masterKeySeed) {
+    const {key, chainCode} = getMasterKeyFromSeed(masterKeySeed);
+    return typeConverter.bufferToUint8Array(key)
 }
 
-// privateKey should be 64 bytes Uint8Array of (key + chainCode) for Ed25519
-// return derived privateKey's public Key which is a 32 bytes base64 string
-function derivePublicKeyOLT(privateKey) {
-    const {publicKey} = nacl.sign.keyPair.fromSecretKey(privateKey);
-    return nacl.util.encodeBase64(publicKey)
+// derive new privateKeySeed based on masterKey and keyPath
+// input : masterKey should be a 32 bytes uint8array for Ed25519, masterKey should be the derived key part of masterKey
+// input : keyPath is a string
+// return : derived new privateKeySeed which is a 32 byte buffer
+function derivePrivateKeySeed(masterKey, keyPath) {
+    const hexMasterKey = typeConverter.uint8arrayToHexStr(masterKey);
+    const {key, chainCode} = derivePath(keyPath, hexMasterKey);
+    return key
 }
 
-// publicKey should be a 32 bytes base64 string
-// hash address from public key based on SHA256, return 40 chars length address (without prefix)
-function deriveAddressOLT(publicKey) {
+// derive new keyPair from privateKeySeed
+// input : privateKeySeed should be a 32 bytes buffer for Ed25519, privateKeySeed should be derived key part of privateKeySeed
+// return : derived keyPair which the private key is a 64 byte based64 string and public Key is a 32 bytes base64 string
+function deriveKeyPair(privateKeySeed) {
+    const {publicKey, secretKey} = nacl.sign.keyPair.fromSeed(privateKeySeed);
+    return {publicKey: nacl.util.encodeBase64(publicKey), privateKey: nacl.util.encodeBase64(secretKey)}
+}
+
+// derive the address of the new keyPair
+// input : publicKey should be a 32 bytes base64 string
+// return : address from public key based on SHA256, return first 40 chars length address (without prefix)
+function deriveAddress(publicKey) {
     let base64PublicKey = sjcl.codec.base64.toBits(publicKey);
     let hash = new sjcl.hash.sha256();
     hash.update(base64PublicKey);
@@ -34,25 +45,27 @@ function deriveAddressOLT(publicKey) {
     return hashedData.substring(0, 40);
 }
 
-// sign tx
-// message should be a base64 string, password is plaintext
-// encryptedMasterKey is a string, keypath is a string
-// return base64 signature
-function signForSignatureOLT(message, password, encryptedMasterKey, keyPath, callback) {
-    return masterkey.masterKeyDecryption(password, encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
+// sign OLT tx
+// input : message should be a base64 string
+// input : password is plaintext
+// input : encryptedMasterKeySeed is a string
+// input : keyPath is a string
+// return : callback function containing error object and base64 signature
+function signForSignature({message, password, encryptedMasterKeySeed, keyPath}, callback) {
+    return masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
         if (error) return callback(error);
-        const derivedPrivatedkey = derivePrivateKeyOLT(decryptedMasterKey, decryptedMasterChaincode, keyPath);
-        console.log(decryptedMasterKey);
-        console.log(decryptedMasterChaincode);
-        console.log("111---", derivedPrivatedkey);
-        callback(null, nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), derivedPrivatedkey)));
+        const masterKey = deriveMasterKey(decryptedMasterKeySeed);
+        const derivedPrivateKeySeed = derivePrivateKeySeed(masterKey, keyPath);
+        const {privateKey, publicKey} = deriveKeyPair(derivedPrivateKeySeed);
+        const signature = nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), nacl.util.decodeBase64(privateKey)));
+        callback(null, signature);
     });
 }
 
-// verify signature
-// message, signature and publicKey are all base64 string
-// TODO : testcase failed
-function verifySignatureOLT(message, signature, publicKey, callback) {
+// verify OLT tx signature
+// input : message, signature and publicKey are all base64 string
+// return : callback function containing error object and verifyResult (true || false)
+function verifySignature(message, signature, publicKey, callback) {
     let verifyResult;
     try {
         verifyResult = nacl.sign.detached.verify(
@@ -61,15 +74,16 @@ function verifySignatureOLT(message, signature, publicKey, callback) {
             nacl.util.decodeBase64(publicKey)
         );
     } catch (err) {
-        return callback(err, null);
+        return callback(err);
     }
     callback(null, verifyResult);
 }
 
 module.exports = {
-    derivePrivateKeyOLT,
-    derivePublicKeyOLT,
-    deriveAddressOLT,
-    signForSignatureOLT,
-    verifySignatureOLT
+    deriveMasterKey,
+    derivePrivateKeySeed,
+    deriveKeyPair,
+    deriveAddress,
+    signForSignature,
+    verifySignature
 };

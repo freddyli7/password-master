@@ -1,103 +1,130 @@
-const {derivePath, getMasterKeyFromSeed, getPublicKey, isValidPath} = require('ed25519-hd-key');
 const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const secp256k1 = require('secp256k1');
 const bitcoinjs = require('bitcoinjs-lib');
 const typeConverter = require("./typeConverter");
-const masterkey = require("./masterkey");
+const masterKeySeed = require("./masterKeySeed");
+const requestErrors = require("./errorType").requestErrors;
+const {bitcoinNetworkType} = require("./config");
+const bip32 = require("bip32");
 
 /* *****************************   Secp256k1 For BTC  ***************************** */
-
-// derive private key from master key, master key is just key part which is a Uint8Array, total should be 32 bytes for BTC
-// keyPath is a string includes chainId, sideChainId, keyIndex
-// return key which is a 32 bytes Uint8Array
-function derivePrivateKeyBTC(masterKey, keyPath) {
-    const hexMasterKey = typeConverter.uint8arrayToHexStr(masterKey);
-    const {key} = derivePath(keyPath, hexMasterKey);
-    return typeConverter.bufferToUint8Array(key)
+// derive private key from masterKeySeed
+// input : masterKeySeed is a 64 bytes buffer
+// input : keyPath is a string
+// input : network should be one of "BTCOIN", "TESTNET" or "REGTEST"
+// return : callback function containing error object and derivedPrivateKey which is a 32 bytes buffer
+function derivePrivateKey(masterKeySeed, keyPath, network, callback) {
+    let networkDetermined;
+    switch (network) {
+        case bitcoinNetworkType.BITCOIN :
+            networkDetermined = bitcoinjs.networks.bitcoin;
+            break;
+        case bitcoinNetworkType.TESTNET:
+            networkDetermined = bitcoinjs.networks.testnet;
+            break;
+        case bitcoinNetworkType.REGTEST:
+            networkDetermined = bitcoinjs.networks.regtest;
+            break;
+        default:
+            return callback(requestErrors.InvalidBTCNetworkType)
+    }
+    // derive BitCoin master key node from masterKeySeed
+    const masterNode = bip32.fromSeed(masterKeySeed, networkDetermined);
+    const keyPair = masterNode.derivePath(keyPath);
+    return callback(null, keyPair.privateKey)
 }
 
 // verify BTC private key
-function verifyPrivateKeyBTC(privateKey) {
-    const key = typeConverter.hexStrToBuffer(privateKey);
-    return secp256k1.privateKeyVerify(key)
+// input : BitCoin privateKey which is a 32 bytes buffer
+// return : privateKey verifyResult (true || false)
+function verifyPrivateKey(privateKey) {
+    return secp256k1.privateKeyVerify(privateKey)
 }
 
-// privateKey should be 32 bytes Uint8Array (just key part) for BTC
-// return derived privateKey's public Key which is a 33 bytes hex string with chain prefix 0x02 or 0x03
-function derivePublicKeyBTC(privateKey) {
-    return typeConverter.bufferToHexStr(secp256k1.publicKeyCreate(privateKey));
+// derive publicKey from privateKey
+// input : privateKey should be 32 bytes buffer
+// return : derived privateKey's publicKey which is a 33 bytes hex string with chain prefix 0x02 or 0x03
+function derivePublicKey(privateKey) {
+    return typeConverter.bufferToHexStr(secp256k1.publicKeyCreate(privateKey))
 }
 
-// publicKey should be 33 bytes hex string with chain prefix
-// return 34 chars length address
+// derive P2PKH address
+// input : publicKey should be a 33 bytes hex string with chain prefix
+// return : 34 chars length base58 encoding P2PKH address
 function deriveP2PKHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2pkh({pubkey}).address;
+    return bitcoinjs.payments.p2pkh({pubkey}).address
 }
 
-// TODO
-function deriveP2PKAddress(publicKey) {
-    const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2pk({pubkey}).address;
+// derive P2PK publicKey
+// input : publicKey should be a 33 bytes hex string with chain prefix
+// return : 33 bytes hex string public key with chain prefix
+function deriveP2PKPubKey(publicKey) {
+    // const pubkey = typeConverter.hexStrToBuffer(publicKey);
+    // bitcoinjs.payments.p2pk({pubkey}).pubkey;
+    return publicKey
 }
 
-// publicKey should be 33 bytes hex string with chain prefix
-// return 42 chars length address
+// TODO : no need for now
 function deriveP2WPKHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2wpkh({pubkey}).address;
+    return bitcoinjs.payments.p2wpkh({pubkey}).address
 }
 
-// TODO : not need for now
+// TODO : no need for now
 function deriveP2WSHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2wsh({pubkey}).address;
+    return bitcoinjs.payments.p2wsh({pubkey}).address
 }
 
-// TODO : not need for now
+// TODO : no need for now
 function deriveP2SHAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2sh({pubkey}).address;
+    return bitcoinjs.payments.p2sh({pubkey}).address
 }
 
-// TODO : not need for now
+// TODO : no need for now
 function deriveP2MSAddress(publicKey) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2ms({pubkey}).address;
+    return bitcoinjs.payments.p2ms({pubkey}).address
 }
 
-// encryptedMasterKey is a string, keypath is a string
-// message should be 32 bytes hex string, password is plaintext
-// return signature which is a 64 bytes buffer, and recovery which is a number
-function signForSignatureBTC(message, password, encryptedMasterKey, keyPath, callback) {
-    // decrypt master key
-    return masterkey.masterKeyDecryption(password, encryptedMasterKey, function (error, decryptedMasterKey, decryptedMasterChaincode) {
+// sign BitCoin tx
+// input : encryptedMasterKeySeed is a string
+// input : keyPath is a string
+// input : message should be a 32 bytes hex string
+// input : password is plaintext
+// input : network should be one of "BTCOIN", "TESTNET" or "REGTEST"
+// return : callback function containing error object and signature which is a 64 bytes buffer and recovery which is a number
+function signForSignature({message, password, encryptedMasterKeySeed, keyPath, network}, callback) {
+    return masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, (error, decryptedMasterKeySeed) => {
         if (error) return callback(error);
-        // derive private key
-        const derivedPrivatedkey = derivePrivateKeyBTC(decryptedMasterKey, keyPath);
-        // sign with derived private key to get signature
-        const {signature, recovery} = secp256k1.sign(typeConverter.hexStrToBuffer(message), derivedPrivatedkey);
-        callback(null, signature, recovery);
+        return derivePrivateKey(decryptedMasterKeySeed, keyPath, network, (error, derivedPrivateKey) => {
+            if (error) return callback(error);
+            const {signature, recovery} = secp256k1.sign(typeConverter.hexStrToBuffer(message), derivedPrivateKey);
+            callback(null, signature, recovery)
+        });
     });
 }
 
 // verify BTC tx signature
-// message 32 bytes, signature 64 bytes and publicKey 33 bytes  are all hex string
-function verifySignatureBTC(message, signature, publicKey) {
+// input : message 32 bytes hex string
+// input : signature 64 bytes hex string
+// input : publicKey 33 bytes hex string
+// return : verifyResult (true || false)
+function verifySignature(message, signature, publicKey) {
     return secp256k1.verify(typeConverter.hexStrToBuffer(message), typeConverter.hexStrToBuffer(signature), typeConverter.hexStrToBuffer(publicKey))
 }
 
 module.exports = {
-    derivePrivateKeyBTC,
-    derivePublicKeyBTC,
-    deriveP2WSHAddress,
-    deriveP2WPKHAddress,
-    deriveP2SHAddress,
-    deriveP2MSAddress,
+    derivePrivateKey,
+    derivePublicKey,
+
     deriveP2PKHAddress,
-    deriveP2PKAddress,
-    verifyPrivateKeyBTC,
-    signForSignatureBTC,
-    verifySignatureBTC
+    deriveP2PKPubKey,
+
+    verifyPrivateKey,
+    signForSignature,
+    verifySignature
 };
