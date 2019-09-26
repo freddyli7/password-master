@@ -17,15 +17,15 @@ const requestErrors = {
         message: "Wrong key type for deriving new key, valid key type should be either OLT, BTC-P2PK, BTC-P2PKH or ETH"
     },
     InvalidSignKeyType: {
-        code: -11010,
+        code: -11011,
         message: "Wrong key type for signing tx, valid key type should be either OLT, BTC or ETH"
     },
     InvalidBTCNetworkType: {
-        code: -11011,
+        code: -11012,
         message: "Wrong BitCoin network type, valid network type should be either BITCOIN, TESTNET or REGTEST"
     },
     InvalidETHSignature: {
-        code: -11012,
+        code: -11013,
         message: "Invalid ETH tx signature"
     }
 };
