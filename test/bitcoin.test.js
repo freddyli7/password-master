@@ -19,7 +19,7 @@ describe("test derive privateKey from masterKeySeed for BTC", function () {
     it("test with wrong BitCoin network", function () {
         bitcoin.derivePrivateKey(typeConverter.hexStrToBuffer(masterKeySeedHex), keyPath, "BITCOIN111", (error, derivedPriKey) => {
             // console.log(error.message);
-            should.equal(error.code, "-11011");
+            should.equal(error.code, "-11012");
         });
     });
     it("test with valid BitCoin network", function () {
