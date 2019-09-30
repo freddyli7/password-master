@@ -42,7 +42,7 @@ const requestErrors = {
     },
     InvalidTxReceiverAddress: {
         code: -11009,
-        message: "Invalid tx receiver address, address should have 40 characters, please include 0x as the prefix",
+        message: "Invalid tx receiver address, please enter valid ETH address and include 0x as the prefix",
         detail: "-11009 : invalid tx receiver address"
     },
     InvalidDerivedKeyType: {
