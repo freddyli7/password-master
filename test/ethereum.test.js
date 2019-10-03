@@ -47,7 +47,8 @@ describe("test derive address for ETH", function () {
         // console.log(uncompressedAddress);
         // console.log(compressedAddress);
         should.equal(uncompressedAddress, compressedAddress, "address derived from uncompressed pubkey should be identical with address derived from compressed pubkey");
-        should.equal(uncompressedAddress.length, 42, "address should be 42 chars")
+        should.equal(uncompressedAddress.length, 42, "address should be 42 chars");
+        should.equal(uncompressedAddress.substring(0, 2), "0x", "address should start with 0x");
     })
 });
 
