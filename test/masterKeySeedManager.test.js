@@ -35,7 +35,7 @@ describe("test new master key", function () {
         // console.log(masterKeySeedObj);
         const masterkeySeed = JSON.parse(masterKeySeedObj.encryptedMasterKeySeed);
         should.equal(masterkeySeed.ct.length, 128, "encrypted masterkeySeed ct part should be 128 chars");
-        should.equal(masterKeySeedObj.masterKeySeedAddress.length, 40, "masterkeyseed address should be 40 chars")
+        should.equal(masterKeySeedObj.masterKeySeedAddress.length, 42, "masterkeyseed address should be 42 chars")
     })
 });
 
@@ -47,7 +47,7 @@ describe("test export new masterKeySeed info", function () {
             // console.log(masterKeySeedAddress);
             const masterKeySeedObj = JSON.parse(encryptedMasterKeySeed);
             should.equal(masterKeySeedObj.ct.length, 128, "encrypted masterkeySeed ct part should be 128 chars");
-            should.equal(masterKeySeedAddress.length, 40, "masterkeyseed address should be 40 chars")
+            should.equal(masterKeySeedAddress.length, 42, "masterkeyseed address should be 42 chars")
         })
     })
 });

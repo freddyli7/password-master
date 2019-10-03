@@ -40,12 +40,11 @@ describe("test derive keyPair from privateKeySeed for Ed25519", function () {
     })
 });
 
-
 describe("test derive address from keyPair's publicKey for Ed25519", function () {
     it("test 1", function () {
         const publicKey = "XCmcmAM+wznX76gUTM6uaG5ka+92oTZb4GaKYMaxUzs=";
         const address = oneledger.deriveAddress(publicKey);
-        should.equal(address.length, 40, "derived address should be 40 chars long without 0x prefix")
+        should.equal(address.length, 42, "derived address should be 42 chars long including 0x prefix")
     })
 });
 
@@ -53,8 +52,8 @@ describe("test sign tx using Ed25519", function () {
     it("test 1, sign tx and verify signature", function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterkeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const data = {
-            message : rawTxmessage,
-            password : masterkeyPassword,
+            message: rawTxmessage,
+            password: masterkeyPassword,
             encryptedMasterKeySeed,
             keyPath
         };
