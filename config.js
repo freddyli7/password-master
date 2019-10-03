@@ -54,6 +54,8 @@ const bitcoinNetworkType = {
     REGTEST : "REGTEST"
 };
 
+const ed25519KeyAddrPrefix = "0x";
+
 module.exports = {
     oneledgerKeyPath,
     bitcoinKeyPath,
@@ -61,5 +63,6 @@ module.exports = {
     keyPathSuffix,
     derivedKeyType,
     signatureKeyType,
-    bitcoinNetworkType
+    bitcoinNetworkType,
+    ed25519KeyAddrPrefix
 };

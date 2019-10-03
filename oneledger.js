@@ -4,6 +4,7 @@ nacl.util = require("tweetnacl-util");
 const sjcl = require("sjcl");
 const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
+const oltKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
 
 /* *****************************   Ed25519 For Oneledger  ***************************** */
 // derive 32 bytes masterKey from masterKeySeed
@@ -34,7 +35,7 @@ function deriveKeyPair(privateKeySeed) {
 
 // derive the address of the new keyPair
 // input : publicKey should be a 32 bytes base64 string
-// return : address from public key based on SHA256, return first 40 chars length address (without prefix)
+// return : address from public key based on SHA256, return 0x prefix and first 40 chars length address
 function deriveAddress(publicKey) {
     let base64PublicKey = sjcl.codec.base64.toBits(publicKey);
     let hash = new sjcl.hash.sha256();
@@ -42,7 +43,7 @@ function deriveAddress(publicKey) {
     let hashResult = hash.finalize();
     let hashedData = sjcl.codec.hex.fromBits(hashResult);
     hash.reset();
-    return hashedData.substring(0, 40);
+    return `${oltKeyAddrPrefix}${hashedData.substring(0, 40)}`
 }
 
 // sign OLT tx
