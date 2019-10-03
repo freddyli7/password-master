@@ -45,6 +45,7 @@ describe("test derive address from keyPair's publicKey for Ed25519", function ()
         const publicKey = "XCmcmAM+wznX76gUTM6uaG5ka+92oTZb4GaKYMaxUzs=";
         const address = oneledger.deriveAddress(publicKey);
         should.equal(address.length, 42, "derived address should be 42 chars long including 0x prefix")
+        should.equal(address.substring(0,2), "0x", "master seed address should start with 0x")
     })
 });
 

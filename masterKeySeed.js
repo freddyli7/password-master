@@ -100,7 +100,7 @@ function getMasterKeySeedAddress(masterKeySeedPublicKey) {
     let hashResult = hash.finalize();
     let hashedData = sjcl.codec.hex.fromBits(hashResult);
     hash.reset();
-    return masterSeedKeyAddrPrefix + hashedData.substring(0, 40)
+    return `${masterSeedKeyAddrPrefix}${hashedData.substring(0, 40)}`
 }
 
 // derive masterKey address based on provided mnemonic array

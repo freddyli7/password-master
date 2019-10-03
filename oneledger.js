@@ -43,7 +43,7 @@ function deriveAddress(publicKey) {
     let hashResult = hash.finalize();
     let hashedData = sjcl.codec.hex.fromBits(hashResult);
     hash.reset();
-    return oltKeyAddrPrefix + hashedData.substring(0, 40);
+    return `${oltKeyAddrPrefix}${hashedData.substring(0, 40)}`
 }
 
 // sign OLT tx
