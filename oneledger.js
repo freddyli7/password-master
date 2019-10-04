@@ -5,6 +5,7 @@ const sjcl = require("sjcl");
 const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
 const oltKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
+const util = require("./util");
 
 /* *****************************   Ed25519 For Oneledger  ***************************** */
 // derive 32 bytes masterKey from masterKeySeed
@@ -46,6 +47,11 @@ function deriveAddress(publicKey) {
     return `${oltKeyAddrPrefix}${hashedData.substring(0, 40)}`
 }
 
+// verify OLT address
+function verifyAddress(address) {
+    return util.isValidAddress(address)
+}
+
 // sign OLT tx
 // input : message should be a base64 string
 // input : password is plaintext
@@ -85,6 +91,7 @@ module.exports = {
     derivePrivateKeySeed,
     deriveKeyPair,
     deriveAddress,
+    verifyAddress,
     signForSignature,
     verifySignature
 };
