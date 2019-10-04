@@ -83,6 +83,148 @@ describe("test different tx types for BTC", function () {
     // });
 });
 
+const addressVerifyTestcases = [
+    {
+        name: "test 1, valid P2PKH address",
+        input: "1J7kGhFgKb6oyu8RvHtA6EKFC26htEbRcE",
+        expect: true
+    },
+    {
+        name: "test 2, valid P2PKH address",
+        input: "12o1PxAT4KzdYUy2Yu6EifeyLj56srbnPR",
+        expect: true
+    },
+    {
+        name: "test 3, valid P2PKH address",
+        input: "1F65Z3KKotQx62Bv65tSjPcHCnwSALWZeM",
+        expect: true
+    },
+    {
+        name: "test 4, valid P2PKH address",
+        input: "1N5ywgt287zwA8BrwXG47UjThjXuc93jXK",
+        expect: true
+    },
+    {
+        name: "test 5, valid P2PKH address",
+        input: "15RF7sWDtSNRENuB6xnA3KM6FyJ9vt751S",
+        expect: true
+    },
+    {
+        name: "test 6, invalid P2PKH address",
+        input: "1BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg",
+        expect: true
+    },
+    {
+        name: "test 7, invalid P2PKH address, 0x + 40 chars",
+        input: "0x0ba158d7d2ea60a091def2c85ad2f72815332189",
+        expect: false
+    },
+    {
+        name: "test 8, invalid P2PKH address, without prefix 1",
+        input: "BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg",
+        expect: false
+    },
+    {
+        name: "test 9, invalid P2PKH address, longer",
+        input: "BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg23fG",
+        expect: false
+    },
+    {
+        name: "test 9, invalid P2PKH address, empty",
+        input: "",
+        expect: false
+    },
+    {
+        name: "test 10, invalid P2PKH address, null",
+        input: null,
+        expect: false
+    },
+    {
+        name: "test 11, invalid P2PKH address, undefined",
+        input: undefined,
+        expect: false
+    }
+];
+
+describe("test verify derived address for P2PKH and P2SH of BTC", function () {
+    addressVerifyTestcases.forEach(testcase => {
+        it(testcase.name, function () {
+            should.equal(bitcoin.verifyAddress(testcase.input), testcase.expect, "derived address validation should be " + testcase.expect)
+        })
+    })
+});
+
+const p2pkPubKeyVerifyTestcases = [
+    {
+        name: "test 1, valid P2PK public key",
+        input: "02287dbe3e345f4df846b1731ef95c6b3f2a1c95f639c97069b225bde027c26630",
+        expect: true
+    },
+    {
+        name: "test 2, valid P2PK public key",
+        input: "03a714af3054682f8b6d75ff98d342a3584d43510c40db18f8dcc5ad1de2ba5c7f",
+        expect: true
+    },
+    {
+        name: "test 3, valid P2PK public key",
+        input: "034e09dff38a56a6f24905b8beb82bbdc844fd088f4afb04810922ce95a45ad61c",
+        expect: true
+    },
+    {
+        name: "test 4, valid P2PK public key",
+        input: "021c78948b1297bcfaea47e3bc4ce522dfadce8a94bb4c92077ff2415763f6f125",
+        expect: true
+    },
+    {
+        name: "test 5, valid P2PK public key",
+        input: "022077c1b8b8bd3ddf297ad9658a6c5f0d7015f2967ccff3a1f8815f7766bbeeb5",
+        expect: true
+    },
+    {
+        name: "test 6, invalid P2PK public key",
+        input: "0274aec55e2d10c58b08edcf0b87ab053690e8618a345dc00a1e6ec79b2da61ddb",
+        expect: true
+    },
+    {
+        name: "test 7, invalid P2PK public key, 0x + 40 chars",
+        input: "0x0ba158d7d2ea60a091def2c85ad2f72815332189",
+        expect: false
+    },
+    {
+        name: "test 8, invalid P2PK public key, without prefix 1",
+        input: "BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg",
+        expect: false
+    },
+    {
+        name: "test 9, invalid P2PK public key, longer",
+        input: "0274aec55e2d10c58b08edcf0b87ab053690e8618a345dc00a1e6ec79b2da61ddb234vwvg24v2ev",
+        expect: false
+    },
+    {
+        name: "test 9, invalid P2PK public key, empty",
+        input: "",
+        expect: false
+    },
+    {
+        name: "test 10, invalid P2PK public key, null",
+        input: null,
+        expect: false
+    },
+    {
+        name: "test 11, invalid P2PK public key, undefined",
+        input: undefined,
+        expect: false
+    }
+];
+
+describe("test verify derived public key for P2PK of BTC", function () {
+    p2pkPubKeyVerifyTestcases.forEach(testcase => {
+        it(testcase.name, function () {
+            should.equal(bitcoin.verifyP2PKPublicKey(testcase.input), testcase.expect, "derived public key validation should be " + testcase.expect)
+        })
+    })
+});
+
 describe("test sign tx for BTC", function () {
     it("test 1", function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterkeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
