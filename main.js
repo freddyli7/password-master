@@ -9,3 +9,7 @@ exports.mnemonicUtil = {
     mnemonicGenerator12,
     mnemonicGenerator24
 };
+const {verify} = require("./addressVerifier");
+exports.address = {
+    verify
+};

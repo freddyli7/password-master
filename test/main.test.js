@@ -67,6 +67,9 @@ describe("examples of how to use HD-vault", function () {
         HDVault.derivedKeyManager.signTx(signData, (error, signature) => {
             // console.log(error);
             console.log("signature from derived key: ", signature);
-        })
+        });
+        // verify address
+        const addreVerifyResult = HDVault.address.verify("1BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg", "OLT");
+        console.log(addreVerifyResult);
     })
 });
