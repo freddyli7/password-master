@@ -7,6 +7,7 @@ const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
 const HDWallet = require('ethereum-hdwallet');
 const requestErrors = require("./errorType").requestErrors;
+const walletValidator = require('wallet-address-validator');
 
 /* *****************************   Secp256k1 For ETH  ***************************** */
 // derive privateKey from masterKeySeed
@@ -43,6 +44,11 @@ function deriveAddress(publicKey) {
     return wallet.getChecksumAddressString()
 }
 
+// verify ETH address
+function verifyAddress(address) {
+    return walletValidator.validate(address, 'ETH')
+}
+
 // sign ETH tx
 // input : txParams is an object including nonce, gasPrice, gasLimit, to, value and data
 // input : nonce is an uint, gasPrice is an uint, gasLimit is an uint, to is recipient address, value is an uint (wei), data is a hex string
@@ -66,5 +72,6 @@ module.exports = {
     verifyPrivateKey,
     derivePublicKey,
     deriveAddress,
+    verifyAddress,
     signForSignature
 };

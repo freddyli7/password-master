@@ -7,6 +7,8 @@ const masterKeySeed = require("./masterKeySeed");
 const requestErrors = require("./errorType").requestErrors;
 const {bitcoinNetworkType} = require("./config");
 const bip32 = require("bip32");
+const walletValidator = require('wallet-address-validator');
+const util = require('./util');
 
 /* *****************************   Secp256k1 For BTC  ***************************** */
 // derive private key from masterKeySeed
@@ -57,6 +59,12 @@ function deriveP2PKHAddress(publicKey) {
     return bitcoinjs.payments.p2pkh({pubkey}).address
 }
 
+// verify P2PKH or P2SH address
+function verifyAddress(address) {
+    if (!util.isValidString(address)) return false;
+    return walletValidator.validate(address, 'BTC')
+}
+
 // derive P2PK publicKey
 // input : publicKey should be a 33 bytes hex string with chain prefix
 // return : 33 bytes hex string public key with chain prefix
@@ -64,6 +72,12 @@ function deriveP2PKPubKey(publicKey) {
     // const pubkey = typeConverter.hexStrToBuffer(publicKey);
     // bitcoinjs.payments.p2pk({pubkey}).pubkey;
     return publicKey
+}
+
+// verify P2PK public key
+function verifyP2PKPublicKey(publicKey) {
+    if (!util.isValidString(publicKey)) return false;
+    return secp256k1.publicKeyVerify(typeConverter.hexStrToBuffer(publicKey))
 }
 
 // TODO : no need for now
@@ -123,6 +137,8 @@ module.exports = {
 
     deriveP2PKHAddress,
     deriveP2PKPubKey,
+    verifyAddress,
+    verifyP2PKPublicKey,
 
     verifyPrivateKey,
     signForSignature,

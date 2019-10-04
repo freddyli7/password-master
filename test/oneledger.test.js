@@ -44,8 +44,74 @@ describe("test derive address from keyPair's publicKey for Ed25519", function ()
     it("test 1", function () {
         const publicKey = "XCmcmAM+wznX76gUTM6uaG5ka+92oTZb4GaKYMaxUzs=";
         const address = oneledger.deriveAddress(publicKey);
-        should.equal(address.length, 42, "derived address should be 42 chars long including 0x prefix")
+        should.equal(address.length, 42, "derived address should be 42 chars long including 0x prefix");
         should.equal(address.substring(0,2), "0x", "master seed address should start with 0x")
+    })
+});
+
+const addressVerifyTestcases = [
+    {
+        name :"test 1, valid OLT address",
+        input : "0x9a59efaa736beb8feaabcbc9ab7c99d4b8c712af",
+        expect : true
+    },
+    {
+        name :"test 2, valid OLT address",
+        input : "0xf1b2027fe0f9e0de269a483a4be40d3b917fb204",
+        expect : true
+    },
+    {
+        name :"test 3, valid OLT address",
+        input : "0x4d4e3fca3fb547bab80c7fd600533f6a1d4e080b",
+        expect : true
+    },
+    {
+        name :"test 4, valid OLT address",
+        input : "0xb45861ffaa41a5582bc3a98bd837e1cafefbd140",
+        expect : true
+    },
+    {
+        name :"test 5, valid OLT address",
+        input : "0xd70050d1669f2146dd3095a61345a276dc8c599f",
+        expect : true
+    },
+    {
+        name :"test 6, valid OLT address",
+        input : "0x0ba158d7d2ea60a091def2c85ad2f7281533218f",
+        expect : true
+    },
+    {
+        name :"test 7, invalid OLT address, 0x + 39 chars",
+        input : "0x0ba158d7d2ea60a091def2c85ad2f7281533218",
+        expect : false
+    },
+    {
+        name :"test 8, invalid OLT address, without 0x",
+        input : "0ba158d7d2ea60a091def2c85ad2f7281533218f",
+        expect : false
+    },
+    {
+        name :"test 9, invalid OLT address, only 0x",
+        input : "0x",
+        expect : false
+    },
+    {
+        name :"test 9, invalid OLT address, empty",
+        input : "",
+        expect : false
+    },
+    {
+        name :"test 10, invalid OLT address, null",
+        input : null,
+        expect : false
+    }
+];
+
+describe("test verify derived address for Ed25519", function () {
+    addressVerifyTestcases.forEach(testcase => {
+        it(testcase.name, function () {
+            should.equal(oneledger.verifyAddress(testcase.input), testcase.expect, "derived address validation should be " + testcase.expect)
+        })
     })
 });
 

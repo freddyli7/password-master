@@ -20,7 +20,8 @@
     "secp256k1": "3.7.1",
     "sjcl": "1.0.8",
     "tweetnacl": "1.0.1",
-    "tweetnacl-util": "0.15.0"
+    "tweetnacl-util": "0.15.0",
+    "wallet-address-validator": "0.2.4"
   },
   "devDependencies": {
     "chai": "^4.2.0",
