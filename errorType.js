@@ -64,6 +64,16 @@ const requestErrors = {
         code: -11013,
         message: "Invalid ETH tx signature",
         detail: "-11013 : invalid ETH tx signature"
+    },
+    InvalidAddressType: {
+        code: -11014,
+        message: "Wrong address type to validate, valid address type should be either OLT, BTC-P2PK, BTC-P2PKH or ETH",
+        detail: "-11014 : wrong address type to validate, valid address type should be either OLT, BTC-P2PK, BTC-P2PKH or ETH"
+    },
+    InvalidInputData: {
+        code: -11015,
+        message: "Address and address type have to be valid string",
+        detail: "-11015 : address and address type have to be valid string"
     }
 };
 
