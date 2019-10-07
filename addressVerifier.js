@@ -6,7 +6,7 @@ const {requestErrors} = require("./errorType");
 const util = require("./util");
 
 function verify(address, addressType) {
-    if (!util.isValidString(address) || !util.isValidString(addressType)) return requestErrors.InvalidInputData;
+    if (!util.isValidString(address) || !util.isValidString(addressType)) return util.returnErrorStructure(requestErrors.InvalidInputData);
     switch (addressType) {
         case derivedKeyType.OLT:
             return oneledger.verifyAddress(address);
@@ -17,7 +17,7 @@ function verify(address, addressType) {
         case derivedKeyType.BTCP2PKH:
             return bitcoin.verifyAddress(address);
         default:
-            return requestErrors.InvalidAddressType;
+            return util.returnErrorStructure(requestErrors.InvalidAddressType);
     }
 }
 

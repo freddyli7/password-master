@@ -29,7 +29,7 @@ function derivePrivateKey(masterKeySeed, keyPath, network, callback) {
             networkDetermined = bitcoinjs.networks.regtest;
             break;
         default:
-            return callback(requestErrors.InvalidBTCNetworkType)
+            return callback(util.returnErrorStructure(requestErrors.InvalidBTCNetworkType))
     }
     // derive BitCoin master key node from masterKeySeed
     const masterNode = bip32.fromSeed(masterKeySeed, networkDetermined);
