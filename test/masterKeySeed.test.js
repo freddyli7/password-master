@@ -58,7 +58,7 @@ describe("test encrypt and decrypt master key seed", function () {
             masterKeySeed.masterKeySeedDecryption(wrongPassword, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
                 // console.log(error.message());
                 should.equal(decryptedMasterKeySeed, null);
-                should.equal(error.message, "Wrong password");
+                should.equal(error.error.message, "Wrong password");
             });
             masterKeySeed.masterKeySeedDecryption(masterkeyPassword, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
                 // console.log(decryptedMasterKeySeed);
@@ -99,15 +99,21 @@ describe("test recovery master key", function () {
 });
 
 describe("test unlock master key seed", function () {
-    it("test 1, wrong password, should get false", function () {
-        masterKeySeed.unlockMasterKeySeed(wrongPassword, encryptedMasterKeySeed, function (unlockResult) {
-            should.ok(!unlockResult)
+    it("test 1, wrong password, should get false", async function () {
+        const unlockResult = await masterKeySeed.unlockMasterKeySeed(wrongPassword, encryptedMasterKeySeed).catch(err => {
+            // console.log(err);
+            should.equal(err.error.code, -11000)
         });
+        // console.log(unlockResult);
+        if (typeof unlockResult !== "undefined") {
+            should.fail(unlockResult, undefined, "wrong password should not be able to unlock")
+        }
     });
-    it("test 2, correct password, should get true", function () {
-        masterKeySeed.unlockMasterKeySeed(masterkeyPassword, encryptedMasterKeySeed, function (unlockResult) {
-            should.ok(unlockResult)
+    it("test 2, correct password, should get true", async function () {
+        const unlockResult = masterKeySeed.unlockMasterKeySeed(masterkeyPassword, encryptedMasterKeySeed).catch(err => {
+            should.fail(err, undefined, "correct password should be able to unlock successfully")
         });
+        should.ok(unlockResult)
     });
 });
 

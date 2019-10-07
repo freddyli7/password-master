@@ -55,16 +55,22 @@ describe("test export new masterKeySeed info", function () {
 });
 
 describe("test unlock encrypted master key seed", function () {
-    it("test 1, wrong password, should get false", function () {
+    it("test 1, wrong password, should get false", async function () {
         const mm = new masterKeySeedManager(mnemonicArray, "123456");
-        mm.unlockMasterKeySeed(wrongMasterKeyPassword, function (unlockResult) {
-            should.ok(!unlockResult)
+        const unlockResult = await mm.unlockMasterKeySeed(wrongMasterKeyPassword).catch(err => {
+            // console.log(err);
+            should.equal(err.error.code, -11000)
         });
+        // console.log(unlockResult);
+        if (typeof unlockResult !== "undefined") {
+            should.fail(unlockResult, undefined, "wrong password should not be able to unlock")
+        }
     });
-    it("test 2, correct password, should get true", function () {
+    it("test 2, correct password, should get true", async function () {
         const mm = new masterKeySeedManager(mnemonicArray, "123456");
-        mm.unlockMasterKeySeed(masterKeyPassword, function (unlockResult) {
-            should.ok(unlockResult)
+        const unlockResult = await mm.unlockMasterKeySeed(masterKeyPassword).catch(err => {
+            should.fail(err, undefined, "correct password should be able to unlock successfully")
         });
+        should.ok(unlockResult)
     });
 });

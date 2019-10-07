@@ -19,11 +19,9 @@ class MasterKeySeedManager {
 
     // check masterKeySeed encryption password
     // input : password is string
-    // return : callback function containing unlockResult (true || false)
-    unlockMasterKeySeed(password, callback) {
-        return masterKeySeed.unlockMasterKeySeed(password, this.encryptedMasterKeySeed, function (unlockResult) {
-            callback(unlockResult)
-        })
+    // return : promise
+    unlockMasterKeySeed(password) {
+        return masterKeySeed.unlockMasterKeySeed(password, this.encryptedMasterKeySeed)
     }
 }
 

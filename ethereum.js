@@ -62,7 +62,7 @@ function signForSignature({txParams, password, encryptedMasterKeySeed, keyPath},
         const derivedPrivateKey = derivePrivateKey(decryptedMasterKeySeed, keyPath);
         const tx = new EthereumTx(txParams, {chain: 'mainnet', hardfork: 'petersburg'});
         tx.sign(derivedPrivateKey);
-        if (!tx.verifySignature()) return callback(requestErrors.InvalidETHSignature);
+        if (!tx.verifySignature()) return callback(util.returnErrorStructure(requestErrors.InvalidETHSignature));
         callback(null, tx.serialize().toString('hex'));
     });
 }

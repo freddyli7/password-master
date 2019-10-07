@@ -17,10 +17,10 @@ const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = requi
 // input : network should be one of "BTCOIN", "TESTNET" or "REGTEST" only applicable for BitCoin
 // return : callback function containing error object and derived new keyPair's keyIndex and address
 function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}, callback) {
-    if (!util.isNonNegativeInteger(keyIndex)) return callback(requestErrors.InvalidKeyIndex);
-    if (typeof encryptedMasterKeySeed !== "string") return callback(requestErrors.InvalidEncryptedMasterKeySeed);
+    if (!util.isNonNegativeInteger(keyIndex)) return callback(util.returnErrorStructure(requestErrors.InvalidKeyIndex));
+    if (typeof encryptedMasterKeySeed !== "string") return callback(util.returnErrorStructure(requestErrors.InvalidEncryptedMasterKeySeed));
     return masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, (error, masterKeySeed) => {
-        if (error) return callback(requestErrors.WrongPassword);
+        if (error) return callback(util.returnErrorStructure(requestErrors.WrongPassword));
         switch (keyType) {
             case derivedKeyType.OLT:
                 // console.log(oneledgerKeyPath + keyIndex + keyPathSuffix);
@@ -51,7 +51,7 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                 const ethereumDerivedAddress = ethereum.deriveAddress(ethereumDerivedPubkey);
                 return callback(null, keyIndex, ethereumDerivedAddress);
             default:
-                return callback(requestErrors.InvalidDerivedKeyType)
+                return callback(util.returnErrorStructure(requestErrors.InvalidDerivedKeyType))
         }
     });
 }
@@ -66,11 +66,11 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
 // input : message is different when choosing BTC, OLT or ETH, see testcase for detail
 // return : callback function containing error object and signature with recovery(recovery only for BTC)
 function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, network}, callback) {
-    if (!util.isNonNegativeInteger(keyIndex)) return callback(requestErrors.InvalidKeyIndex);
-    if (typeof encryptedMasterKeySeed !== "string") return callback(requestErrors.InvalidEncryptedMasterKeySeed);
+    if (!util.isNonNegativeInteger(keyIndex)) return callback(util.returnErrorStructure(requestErrors.InvalidKeyIndex));
+    if (typeof encryptedMasterKeySeed !== "string") return callback(util.returnErrorStructure(requestErrors.InvalidEncryptedMasterKeySeed));
     switch (keyType) {
         case signatureKeyType.OLT:
-            if (!util.validateBase64(message)) return callback(requestErrors.InvalidEncodedTxMessage);
+            if (!util.validateBase64(message)) return callback(util.returnErrorStructure(requestErrors.InvalidEncodedTxMessage));
             const oltTxData = {
                 message,
                 keyPath: oneledgerKeyPath + keyIndex + keyPathSuffix,
@@ -82,7 +82,7 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
                 return callback(null, signature)
             });
         case signatureKeyType.BTC:
-            if (!util.validBTCTxMessage(message)) return callback(requestErrors.InvalidBTCtxMessage);
+            if (!util.validBTCTxMessage(message)) return callback(util.returnErrorStructure(requestErrors.InvalidBTCtxMessage));
             const btcTxData = {
                 message,
                 keyPath: bitcoinKeyPath + keyIndex,
@@ -97,11 +97,11 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
         case signatureKeyType.ETH:
             const {nonce, gasPrice, gasLimit, to, value} = message;
             // verify eth tx message data
-            if (!util.isNonNegativeInteger(nonce)) return callback(requestErrors.InvalidNonce);
-            if (!util.isNonNegativeNumber(gasPrice)) return callback(requestErrors.InvalidGasPrice);
-            if (!util.isNonNegativeNumber(value)) return callback(requestErrors.InvalidTxValue);
-            if (!util.isPositiveInteger(gasLimit)) return callback(requestErrors.InvalidGasLimit);
-            if (!util.isValidAddress(to)) return callback(requestErrors.InvalidTxReceiverAddress);
+            if (!util.isNonNegativeInteger(nonce)) return callback(util.returnErrorStructure(requestErrors.InvalidNonce));
+            if (!util.isNonNegativeNumber(gasPrice)) return callback(util.returnErrorStructure(requestErrors.InvalidGasPrice));
+            if (!util.isNonNegativeNumber(value)) return callback(util.returnErrorStructure(requestErrors.InvalidTxValue));
+            if (!util.isPositiveInteger(gasLimit)) return callback(util.returnErrorStructure(requestErrors.InvalidGasLimit));
+            if (!util.isValidAddress(to)) return callback(util.returnErrorStructure(requestErrors.InvalidTxReceiverAddress));
             const ethTxData = {
                 txParams: message,
                 password,
@@ -113,7 +113,7 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
                 return callback(null, signature)
             });
         default:
-            return callback(requestErrors.InvalidSignKeyType);
+            return callback(util.returnErrorStructure(requestErrors.InvalidSignKeyType));
     }
 }
 
