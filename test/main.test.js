@@ -34,8 +34,8 @@ describe("examples of how to use HD-vault", function () {
         // generate masterKeySeed with mnemonic and password
         const mm = new HDVault.MasterKeySeedManager(words, "123456");
         // when import masterKeySeed file, unlock it with password
-        mm.unlockMasterKeySeed("123456", ok => {
-            console.log("unlock masterKeySeed result: ", ok);
+        HDVault.masterKeySeedUtil.unlockMasterKeySeed("123456", encryptedMasterKeySeed, (unlockResult) => {
+            console.log("unlock masterKeySeed result: ", unlockResult);
         });
         // get masterKeySeed info after new masterKeySeed is generated OR when user recovery with new password
         mm.getMasterKeySeedInfo((encryptedMasterKeySeed, masterKeySeedAddress) => {
