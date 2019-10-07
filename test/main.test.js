@@ -28,15 +28,16 @@ const mnemonicArray = [{index: 1, word: 'turtle'},
 const encryptedMasterKeySeed = '{"iv":"QlG4nschGJ05XE5eewWNoQ==","v":1,"iter":1000,"ks":128,"ts":64,"mode":"ccm","adata":"","cipher":"aes","salt":"0S3l9i0pRtQFaAZFTi0nHw==","ct":"oqwz5Fan11XtWeUCK2UCaVmlfJKHNuOjAmgLZsQOaedukydoZdUta6iK5ZV6KQUn4iuWuenIDvAYuTchadsh0z3FQC9NHwYTNqCISxKhe1TeBLwP4V7DVQwvdQJlKwBg"}\n';
 
 describe("examples of how to use HD-vault", function () {
-    it("test 1", function () {
+    it("test 1", async function () {
         // generate 24 mnemonic
         const words = HDVault.mnemonicUtil.mnemonicGenerator24();
         // generate masterKeySeed with mnemonic and password
         const mm = new HDVault.MasterKeySeedManager(words, "123456");
         // when import masterKeySeed file, unlock it with password
-        HDVault.masterKeySeedUtil.unlockMasterKeySeed("123456", encryptedMasterKeySeed, (unlockResult) => {
-            console.log("unlock masterKeySeed result: ", unlockResult);
+        const unlockResult = await HDVault.masterKeySeedUtil.unlockMasterKeySeed("123456", encryptedMasterKeySeed).catch(err => {
+            console.log("unlock masterKeySeed error: ", err);
         });
+        console.log("unlock masterKeySeed result: ", unlockResult);
         // get masterKeySeed info after new masterKeySeed is generated OR when user recovery with new password
         mm.getMasterKeySeedInfo((encryptedMasterKeySeed, masterKeySeedAddress) => {
             console.log("get masterKeySeed info: ", encryptedMasterKeySeed, masterKeySeedAddress);

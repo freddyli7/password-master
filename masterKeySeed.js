@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const requestErrors = require("./errorType").requestErrors;
 const typeConverter = require("./typeConverter");
 const masterSeedKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
+const util = require("./util");
 
 /* *****************************   Master key  ***************************** */
 // generate 24 mnemonic before creating a new master key
@@ -75,7 +76,7 @@ function masterKeySeedDecryption(password, encryptedMasterKeySeed, callback) {
     try {
         decryptedMasterKeySeed = sjcl.decrypt(password, encryptedMasterKeySeed)
     } catch (err) {
-        return callback(requestErrors.WrongPassword)
+        return callback(util.returnErrorStructure(requestErrors.WrongPassword))
     }
     callback(null, typeConverter.uint8ArrayToBuffer(nacl.util.decodeBase64(decryptedMasterKeySeed)))
 }
@@ -114,11 +115,19 @@ function recoveryMasterKeySeed(mnemonicArray) {
 // check password when import masterKeySeed file
 // input : password is plaintext
 // input : encryptedMasterKeySeed is string
-// return : callback function containing unlockResult (true || false)
-function unlockMasterKeySeed(password, encryptedMasterKeySeed, callback) {
-    return masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, unlockResult) {
-        callback(typeof unlockResult !== "undefined");
-    })
+// return : promise
+function unlockMasterKeySeed(password, encryptedMasterKeySeed) {
+    let receiver;
+    masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, unlockResult) {
+        if (error) {
+            receiver = Promise.reject(error);
+            return receiver
+        } else if (typeof unlockResult !== "undefined") {
+            receiver = Promise.resolve(util.returnResponseStructure(true));
+            return receiver
+        }
+    });
+    return receiver
 }
 
 module.exports = {
