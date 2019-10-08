@@ -107,7 +107,7 @@ function getMasterKeySeedAddress(masterKeySeedPublicKey) {
 // derive masterKey address based on provided mnemonic array
 // input : mnemonic array
 // return : masterKeySeed address
-function recoveryMasterKeySeed(mnemonicArray) {
+function getMasterKeySeedAddressForRecovery(mnemonicArray) {
     const masterKeySeed = masterKeySeedGenerator(mnemonicArray);
     return getMasterKeySeedAddress(getMasterKeySeedPublicKey(masterKeySeed))
 }
@@ -138,7 +138,7 @@ module.exports = {
     masterKeySeedDecryption,
     getMasterKeySeedPublicKey,
     getMasterKeySeedAddress,
-    recoveryMasterKeySeed,
+    getMasterKeySeedAddressForRecovery,
     unlockMasterKeySeed,
     mnemonicStrToArray,
     mnemonicArrayToStr
