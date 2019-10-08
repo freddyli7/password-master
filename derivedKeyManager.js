@@ -5,7 +5,8 @@ const masterKeySeed = require("./masterKeySeed");
 const util = require("./util");
 const typeConverter = require("./typeConverter");
 const {signatureKeyType, derivedKeyType} = require("./config");
-const requestErrors = require("./errorType").requestErrors;
+const {ErrorType, Util} = require("middle_utility").Error;
+const {requestErrors} = ErrorType;
 const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
 
 // expose this function to UI
@@ -17,10 +18,10 @@ const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = requi
 // input : network should be one of "BTCOIN", "TESTNET" or "REGTEST" only applicable for BitCoin
 // return : callback function containing error object and derived new keyPair's keyIndex and address
 function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}, callback) {
-    if (!util.isNonNegativeInteger(keyIndex)) return callback(util.returnErrorStructure(requestErrors.InvalidKeyIndex));
-    if (typeof encryptedMasterKeySeed !== "string") return callback(util.returnErrorStructure(requestErrors.InvalidEncryptedMasterKeySeed));
+    if (!util.isNonNegativeInteger(keyIndex)) return callback(Util.errorWrap(requestErrors.InvalidKeyIndex));
+    if (typeof encryptedMasterKeySeed !== "string") return callback(Util.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
     return masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, (error, masterKeySeed) => {
-        if (error) return callback(util.returnErrorStructure(requestErrors.WrongPassword));
+        if (error) return callback(Util.errorWrap(requestErrors.WrongPassword));
         switch (keyType) {
             case derivedKeyType.OLT:
                 // console.log(oneledgerKeyPath + keyIndex + keyPathSuffix);
@@ -51,7 +52,7 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                 const ethereumDerivedAddress = ethereum.deriveAddress(ethereumDerivedPubkey);
                 return callback(null, keyIndex, ethereumDerivedAddress);
             default:
-                return callback(util.returnErrorStructure(requestErrors.InvalidDerivedKeyType))
+                return callback(Util.errorWrap(requestErrors.InvalidDerivedKeyType))
         }
     });
 }
@@ -66,11 +67,11 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
 // input : message is different when choosing BTC, OLT or ETH, see testcase for detail
 // return : callback function containing error object and signature with recovery(recovery only for BTC)
 function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, network}, callback) {
-    if (!util.isNonNegativeInteger(keyIndex)) return callback(util.returnErrorStructure(requestErrors.InvalidKeyIndex));
-    if (typeof encryptedMasterKeySeed !== "string") return callback(util.returnErrorStructure(requestErrors.InvalidEncryptedMasterKeySeed));
+    if (!util.isNonNegativeInteger(keyIndex)) return callback(Util.errorWrap(requestErrors.InvalidKeyIndex));
+    if (typeof encryptedMasterKeySeed !== "string") return callback(Util.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
     switch (keyType) {
         case signatureKeyType.OLT:
-            if (!util.validateBase64(message)) return callback(util.returnErrorStructure(requestErrors.InvalidEncodedTxMessage));
+            if (!util.validateBase64(message)) return callback(Util.errorWrap(requestErrors.InvalidEncodedTxMessage));
             const oltTxData = {
                 message,
                 keyPath: oneledgerKeyPath + keyIndex + keyPathSuffix,
@@ -82,7 +83,7 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
                 return callback(null, signature)
             });
         case signatureKeyType.BTC:
-            if (!util.validBTCTxMessage(message)) return callback(util.returnErrorStructure(requestErrors.InvalidBTCtxMessage));
+            if (!util.validBTCTxMessage(message)) return callback(Util.errorWrap(requestErrors.InvalidBTCtxMessage));
             const btcTxData = {
                 message,
                 keyPath: bitcoinKeyPath + keyIndex,
@@ -97,11 +98,11 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
         case signatureKeyType.ETH:
             const {nonce, gasPrice, gasLimit, to, value} = message;
             // verify eth tx message data
-            if (!util.isNonNegativeInteger(nonce)) return callback(util.returnErrorStructure(requestErrors.InvalidNonce));
-            if (!util.isNonNegativeNumber(gasPrice)) return callback(util.returnErrorStructure(requestErrors.InvalidGasPrice));
-            if (!util.isNonNegativeNumber(value)) return callback(util.returnErrorStructure(requestErrors.InvalidTxValue));
-            if (!util.isPositiveInteger(gasLimit)) return callback(util.returnErrorStructure(requestErrors.InvalidGasLimit));
-            if (!util.isValidAddress(to)) return callback(util.returnErrorStructure(requestErrors.InvalidTxReceiverAddress));
+            if (!util.isNonNegativeInteger(nonce)) return callback(Util.errorWrap(requestErrors.InvalidNonce));
+            if (!util.isNonNegativeNumber(gasPrice)) return callback(Util.errorWrap(requestErrors.InvalidGasPrice));
+            if (!util.isNonNegativeNumber(value)) return callback(Util.errorWrap(requestErrors.InvalidTxValue));
+            if (!util.isPositiveInteger(gasLimit)) return callback(Util.errorWrap(requestErrors.InvalidGasLimit));
+            if (!util.isValidAddress(to)) return callback(Util.errorWrap(requestErrors.InvalidTxReceiverAddress));
             const ethTxData = {
                 txParams: message,
                 password,
@@ -113,7 +114,7 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
                 return callback(null, signature)
             });
         default:
-            return callback(util.returnErrorStructure(requestErrors.InvalidSignKeyType));
+            return callback(Util.errorWrap(requestErrors.InvalidSignKeyType));
     }
 }
 

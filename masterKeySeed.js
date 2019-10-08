@@ -3,7 +3,8 @@ const nacl = require("tweetnacl");
 nacl.util = require("tweetnacl-util");
 const sjcl = require("sjcl");
 const crypto = require("crypto");
-const requestErrors = require("./errorType").requestErrors;
+const {ErrorType, Util} = require("middle_utility").Error;
+const {requestErrors} = ErrorType;
 const typeConverter = require("./typeConverter");
 const masterSeedKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
 const util = require("./util");
@@ -76,7 +77,7 @@ function masterKeySeedDecryption(password, encryptedMasterKeySeed, callback) {
     try {
         decryptedMasterKeySeed = sjcl.decrypt(password, encryptedMasterKeySeed)
     } catch (err) {
-        return callback(util.returnErrorStructure(requestErrors.WrongPassword))
+        return callback(Util.errorWrap(requestErrors.WrongPassword))
     }
     callback(null, typeConverter.uint8ArrayToBuffer(nacl.util.decodeBase64(decryptedMasterKeySeed)))
 }
@@ -123,7 +124,7 @@ function unlockMasterKeySeed(password, encryptedMasterKeySeed) {
             receiver = Promise.reject(error);
             return receiver
         } else if (typeof unlockResult !== "undefined") {
-            receiver = Promise.resolve(util.returnResponseStructure(true));
+            receiver = Promise.resolve(util.responseWrap(true));
             return receiver
         }
     });

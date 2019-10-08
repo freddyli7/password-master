@@ -6,7 +6,8 @@ const EthereumTx = require('ethereumjs-tx').Transaction;
 const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
 const HDWallet = require('ethereum-hdwallet');
-const requestErrors = require("./errorType").requestErrors;
+const {ErrorType, Util} = require("middle_utility").Error;
+const {requestErrors} = ErrorType;
 const walletValidator = require('wallet-address-validator');
 
 /* *****************************   Secp256k1 For ETH  ***************************** */
@@ -62,7 +63,7 @@ function signForSignature({txParams, password, encryptedMasterKeySeed, keyPath},
         const derivedPrivateKey = derivePrivateKey(decryptedMasterKeySeed, keyPath);
         const tx = new EthereumTx(txParams, {chain: 'mainnet', hardfork: 'petersburg'});
         tx.sign(derivedPrivateKey);
-        if (!tx.verifySignature()) return callback(util.returnErrorStructure(requestErrors.InvalidETHSignature));
+        if (!tx.verifySignature()) return callback(Util.errorWrap(requestErrors.InvalidETHSignature));
         callback(null, tx.serialize().toString('hex'));
     });
 }

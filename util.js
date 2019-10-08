@@ -33,13 +33,8 @@ function isValidString(str) {
     return !(typeof str === "undefined" || str === "" || str === "<nil>" || str === null)
 }
 
-// return error structure to UI
-function returnErrorStructure(err) {
-    return {error: err}
-}
-
 // return response structure to UI
-function returnResponseStructure(response) {
+function responseWrap(response) {
     return {response: response}
 }
 
@@ -51,6 +46,5 @@ module.exports = {
     isNonNegativeNumber,
     isValidAddress,
     isValidString,
-    returnErrorStructure,
-    returnResponseStructure
+    responseWrap
 };

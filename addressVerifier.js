@@ -2,11 +2,12 @@ const bitcoin = require("./bitcoin");
 const ethereum = require("./ethereum");
 const oneledger = require("./oneledger");
 const {derivedKeyType} = require("./config");
-const {requestErrors} = require("./errorType");
 const util = require("./util");
+const {ErrorType, Util} = require("middle_utility").Error;
+const {requestErrors} = ErrorType;
 
 function verify(address, addressType) {
-    if (!util.isValidString(address) || !util.isValidString(addressType)) return util.returnErrorStructure(requestErrors.InvalidInputData);
+    if (!util.isValidString(address) || !util.isValidString(addressType)) return Util.errorWrap(requestErrors.InvalidInputData);
     switch (addressType) {
         case derivedKeyType.OLT:
             return oneledger.verifyAddress(address);
@@ -17,7 +18,7 @@ function verify(address, addressType) {
         case derivedKeyType.BTCP2PKH:
             return bitcoin.verifyAddress(address);
         default:
-            return util.returnErrorStructure(requestErrors.InvalidAddressType);
+            return Util.errorWrap(requestErrors.InvalidAddressType);
     }
 }
 
