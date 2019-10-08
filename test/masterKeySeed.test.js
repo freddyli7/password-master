@@ -91,7 +91,7 @@ describe("test masterKeySeed address", function () {
 describe("test recovery master key", function () {
     it("test 1", function () {
         // recovery address from mnemonic words array
-        const masterAddress = masterKeySeed.recoveryMasterKeySeed(mnemonicArray);
+        const masterAddress = masterKeySeed.getMasterKeySeedAddressForRecovery(mnemonicArray);
         // address from masterKeySeed generator
         const keyseed = masterKeySeed.masterKeySeedGenerator(mnemonicArray);
         should.equal(masterAddress, masterKeySeed.getMasterKeySeedAddress(masterKeySeed.getMasterKeySeedPublicKey(keyseed)), "the address derived from user recovery mnemonic words should be identical with the address stored in master key local file")
