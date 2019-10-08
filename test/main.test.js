@@ -43,7 +43,7 @@ describe("examples of how to use HD-vault", function () {
             console.log("get masterKeySeed info: ", encryptedMasterKeySeed, masterKeySeedAddress);
         });
         // when user recovery masterKeySeed, get the masterAddress based on provided mnemonic for comparison
-        console.log("recovery : " + HDVault.masterKeySeedUtil.recoveryMasterKeySeed(mnemonicArray));
+        console.log("recovery address: " + HDVault.masterKeySeedUtil.getMasterKeySeedAddressForRecovery(mnemonicArray));
         // derive new key with different keyType : OLT, BTC-P2PK, BTC-P2PKH, ETH
         // return new key's address and keyIndex to store locally
         const derivedData = {
