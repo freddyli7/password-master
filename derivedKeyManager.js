@@ -28,7 +28,7 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                 const oneledgerPrivateKeySeed = oneledger.derivePrivateKeySeed(oneledgerMasterKey, oneledgerKeyPath + keyIndex + keyPathSuffix);
                 const {publicKey} = oneledger.deriveKeyPair(oneledgerPrivateKeySeed);
                 const oneledgerAddress = oneledger.deriveAddress(publicKey);
-                return callback(null, keyIndex, oneledgerAddress);
+                return callback(null, keyIndex, oneledgerAddress, publicKey);
             case derivedKeyType.BTCP2PK:
                 // console.log(bitcoinKeyPath + keyIndex);
                 return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PK) => {
@@ -42,14 +42,14 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                 return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PKH) => {
                     const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PKH);
                     const bitcoinDerivedP2PKHAddress = bitcoin.deriveP2PKHAddress(bitcoinDerivedPubkeyP2PKH);
-                    callback(null, keyIndex, bitcoinDerivedP2PKHAddress)
+                    callback(null, keyIndex, bitcoinDerivedP2PKHAddress, bitcoinDerivedPubkeyP2PKH)
                 });
             case derivedKeyType.ETH:
-                // console.log(ethereumKeyPath + keyIndex);;
+                // console.log(ethereumKeyPath + keyIndex);
                 const ethereumDerivedPriKey = ethereum.derivePrivateKey(masterKeySeed, ethereumKeyPath + keyIndex);
                 const ethereumDerivedPubkey = ethereum.derivePublicKey(ethereumDerivedPriKey);
                 const ethereumDerivedAddress = ethereum.deriveAddress(ethereumDerivedPubkey);
-                return callback(null, keyIndex, ethereumDerivedAddress);
+                return callback(null, keyIndex, ethereumDerivedAddress, ethereumDerivedPubkey);
             default:
                 return callback(util.returnErrorStructure(requestErrors.InvalidDerivedKeyType))
         }
