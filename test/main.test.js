@@ -52,9 +52,10 @@ describe("examples of how to use HD-vault", function () {
             password: "123456",
             encryptedMasterKeySeed
         };
-        HDVault.derivedKeyManager.deriveNewKeyPair(derivedData, (error, keyIndex, address) => {
+        HDVault.derivedKeyManager.deriveNewKeyPair(derivedData, (error, keyIndex, address, publicKey) => {
             console.log("get derived key's keyIndex: ", keyIndex);
             console.log("get derived key's address: ", address);
+            console.log("get derived key's public key: ", publicKey);
         });
         // sign tx with derived new key
         const messageOLT = 'eyJ0eF90eXBlIjoyLCJ0eF9kYXRhIjoiZXlKUGQyNWxjaUk2SWpCNE1qZ3dabVkxT0dNMk5UYzNaRGhrWkRBeE5XVmlNelkzTUdRMU1UY3paVFl4WVRnNE1HWmxZU0lzSWtGalkyOTFiblFpT2lJd2VESTRNR1ptTlRoak5qVTNOMlE0WkdRd01UVmxZak0yTnpCa05URTNNMlUyTVdFNE9EQm1aV0VpTENKT1lXMWxJam9pZEdWemRHUnZiV0ZwYmpFeElpd2lVSEpwWTJVaU9uc2lZM1Z5Y21WdVkza2lPaUpQVEZRaUxDSjJZV3gxWlNJNklqRXdNREF3TURBd01EQXdNREF3TURBd01EQXdNREFpZlgwPSIsImZlZSI6eyJQcmljZSI6eyJjdXJyZW5jeSI6Ik9MVCIsInZhbHVlIjoiMTAwMDAwMDAwMDAwMDAwMDAwMCJ9LCJHYXMiOjF9LCJtZW1vIjoiNGM1MzQ4ZTctYWNjOS0xMWU5LTlhN2MtNDIwMTBhMGEwMDA5In0=';
