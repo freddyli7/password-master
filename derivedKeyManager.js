@@ -5,7 +5,7 @@ const masterKeySeed = require("./masterKeySeed");
 const util = require("./util");
 const typeConverter = require("./typeConverter");
 const {signatureKeyType, derivedKeyType} = require("./config");
-const {ErrorType, Util} = require("middle_utility").Error;
+const {ErrorType, Util} = require("./middle_utility").Error;
 const {requestErrors} = ErrorType;
 const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
 

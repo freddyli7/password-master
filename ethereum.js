@@ -6,7 +6,7 @@ const EthereumTx = require('ethereumjs-tx').Transaction;
 const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
 const HDWallet = require('ethereum-hdwallet');
-const {ErrorType, Util} = require("middle_utility").Error;
+const {ErrorType, Util} = require("./middle_utility").Error;
 const {requestErrors} = ErrorType;
 const walletValidator = require('wallet-address-validator');
 

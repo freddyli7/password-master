@@ -8,7 +8,7 @@ const {bitcoinNetworkType} = require("./config");
 const bip32 = require("bip32");
 const walletValidator = require('wallet-address-validator');
 const util = require('./util');
-const {ErrorType, Util} = require("middle_utility").Error;
+const {ErrorType, Util} = require("./middle_utility").Error;
 const {requestErrors} = ErrorType;
 
 /* *****************************   Secp256k1 For BTC  ***************************** */

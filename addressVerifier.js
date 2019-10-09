@@ -3,7 +3,7 @@ const ethereum = require("./ethereum");
 const oneledger = require("./oneledger");
 const {derivedKeyType} = require("./config");
 const util = require("./util");
-const {ErrorType, Util} = require("middle_utility").Error;
+const {ErrorType, Util} = require("./middle_utility").Error;
 const {requestErrors} = ErrorType;
 
 function verify(address, addressType) {
