@@ -35,6 +35,11 @@ const requestErrors = {
     InvalidInputData: {
         code: -11015,
         message: "Address and address type have to be valid string"
+    },
+    FailedToDeriveNewKeyError: {
+        code: -20007,
+        message: "Error (20007): Failed to derive new key",
+        detail: "-20007 : failed to derive new key"
     }
 };
 
