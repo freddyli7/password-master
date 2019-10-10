@@ -12,9 +12,9 @@ class MasterKeySeedManager {
 
     // export masterKeySeed info for persisting at local file system
     // should be called only when creating new masterKeySeed OR when after user recovery with correct mnemonic words and encrypted the masterKeySeed with new password
-    // return : callback function containing encryptedMasterKeySeed and masterKeySeedAddress
-    getMasterKeySeedInfo(callback) {
-        callback(this.encryptedMasterKeySeed, this.masterKeySeedAddress)
+    // return : object containing encryptedMasterKeySeed and masterKeySeedAddress
+    getMasterKeySeedInfo() {
+        return {encryptedMasterKeySeed: this.encryptedMasterKeySeed, masterKeySeedAddress: this.masterKeySeedAddress}
     }
 
     // check masterKeySeed encryption password

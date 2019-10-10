@@ -9,7 +9,7 @@ const masterKeyPassword = "123456";
 const wrongMasterkeyPassword = "123456123123";
 
 describe("test derive new key", function () {
-    it("test derive new oneledger account", function () {
+    it("test derive new oneledger account", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const kamap = new Map();
         for (let i = 0; i < 1000; i++) {
@@ -19,14 +19,17 @@ describe("test derive new key", function () {
                 password: masterKeyPassword,
                 encryptedMasterKeySeed
             };
-            deriveKeyManager.deriveNewKeyPair(data, (error, keyIndex, address) => {
-                if (error) should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
-                kamap.set(address, keyIndex)
+            const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
+                // console.log("ERR :", error);
+                should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            const {keyIndex, address, publicKey} = response;
+            kamap.set(address, keyIndex);
+            // console.log(`${keyIndex} ${address}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different addresses")
     }).timeout(20000);
-    it("test derive new BTC-P2PK account", function () {
+    it("test derive new BTC-P2PK account", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const kamap = new Map();
         for (let i = 0; i < 1000; i++) {
@@ -37,14 +40,17 @@ describe("test derive new key", function () {
                 encryptedMasterKeySeed,
                 network: "BITCOIN"
             };
-            deriveKeyManager.deriveNewKeyPair(data, (error, keyIndex, pubKey) => {
-                if (error) should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
-                kamap.set(pubKey, keyIndex)
+            const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
+                // console.log(error);
+                should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            const {keyIndex, address, publicKey} = response;
+            kamap.set(publicKey, keyIndex);
+            // console.log(`${keyIndex} ${publicKey}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different public key")
     }).timeout(20000);
-    it("test derive new BTC-P2PKH account", function () {
+    it("test derive new BTC-P2PKH account", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const kamap = new Map();
         for (let i = 0; i < 1000; i++) {
@@ -55,14 +61,16 @@ describe("test derive new key", function () {
                 encryptedMasterKeySeed,
                 network: "BITCOIN"
             };
-            deriveKeyManager.deriveNewKeyPair(data, (error, keyIndex, address) => {
-                if (error) should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
-                kamap.set(address, keyIndex)
+            const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
+                should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            const {keyIndex, address, publicKey} = response;
+            kamap.set(address, keyIndex);
+            // console.log(`${keyIndex} ${address}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different addresses")
     }).timeout(20000);
-    it("test derive new ETH account", function () {
+    it("test derive new ETH account", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const kamap = new Map();
         for (let i = 0; i < 1000; i++) {
@@ -72,10 +80,12 @@ describe("test derive new key", function () {
                 password: masterKeyPassword,
                 encryptedMasterKeySeed
             };
-            deriveKeyManager.deriveNewKeyPair(data, (error, keyIndex, address) => {
-                if (error) should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
-                kamap.set(address, keyIndex)
+            const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
+                should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            const {keyIndex, address, publicKey} = response;
+            kamap.set(address, keyIndex);
+            // console.log(`${keyIndex} ${address}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different addresses")
     }).timeout(20000);
@@ -93,7 +103,7 @@ const txParamsETH = {
 };
 
 describe("test sign tx", function () {
-    it("test sign tx with OLT derived key", function () {
+    it("test sign tx with OLT derived key", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const ismap = new Map();
         for (let i = 0; i < 1000; i++) {
@@ -104,14 +114,16 @@ describe("test sign tx", function () {
                 password: masterKeyPassword,
                 encryptedMasterKeySeed
             };
-            deriveKeyManager.signTx(data, (error, signature) => {
-                if (error) should.fail(error, null, "sign OLT tx should be ok but : " + error.message);
-                ismap.set(signature, i)
+            const {response} = await deriveKeyManager.signTx(data).catch(error => {
+                should.fail(error, null, "sign OLT tx should be ok but : " + error.error.message);
             });
+            const {signature} = response;
+            ismap.set(signature, i);
+            // console.log(`${i} ${signature}`);
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
     }).timeout(20000);
-    it("test sign tx with BTC derived key", function () {
+    it("test sign tx with BTC derived key", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const ismap = new Map();
         for (let i = 0; i < 1000; i++) {
@@ -123,14 +135,15 @@ describe("test sign tx", function () {
                 encryptedMasterKeySeed,
                 network: "BITCOIN"
             };
-            deriveKeyManager.signTx(data, (error, signature) => {
-                if (error) should.fail(error, null, "sign BTC tx should be ok but : " + error.message);
-                ismap.set(signature, i)
+            const {response} = await deriveKeyManager.signTx(data).catch(error => {
+                should.fail(error, null, "sign BTC tx should be ok but : " + error.error.message);
             });
+            const {signature, recovery} = response;
+            ismap.set(signature, i)
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
     }).timeout(20000);
-    it("test sign tx with ETH derived key", function () {
+    it("test sign tx with ETH derived key", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const ismap = new Map();
         for (let i = 0; i < 1000; i++) {
@@ -141,10 +154,12 @@ describe("test sign tx", function () {
                 password: masterKeyPassword,
                 encryptedMasterKeySeed
             };
-            deriveKeyManager.signTx(data, (error, signature) => {
-                if (error) should.fail(error, null, "sign ETH tx should be ok but : " + error.message);
-                ismap.set(signature, i)
+            const {response} = await deriveKeyManager.signTx(data).catch(error => {
+                should.fail(error, null, "sign ETH tx should be ok but : " + error.error.message);
             });
+            const {signature} = response;
+            ismap.set(signature, i);
+            // console.log(`${i} ${signature}`);
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
     }).timeout(20000);

@@ -235,8 +235,9 @@ describe("test sign tx for BTC", function () {
             keyPath,
             network: "BITCOIN"
         };
-        bitcoin.signForSignature(data, function (error, signature, recovery) {
+        bitcoin.signForSignature(data, function (error, result) {
             if (error) should.fail(error, null, "sign tx should be ok, but : " + error);
+            const {signature, recovery} = result;
             // console.log(signature);
             // console.log(typeConverter.bufferToHexStr(signature));
             // console.log(recovery);
