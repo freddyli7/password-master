@@ -41,7 +41,8 @@ describe("test derive new key", function () {
                 network: "BITCOIN"
             };
             const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
-                should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
+                // console.log(error);
+                should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
             const {keyIndex, address, publicKey} = response;
             kamap.set(publicKey, keyIndex);
@@ -61,7 +62,7 @@ describe("test derive new key", function () {
                 network: "BITCOIN"
             };
             const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
-                should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
+                should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
             const {keyIndex, address, publicKey} = response;
             kamap.set(address, keyIndex);
@@ -80,7 +81,7 @@ describe("test derive new key", function () {
                 encryptedMasterKeySeed
             };
             const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
-                should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
+                should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
             const {keyIndex, address, publicKey} = response;
             kamap.set(address, keyIndex);

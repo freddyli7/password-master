@@ -118,8 +118,8 @@ function signForSignature({message, password, encryptedMasterKeySeed, keyPath, n
             if (error) return callback(error);
             const {signature, recovery} = secp256k1.sign(typeConverter.hexStrToBuffer(message), derivedPrivateKey);
             callback(null, {signature, recovery})
-        });
-    });
+        })
+    })
 }
 
 // verify BTC tx signature

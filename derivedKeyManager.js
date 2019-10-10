@@ -9,6 +9,15 @@ const requestErrors = require("./errorType").requestErrors;
 const sysUtil = require("util");
 const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
 
+// TODO : need to remove this function after integrated with middle_utility
+function temporaryErrHandler(err) {
+    const {code} = err.error;
+    if (code === -11012) {
+        return err
+    }
+    return util.returnErrorStructure(requestErrors.FailedToDeriveNewKeyError)
+}
+
 // expose this function to UI
 // derive new keys and store keyIndex with address (or publicKey) locally
 // input : keyType should be string of either "OLT", "BTC-P2PK", "BTC-P2PKH", "ETH"
@@ -23,24 +32,45 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
     return new Promise((resolve, reject) => {
         masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, (error, masterKeySeed) => {
             if (error) reject(util.returnErrorStructure(requestErrors.WrongPassword));
+            let result;
             switch (keyType) {
                 case derivedKeyType.OLT:
-                    resolve(util.returnResponseStructure(deriveNewKeyPairOLT(masterKeySeed, keyIndex)));
+                    try {
+                        result = deriveNewKeyPairOLT(masterKeySeed, keyIndex)
+                    } catch (error) {
+                        reject(temporaryErrHandler(error))
+                    }
+                    resolve(util.returnResponseStructure(result));
                     break;
                 case derivedKeyType.BTCP2PK:
-                    resolve(util.returnResponseStructure(deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network)));
+                    try {
+                        result = deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network)
+                    } catch (error) {
+                        reject(temporaryErrHandler(error))
+                    }
+                    resolve(util.returnResponseStructure(result));
                     break;
                 case derivedKeyType.BTCP2PKH:
-                    resolve(util.returnResponseStructure(deriveNewKeyPairBTCP2PKH(masterKeySeed, keyIndex, network)));
+                    try {
+                        result = deriveNewKeyPairBTCP2PKH(masterKeySeed, keyIndex, network)
+                    } catch (error) {
+                        reject(temporaryErrHandler(error))
+                    }
+                    resolve(util.returnResponseStructure(result));
                     break;
                 case derivedKeyType.ETH:
-                    resolve(util.returnResponseStructure(deriveNewKeyPairETH(masterKeySeed, keyIndex)));
+                    try {
+                        result = deriveNewKeyPairETH(masterKeySeed, keyIndex)
+                    } catch (error) {
+                        reject(temporaryErrHandler(error))
+                    }
+                    resolve(util.returnResponseStructure(result));
                     break;
                 default:
                     reject(util.returnErrorStructure(requestErrors.InvalidDerivedKeyType))
             }
-        });
-    });
+        })
+    })
 }
 
 function deriveNewKeyPairOLT(masterKeySeed, keyIndex) {
@@ -55,7 +85,7 @@ function deriveNewKeyPairOLT(masterKeySeed, keyIndex) {
 function deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network) {
     // console.log(bitcoinKeyPath + keyIndex);
     return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PK) => {
-        if (error) return callback(error);
+        if (error) throw(error);
         const bitcoinDerivedPubkeyP2PK = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PK);
         const bitcoinDerivedP2PKPubkey = bitcoin.deriveP2PKPubKey(bitcoinDerivedPubkeyP2PK);
         return {keyIndex, publicKey: bitcoinDerivedP2PKPubkey}
@@ -65,6 +95,7 @@ function deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network) {
 function deriveNewKeyPairBTCP2PKH(masterKeySeed, keyIndex, network) {
     // console.log(bitcoinKeyPath + keyIndex);
     return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PKH) => {
+        if (error) throw(error);
         const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PKH);
         const bitcoinDerivedP2PKHAddress = bitcoin.deriveP2PKHAddress(bitcoinDerivedPubkeyP2PKH);
         return {
@@ -159,7 +190,7 @@ function signTxETH(message, keyIndex, encryptedMasterKeySeed, password) {
         return Promise.resolve(util.returnResponseStructure({signature}))
     }).catch(error => {
         return Promise.reject(error)
-    });
+    })
 }
 
 module.exports = {
