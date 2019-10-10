@@ -6,6 +6,7 @@ const util = require("./util");
 const typeConverter = require("./typeConverter");
 const {signatureKeyType, derivedKeyType} = require("./config");
 const requestErrors = require("./errorType").requestErrors;
+const sysUtil = require("util");
 const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
 
 // expose this function to UI
@@ -19,57 +20,67 @@ const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = requi
 function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}) {
     if (!util.isNonNegativeInteger(keyIndex)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidKeyIndex));
     if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(util.returnErrorStructure(requestErrors.InvalidEncryptedMasterKeySeed));
-    let receiver;
-    masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, (error, masterKeySeed) => {
-        if (error) {
-            receiver = Promise.reject(util.returnErrorStructure(requestErrors.WrongPassword));
-            return
-        }
-        switch (keyType) {
-            case derivedKeyType.OLT:
-                // console.log(oneledgerKeyPath + keyIndex + keyPathSuffix);
-                const oneledgerMasterKey = oneledger.deriveMasterKey(typeConverter.bufferToHexStr(masterKeySeed));
-                const oneledgerPrivateKeySeed = oneledger.derivePrivateKeySeed(oneledgerMasterKey, oneledgerKeyPath + keyIndex + keyPathSuffix);
-                const {publicKey} = oneledger.deriveKeyPair(oneledgerPrivateKeySeed);
-                const oneledgerAddress = oneledger.deriveAddress(publicKey);
-                const objOlt = {keyIndex, address: oneledgerAddress, publicKey};
-                receiver = Promise.resolve(util.returnResponseStructure(objOlt));
-                return;
-            case derivedKeyType.BTCP2PK:
-                // console.log(bitcoinKeyPath + keyIndex);
-                return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PK) => {
-                    if (error) return callback(error);
-                    const bitcoinDerivedPubkeyP2PK = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PK);
-                    const bitcoinDerivedP2PKPubkey = bitcoin.deriveP2PKPubKey(bitcoinDerivedPubkeyP2PK);
-                    const objBtcP2PK = {keyIndex, publicKey: bitcoinDerivedP2PKPubkey};
-                    receiver = Promise.resolve(util.returnResponseStructure(objBtcP2PK))
-                });
-            case derivedKeyType.BTCP2PKH:
-                // console.log(bitcoinKeyPath + keyIndex);
-                return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PKH) => {
-                    const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PKH);
-                    const bitcoinDerivedP2PKHAddress = bitcoin.deriveP2PKHAddress(bitcoinDerivedPubkeyP2PKH);
-                    const objBtcP2PKH = {
-                        keyIndex,
-                        address: bitcoinDerivedP2PKHAddress,
-                        publicKey: bitcoinDerivedPubkeyP2PKH
-                    };
-                    receiver = Promise.resolve(util.returnResponseStructure(objBtcP2PKH))
-                });
-            case derivedKeyType.ETH:
-                // console.log(ethereumKeyPath + keyIndex);
-                const ethereumDerivedPriKey = ethereum.derivePrivateKey(masterKeySeed, ethereumKeyPath + keyIndex);
-                const ethereumDerivedPubkey = ethereum.derivePublicKey(ethereumDerivedPriKey);
-                const ethereumDerivedAddress = ethereum.deriveAddress(ethereumDerivedPubkey);
-                const objEth = {keyIndex, address: ethereumDerivedAddress, publicKey: ethereumDerivedPubkey};
-                receiver = Promise.resolve(util.returnResponseStructure(objEth));
-                return;
-            default:
-                receiver = Promise.reject(util.returnErrorStructure(requestErrors.InvalidDerivedKeyType));
-                return
-        }
+    return new Promise((resolve, reject) => {
+        masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, (error, masterKeySeed) => {
+            if (error) reject(util.returnErrorStructure(requestErrors.WrongPassword));
+            switch (keyType) {
+                case derivedKeyType.OLT:
+                    resolve(util.returnResponseStructure(deriveNewKeyPairOLT(masterKeySeed, keyIndex)));
+                    break;
+                case derivedKeyType.BTCP2PK:
+                    resolve(util.returnResponseStructure(deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network)));
+                    break;
+                case derivedKeyType.BTCP2PKH:
+                    resolve(util.returnResponseStructure(deriveNewKeyPairBTCP2PKH(masterKeySeed, keyIndex, network)));
+                    break;
+                case derivedKeyType.ETH:
+                    resolve(util.returnResponseStructure(deriveNewKeyPairETH(masterKeySeed, keyIndex)));
+                    break;
+                default:
+                    reject(util.returnErrorStructure(requestErrors.InvalidDerivedKeyType))
+            }
+        });
     });
-    return receiver
+}
+
+function deriveNewKeyPairOLT(masterKeySeed, keyIndex) {
+    // console.log(oneledgerKeyPath + keyIndex + keyPathSuffix);
+    const oneledgerMasterKey = oneledger.deriveMasterKey(typeConverter.bufferToHexStr(masterKeySeed));
+    const oneledgerPrivateKeySeed = oneledger.derivePrivateKeySeed(oneledgerMasterKey, oneledgerKeyPath + keyIndex + keyPathSuffix);
+    const {publicKey} = oneledger.deriveKeyPair(oneledgerPrivateKeySeed);
+    const oneledgerAddress = oneledger.deriveAddress(publicKey);
+    return {keyIndex, address: oneledgerAddress, publicKey}
+}
+
+function deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network) {
+    // console.log(bitcoinKeyPath + keyIndex);
+    return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PK) => {
+        if (error) return callback(error);
+        const bitcoinDerivedPubkeyP2PK = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PK);
+        const bitcoinDerivedP2PKPubkey = bitcoin.deriveP2PKPubKey(bitcoinDerivedPubkeyP2PK);
+        return {keyIndex, publicKey: bitcoinDerivedP2PKPubkey}
+    })
+}
+
+function deriveNewKeyPairBTCP2PKH(masterKeySeed, keyIndex, network) {
+    // console.log(bitcoinKeyPath + keyIndex);
+    return bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network, (error, bitcoinDerivedPriKeyP2PKH) => {
+        const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PKH);
+        const bitcoinDerivedP2PKHAddress = bitcoin.deriveP2PKHAddress(bitcoinDerivedPubkeyP2PKH);
+        return {
+            keyIndex,
+            address: bitcoinDerivedP2PKHAddress,
+            publicKey: bitcoinDerivedPubkeyP2PKH
+        }
+    })
+}
+
+function deriveNewKeyPairETH(masterKeySeed, keyIndex) {
+    // console.log(ethereumKeyPath + keyIndex);
+    const ethereumDerivedPriKey = ethereum.derivePrivateKey(masterKeySeed, ethereumKeyPath + keyIndex);
+    const ethereumDerivedPubkey = ethereum.derivePublicKey(ethereumDerivedPriKey);
+    const ethereumDerivedAddress = ethereum.deriveAddress(ethereumDerivedPubkey);
+    return {keyIndex, address: ethereumDerivedAddress, publicKey: ethereumDerivedPubkey}
 }
 
 // expose this function to UI
@@ -86,69 +97,69 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
     if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(util.returnErrorStructure(requestErrors.InvalidEncryptedMasterKeySeed));
     switch (keyType) {
         case signatureKeyType.OLT:
-            if (!util.validateBase64(message)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidEncodedTxMessage));
-            const oltTxData = {
-                message,
-                keyPath: oneledgerKeyPath + keyIndex + keyPathSuffix,
-                encryptedMasterKeySeed,
-                password
-            };
-            let receiverOlt;
-            oneledger.signForSignature(oltTxData, (error, signature) => {
-                if (error) {
-                    receiverOlt = Promise.reject(error);
-                    return
-                }
-                const obj = {signature};
-                receiverOlt = Promise.resolve(util.returnResponseStructure(obj));
-            });
-            return receiverOlt;
+            return signTxOLT(message, keyIndex, encryptedMasterKeySeed, password);
         case signatureKeyType.BTC:
-            if (!util.validBTCTxMessage(message)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidBTCtxMessage));
-            const btcTxData = {
-                message,
-                keyPath: bitcoinKeyPath + keyIndex,
-                network,
-                password,
-                encryptedMasterKeySeed
-            };
-            let receiverBtc;
-            bitcoin.signForSignature(btcTxData, (error, signature, recovery) => {
-                if (error) {
-                    receiverBtc = Promise.reject(error);
-                    return
-                }
-                const obj = {signature, recovery};
-                receiverBtc = Promise.resolve(util.returnResponseStructure(obj));
-            });
-            return receiverBtc;
+            return signTxBTC(message, keyIndex, encryptedMasterKeySeed, password, network);
         case signatureKeyType.ETH:
-            const {nonce, gasPrice, gasLimit, to, value} = message;
-            // verify eth tx message data
-            if (!util.isNonNegativeInteger(nonce)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidNonce));
-            if (!util.isNonNegativeNumber(gasPrice)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidGasPrice));
-            if (!util.isNonNegativeNumber(value)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidTxValue));
-            if (!util.isPositiveInteger(gasLimit)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidGasLimit));
-            if (!util.isValidAddress(to)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidTxReceiverAddress));
-            const ethTxData = {
-                txParams: message,
-                password,
-                encryptedMasterKeySeed,
-                keyPath: ethereumKeyPath + keyIndex
-            };
-            let receiverEth;
-            ethereum.signForSignature(ethTxData, (error, signature) => {
-                if (error) {
-                    receiverEth = Promise.reject(error);
-                    return
-                }
-                const obj = {signature};
-                receiverEth = Promise.resolve(util.returnResponseStructure(obj));
-            });
-            return receiverEth;
+            return signTxETH(message, keyIndex, encryptedMasterKeySeed, password);
         default:
             return Promise.reject(util.returnErrorStructure(requestErrors.InvalidSignKeyType));
     }
+}
+
+function signTxOLT(message, keyIndex, encryptedMasterKeySeed, password) {
+    if (!util.validateBase64(message)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidEncodedTxMessage));
+    const oltTxData = {
+        message,
+        keyPath: oneledgerKeyPath + keyIndex + keyPathSuffix,
+        encryptedMasterKeySeed,
+        password
+    };
+    const signTxOLTPromise = sysUtil.promisify(oneledger.signForSignature);
+    return signTxOLTPromise(oltTxData).then(signature => {
+        return Promise.resolve(util.returnResponseStructure({signature}))
+    }).catch(error => {
+        return Promise.reject(error)
+    })
+}
+
+function signTxBTC(message, keyIndex, encryptedMasterKeySeed, password, network) {
+    if (!util.validBTCTxMessage(message)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidBTCtxMessage));
+    const btcTxData = {
+        message,
+        keyPath: bitcoinKeyPath + keyIndex,
+        network,
+        password,
+        encryptedMasterKeySeed
+    };
+    const signTxBTCPromise = sysUtil.promisify(bitcoin.signForSignature);
+    return signTxBTCPromise(btcTxData).then(result => {
+        return Promise.resolve(util.returnResponseStructure({signature: result.signature, recovery: result.recovery}))
+    }).catch(error => {
+        return Promise.reject(error)
+    })
+}
+
+function signTxETH(message, keyIndex, encryptedMasterKeySeed, password) {
+    const {nonce, gasPrice, gasLimit, to, value} = message;
+    // verify eth tx message data
+    if (!util.isNonNegativeInteger(nonce)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidNonce));
+    if (!util.isNonNegativeNumber(gasPrice)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidGasPrice));
+    if (!util.isNonNegativeNumber(value)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidTxValue));
+    if (!util.isPositiveInteger(gasLimit)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidGasLimit));
+    if (!util.isValidAddress(to)) return Promise.reject(util.returnErrorStructure(requestErrors.InvalidTxReceiverAddress));
+    const ethTxData = {
+        txParams: message,
+        password,
+        encryptedMasterKeySeed,
+        keyPath: ethereumKeyPath + keyIndex
+    };
+    const signTxETHPromise = sysUtil.promisify(ethereum.signForSignature);
+    return signTxETHPromise(ethTxData).then(signature => {
+        return Promise.resolve(util.returnResponseStructure({signature}))
+    }).catch(error => {
+        return Promise.reject(error)
+    });
 }
 
 module.exports = {

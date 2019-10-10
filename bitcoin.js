@@ -117,7 +117,7 @@ function signForSignature({message, password, encryptedMasterKeySeed, keyPath, n
         return derivePrivateKey(decryptedMasterKeySeed, keyPath, network, (error, derivedPrivateKey) => {
             if (error) return callback(error);
             const {signature, recovery} = secp256k1.sign(typeConverter.hexStrToBuffer(message), derivedPrivateKey);
-            callback(null, signature, recovery)
+            callback(null, {signature, recovery})
         });
     });
 }

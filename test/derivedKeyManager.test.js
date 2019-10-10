@@ -24,7 +24,8 @@ describe("test derive new key", function () {
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
             const {keyIndex, address, publicKey} = response;
-            kamap.set(address, keyIndex)
+            kamap.set(address, keyIndex);
+            // console.log(`${keyIndex} ${address}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different addresses")
     }).timeout(20000);
@@ -43,7 +44,8 @@ describe("test derive new key", function () {
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
             });
             const {keyIndex, address, publicKey} = response;
-            kamap.set(publicKey, keyIndex)
+            kamap.set(publicKey, keyIndex);
+            // console.log(`${keyIndex} ${publicKey}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different public key")
     }).timeout(20000);
@@ -62,7 +64,8 @@ describe("test derive new key", function () {
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
             });
             const {keyIndex, address, publicKey} = response;
-            kamap.set(address, keyIndex)
+            kamap.set(address, keyIndex);
+            // console.log(`${keyIndex} ${address}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different addresses")
     }).timeout(20000);
@@ -80,7 +83,8 @@ describe("test derive new key", function () {
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.message);
             });
             const {keyIndex, address, publicKey} = response;
-            kamap.set(address, keyIndex)
+            kamap.set(address, keyIndex);
+            // console.log(`${keyIndex} ${address}`);
         }
         should.equal(kamap.size, 1000, "should generate 1000 different addresses")
     }).timeout(20000);
@@ -113,7 +117,8 @@ describe("test sign tx", function () {
                 should.fail(error, null, "sign OLT tx should be ok but : " + error.error.message);
             });
             const {signature} = response;
-            ismap.set(signature, i)
+            ismap.set(signature, i);
+            // console.log(`${i} ${signature}`);
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
     }).timeout(20000);
@@ -132,7 +137,7 @@ describe("test sign tx", function () {
             const {response} = await deriveKeyManager.signTx(data).catch(error => {
                 should.fail(error, null, "sign BTC tx should be ok but : " + error.error.message);
             });
-            const {signature} = response;
+            const {signature, recovery} = response;
             ismap.set(signature, i)
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
@@ -152,7 +157,8 @@ describe("test sign tx", function () {
                 should.fail(error, null, "sign ETH tx should be ok but : " + error.error.message);
             });
             const {signature} = response;
-            ismap.set(signature, i)
+            ismap.set(signature, i);
+            // console.log(`${i} ${signature}`);
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
     }).timeout(20000);
