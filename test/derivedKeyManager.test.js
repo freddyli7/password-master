@@ -51,7 +51,7 @@ const deriveNewKeyTestcases = [
     {
         name: "test derive new oneledger account with invalid data 5, invalid keyIndex",
         input: {
-            keyType: "BTC-P2PK",
+            keyType: "BTCP2PK",
             keyIndex: -11,
             password: masterKeyPassword,
             encryptedMasterKeySeed: undefined
@@ -61,7 +61,7 @@ const deriveNewKeyTestcases = [
     {
         name: "test derive new oneledger account with invalid data 6, wrong password",
         input: {
-            keyType: "BTC-P2PK",
+            keyType: "BTCP2PK",
             keyIndex: 2,
             password: "masterKeyPassword",
             encryptedMasterKeySeed
@@ -71,7 +71,7 @@ const deriveNewKeyTestcases = [
     {
         name: "test derive new oneledger account with invalid data 7, invalid encryptedMasterKeySeed",
         input: {
-            keyType: "BTC-P2PK",
+            keyType: "BTCP2PK",
             keyIndex: 2,
             password: masterKeyPassword,
             encryptedMasterKeySeed: null
@@ -81,7 +81,7 @@ const deriveNewKeyTestcases = [
     {
         name: "test derive new oneledger account with invalid data 8, invalid keyIndex",
         input: {
-            keyType: "BTC-P2PKH",
+            keyType: "BTCP2PKH",
             keyIndex: -11,
             password: masterKeyPassword,
             encryptedMasterKeySeed: undefined
@@ -91,7 +91,7 @@ const deriveNewKeyTestcases = [
     {
         name: "test derive new oneledger account with invalid data 9, wrong password",
         input: {
-            keyType: "BTC-P2PKH",
+            keyType: "BTCP2PKH",
             keyIndex: 2,
             password: "masterKeyPassword",
             encryptedMasterKeySeed
@@ -101,7 +101,7 @@ const deriveNewKeyTestcases = [
     {
         name: "test derive new oneledger account with invalid data 10, invalid encryptedMasterKeySeed",
         input: {
-            keyType: "BTC-P2PKH",
+            keyType: "BTCP2PKH",
             keyIndex: 2,
             password: masterKeyPassword,
             encryptedMasterKeySeed: null
@@ -161,12 +161,12 @@ describe("test derive new key", function () {
         }
         should.equal(kamap.size, 1000, "should generate 1000 different addresses")
     }).timeout(20000);
-    it("test derive new BTC-P2PK account", async function () {
+    it("test derive new BTCP2PK account", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const kamap = new Map();
         for (let i = 0; i < 1000; i++) {
             const data = {
-                keyType: "BTC-P2PK",
+                keyType: "BTCP2PK",
                 keyIndex: i,
                 password: masterKeyPassword,
                 encryptedMasterKeySeed,
@@ -182,12 +182,12 @@ describe("test derive new key", function () {
         }
         should.equal(kamap.size, 1000, "should generate 1000 different public key")
     }).timeout(20000);
-    it("test derive new BTC-P2PKH account", async function () {
+    it("test derive new BTCP2PKH account", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const kamap = new Map();
         for (let i = 0; i < 1000; i++) {
             const data = {
-                keyType: "BTC-P2PKH",
+                keyType: "BTCP2PKH",
                 keyIndex: i,
                 password: masterKeyPassword,
                 encryptedMasterKeySeed,

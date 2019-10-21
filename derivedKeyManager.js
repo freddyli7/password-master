@@ -12,7 +12,7 @@ const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = requi
 
 // expose this function to UI
 // derive new keys and store keyIndex with address (or publicKey) locally
-// input : keyType should be string of either "OLT", "BTC-P2PK", "BTC-P2PKH", "ETH"
+// input : keyType should be string of either "OLT", "BTCP2PK", "BTCP2PKH", "ETH"
 // input : keyIndex should be uint
 // input : password is string
 // input : encryptedMasterKeySeed is string

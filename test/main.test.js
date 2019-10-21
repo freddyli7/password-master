@@ -48,10 +48,10 @@ describe("examples of how to use HD-vault", async function () {
         // when user recovery masterKeySeed, get the masterAddress based on provided mnemonic for comparison
         console.log("recovery address: " + HDVault.masterKeySeedUtil.getMasterKeySeedAddressForRecovery(mnemonicArray));
 
-        // derive new key with different keyType : OLT, BTC-P2PK, BTC-P2PKH, ETH
+        // derive new key with different keyType : OLT, BTCP2PK, BTCP2PKH, ETH
         // return new key's address and keyIndex to store locally
         // also return publicKey for broadcasting tx
-        // Notice : only OLT, ETH and BTC-P2PKH return keyIndex, address and publicKey, BTC-P2PK only return keyIndex, publicKey
+        // Notice : only OLT, ETH and BTCP2PKH return keyIndex, address and publicKey, BTCP2PK only return keyIndex, publicKey
         const derivedData = {
             keyType: "OLT",
             keyIndex: 0,
@@ -82,7 +82,7 @@ describe("examples of how to use HD-vault", async function () {
         console.log("get signature: ", signature);
 
         // verify address
-        const addreVerifyResult = HDVault.address.verify("1BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg", "BTC-P2PKH");
+        const addreVerifyResult = HDVault.address.verify("1BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg", "BTCP2PKH");
         console.log(addreVerifyResult);
     })
 });
