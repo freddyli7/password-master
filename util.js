@@ -33,11 +33,6 @@ function isValidString(str) {
     return !(typeof str === "undefined" || str === "" || str === "<nil>" || str === null)
 }
 
-// return response structure to UI
-function responseWrap(response) {
-    return {response: response}
-}
-
 module.exports = {
     validateBase64,
     validBTCTxMessage,
@@ -45,6 +40,5 @@ module.exports = {
     isPositiveInteger,
     isNonNegativeNumber,
     isValidAddress,
-    isValidString,
-    responseWrap
+    isValidString
 };

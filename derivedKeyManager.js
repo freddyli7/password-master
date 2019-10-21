@@ -5,7 +5,7 @@ const masterKeySeed = require("./masterKeySeed");
 const util = require("./util");
 const typeConverter = require("./typeConverter");
 const {signatureKeyType, derivedKeyType} = require("./config");
-const {ErrorType, Util} = require("./middle_utility").Error;
+const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
 const sysUtil = require("util");
 const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
@@ -19,11 +19,11 @@ const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = requi
 // input : network should be one of "BTCOIN", "TESTNET" or "REGTEST" only applicable for BitCoin
 // return : promise
 function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}) {
-    if (!util.isNonNegativeInteger(keyIndex)) return Promise.reject(Util.errorWrap(requestErrors.InvalidKeyIndex));
-    if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(Util.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
+    if (!util.isNonNegativeInteger(keyIndex)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidKeyIndex));
+    if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
     return new Promise((resolve, reject) => {
         masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, (error, masterKeySeed) => {
-            if (error) reject(Util.errorWrap(requestErrors.WrongPassword));
+            if (error) reject(ErrorUtil.errorWrap(requestErrors.WrongPassword));
             let result;
             switch (keyType) {
                 case derivedKeyType.OLT:
@@ -32,7 +32,7 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                     } catch (error) {
                         reject(deriveKeyErrFilter(error))
                     }
-                    resolve(util.responseWrap(result));
+                    resolve(ErrorUtil.responseWrap(result));
                     break;
                 case derivedKeyType.BTCP2PK:
                     try {
@@ -40,7 +40,7 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                     } catch (error) {
                         reject(deriveKeyErrFilter(error))
                     }
-                    resolve(util.responseWrap(result));
+                    resolve(ErrorUtil.responseWrap(result));
                     break;
                 case derivedKeyType.BTCP2PKH:
                     try {
@@ -48,7 +48,7 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                     } catch (error) {
                         reject(deriveKeyErrFilter(error))
                     }
-                    resolve(util.responseWrap(result));
+                    resolve(ErrorUtil.responseWrap(result));
                     break;
                 case derivedKeyType.ETH:
                     try {
@@ -56,10 +56,10 @@ function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, 
                     } catch (error) {
                         reject(deriveKeyErrFilter(error))
                     }
-                    resolve(util.responseWrap(result));
+                    resolve(ErrorUtil.responseWrap(result));
                     break;
                 default:
-                    reject(Util.errorWrap(requestErrors.InvalidDerivedKeyType))
+                    reject(ErrorUtil.errorWrap(requestErrors.InvalidDerivedKeyType))
             }
         })
     })
@@ -116,8 +116,8 @@ function deriveNewKeyPairETH(masterKeySeed, keyIndex) {
 // input : message is different when choosing BTC, OLT or ETH, see testcase for detail
 // return : promise (recovery is only for BTC)
 function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, network}) {
-    if (!util.isNonNegativeInteger(keyIndex)) return Promise.reject(Util.errorWrap(requestErrors.InvalidKeyIndex));
-    if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(Util.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
+    if (!util.isNonNegativeInteger(keyIndex)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidKeyIndex));
+    if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
     switch (keyType) {
         case signatureKeyType.OLT:
             return signTxOLT(message, keyIndex, encryptedMasterKeySeed, password);
@@ -126,12 +126,12 @@ function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, n
         case signatureKeyType.ETH:
             return signTxETH(message, keyIndex, encryptedMasterKeySeed, password);
         default:
-            return Promise.reject(Util.errorWrap(requestErrors.InvalidSignKeyType));
+            return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidSignKeyType));
     }
 }
 
 function signTxOLT(message, keyIndex, encryptedMasterKeySeed, password) {
-    if (!util.validateBase64(message)) return Promise.reject(Util.errorWrap(requestErrors.InvalidEncodedTxMessage));
+    if (!util.validateBase64(message)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidEncodedTxMessage));
     const oltTxData = {
         message,
         keyPath: oneledgerKeyPath + keyIndex + keyPathSuffix,
@@ -140,14 +140,14 @@ function signTxOLT(message, keyIndex, encryptedMasterKeySeed, password) {
     };
     const signTxOLTPromise = sysUtil.promisify(oneledger.signForSignature);
     return signTxOLTPromise(oltTxData).then(signature => {
-        return Promise.resolve(util.responseWrap({signature}))
+        return Promise.resolve(ErrorUtil.responseWrap({signature}))
     }).catch(error => {
         return Promise.reject(error)
     })
 }
 
 function signTxBTC(message, keyIndex, encryptedMasterKeySeed, password, network) {
-    if (!util.validBTCTxMessage(message)) return Promise.reject(Util.errorWrap(requestErrors.InvalidBTCtxMessage));
+    if (!util.validBTCTxMessage(message)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidBTCtxMessage));
     const btcTxData = {
         message,
         keyPath: bitcoinKeyPath + keyIndex,
@@ -157,7 +157,7 @@ function signTxBTC(message, keyIndex, encryptedMasterKeySeed, password, network)
     };
     const signTxBTCPromise = sysUtil.promisify(bitcoin.signForSignature);
     return signTxBTCPromise(btcTxData).then(result => {
-        return Promise.resolve(util.responseWrap({signature: result.signature, recovery: result.recovery}))
+        return Promise.resolve(ErrorUtil.responseWrap({signature: result.signature, recovery: result.recovery}))
     }).catch(error => {
         return Promise.reject(error)
     })
@@ -166,11 +166,11 @@ function signTxBTC(message, keyIndex, encryptedMasterKeySeed, password, network)
 function signTxETH(message, keyIndex, encryptedMasterKeySeed, password) {
     const {nonce, gasPrice, gasLimit, to, value} = message;
     // verify eth tx message data
-    if (!util.isNonNegativeInteger(nonce)) return Promise.reject(Util.errorWrap(requestErrors.InvalidNonce));
-    if (!util.isNonNegativeNumber(gasPrice)) return Promise.reject(Util.errorWrap(requestErrors.InvalidGasPrice));
-    if (!util.isNonNegativeNumber(value)) return Promise.reject(Util.errorWrap(requestErrors.InvalidTxValue));
-    if (!util.isPositiveInteger(gasLimit)) return Promise.reject(Util.errorWrap(requestErrors.InvalidGasLimit));
-    if (!util.isValidAddress(to)) return Promise.reject(Util.errorWrap(requestErrors.InvalidTxReceiverAddress));
+    if (!util.isNonNegativeInteger(nonce)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidNonce));
+    if (!util.isNonNegativeNumber(gasPrice)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidGasPrice));
+    if (!util.isNonNegativeNumber(value)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidTxValue));
+    if (!util.isPositiveInteger(gasLimit)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidGasLimit));
+    if (!util.isValidAddress(to)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidTxReceiverAddress));
     const ethTxData = {
         txParams: message,
         password,
@@ -179,7 +179,7 @@ function signTxETH(message, keyIndex, encryptedMasterKeySeed, password) {
     };
     const signTxETHPromise = sysUtil.promisify(ethereum.signForSignature);
     return signTxETHPromise(ethTxData).then(signature => {
-        return Promise.resolve(util.responseWrap({signature}))
+        return Promise.resolve(ErrorUtil.responseWrap({signature}))
     }).catch(error => {
         return Promise.reject(error)
     })
@@ -190,7 +190,7 @@ function deriveKeyErrFilter(err) {
     if (code === requestErrors.InvalidBTCNetworkType.code) {
         return err
     }
-    return Util.errorWrap(requestErrors.FailedToDeriveNewKeyError)
+    return ErrorUtil.errorWrap(requestErrors.FailedToDeriveNewKeyError)
 }
 
 module.exports = {
