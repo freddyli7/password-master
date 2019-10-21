@@ -37,8 +37,8 @@ const ethereumKeyPath = masterkey + bip44purpose + ethCoinType;
 
 const derivedKeyType = {
     OLT : "OLT",
-    BTCP2PK : "BTC-P2PK",
-    BTCP2PKH : "BTC-P2PKH",
+    BTCP2PK : "BTCP2PK",
+    BTCP2PKH : "BTCP2PKH",
     ETH : "ETH"
 };
 

@@ -4,11 +4,12 @@ const secp256k1 = require('secp256k1');
 const bitcoinjs = require('bitcoinjs-lib');
 const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
-const requestErrors = require("./errorType").requestErrors;
 const {bitcoinNetworkType} = require("./config");
 const bip32 = require("bip32");
 const walletValidator = require('wallet-address-validator');
 const util = require('./util');
+const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
+const {requestErrors} = ErrorType;
 
 /* *****************************   Secp256k1 For BTC  ***************************** */
 // derive private key from masterKeySeed
@@ -29,7 +30,7 @@ function derivePrivateKey(masterKeySeed, keyPath, network, callback) {
             networkDetermined = bitcoinjs.networks.regtest;
             break;
         default:
-            return callback(util.returnErrorStructure(requestErrors.InvalidBTCNetworkType))
+            return callback(ErrorUtil.errorWrap(requestErrors.InvalidBTCNetworkType))
     }
     // derive BitCoin master key node from masterKeySeed
     const masterNode = bip32.fromSeed(masterKeySeed, networkDetermined);
