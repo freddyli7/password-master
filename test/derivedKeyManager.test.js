@@ -243,9 +243,9 @@ const txParamsETH = {
     data: "",
 };
 
-const signTxTestcases = [
+const signTxInvalidDataTestcases = [
     {
-        name: "test sign tx with invalid data 1, invalid keyType",
+        name: "1 test sign tx with invalid data, invalid keyType",
         input: {
             message: messageOLT,
             keyType: "OLTABC",
@@ -256,7 +256,7 @@ const signTxTestcases = [
         expect: -11011
     },
     {
-        name: "test sign tx with invalid data 2, invalid keyIndex",
+        name: "2 test sign tx with invalid data, invalid keyIndex",
         input: {
             message: messageOLT,
             keyType: "OLT",
@@ -267,7 +267,7 @@ const signTxTestcases = [
         expect: -11001
     },
     {
-        name: "test sign tx with invalid data 3, wrong password",
+        name: "3 test sign tx with invalid data, wrong password",
         input: {
             message: messageOLT,
             keyType: "OLT",
@@ -278,7 +278,7 @@ const signTxTestcases = [
         expect: -11000
     },
     {
-        name: "test sign tx with invalid data 4, invalid encryptedMasterKeySeed",
+        name: "4 test sign tx with invalid data, invalid encryptedMasterKeySeed",
         input: {
             message: messageOLT,
             keyType: "OLT",
@@ -289,7 +289,7 @@ const signTxTestcases = [
         expect: -11002
     },
     {
-        name: "test sign tx with invalid data 5, invalid keyIndex",
+        name: "5 test sign tx with invalid data, invalid keyIndex",
         input: {
             message: rawTxmessageBTC,
             keyType: "BTC",
@@ -300,7 +300,7 @@ const signTxTestcases = [
         expect: -11001
     },
     {
-        name: "test sign tx with invalid data 6, wrong password",
+        name: "6 test sign tx with invalid data, wrong password",
         input: {
             message: rawTxmessageBTC,
             keyType: "BTC",
@@ -311,7 +311,7 @@ const signTxTestcases = [
         expect: -11000
     },
     {
-        name: "test sign tx with invalid data 7, invalid encryptedMasterKeySeed",
+        name: "7 test sign tx with invalid data, invalid encryptedMasterKeySeed",
         input: {
             message: rawTxmessageBTC,
             keyType: "BTC",
@@ -322,9 +322,9 @@ const signTxTestcases = [
         expect: -11002
     },
     {
-        name: "test sign tx with invalid data 8, invalid keyIndex",
+        name: "8 test sign tx with invalid data, invalid keyIndex",
         input: {
-            message: txParamsETH,
+            message: {txParams: txParamsETH},
             keyType: "ETH",
             keyIndex: -1,
             password: masterKeyPassword,
@@ -333,9 +333,9 @@ const signTxTestcases = [
         expect: -11001
     },
     {
-        name: "test sign tx with invalid data 9, wrong password",
+        name: "9 test sign tx with invalid data, wrong password",
         input: {
-            message: txParamsETH,
+            message: {txParams: txParamsETH},
             keyType: "ETH",
             keyIndex: 1,
             password: wrongMasterkeyPassword,
@@ -344,9 +344,9 @@ const signTxTestcases = [
         expect: -11000
     },
     {
-        name: "test sign tx with invalid data 10, invalid encryptedMasterKeySeed",
+        name: "10 test sign tx with invalid data, invalid encryptedMasterKeySeed",
         input: {
-            message: txParamsETH,
+            message: {txParams: txParamsETH},
             keyType: "ETH",
             keyIndex: 1,
             password: masterKeyPassword,
@@ -355,7 +355,7 @@ const signTxTestcases = [
         expect: -11002
     },
     {
-        name: "test sign tx with invalid data 11, invalid OLT message",
+        name: "11 test sign tx with invalid data, invalid OLT message",
         input: {
             message: "messageOLT",
             keyType: "OLT",
@@ -366,7 +366,7 @@ const signTxTestcases = [
         expect: -11003
     },
     {
-        name: "test sign tx with invalid data 12, invalid BTC message",
+        name: "12 test sign tx with invalid data, invalid BTC message",
         input: {
             message: "rawTxmessageBTC",
             keyType: "BTC",
@@ -377,15 +377,17 @@ const signTxTestcases = [
         expect: -11004
     },
     {
-        name: "test sign tx with invalid data 13, invalid ETH message, invalid nonce",
+        name: "13 test sign tx with invalid data, invalid ETH message, invalid nonce",
         input: {
             message: {
-                nonce: -11,
-                gasPrice: 1.1,
-                gasLimit: 1,
-                to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
-                value: "1",
-                data: "",
+                txParams: {
+                    nonce: -11,
+                    gasPrice: 1.1,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: "1",
+                    data: "",
+                }
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -395,15 +397,17 @@ const signTxTestcases = [
         expect: -11005
     },
     {
-        name: "test sign tx with invalid data 14, invalid ETH message, invalid gasPrice",
+        name: "14 test sign tx with invalid data, invalid ETH message, invalid gasPrice",
         input: {
             message: {
-                nonce: 11,
-                gasPrice: -100,
-                gasLimit: 1,
-                to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
-                value: "1",
-                data: "",
+                txParams: {
+                    nonce: 11,
+                    gasPrice: -100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: "1",
+                    data: "",
+                }
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -413,15 +417,17 @@ const signTxTestcases = [
         expect: -11006
     },
     {
-        name: "test sign tx with invalid data 15, invalid ETH message, invalid gasLimit",
+        name: "15 test sign tx with invalid data, invalid ETH message, invalid gasLimit",
         input: {
             message: {
-                nonce: 11,
-                gasPrice: 100,
-                gasLimit: -1,
-                to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
-                value: "1",
-                data: "",
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: -1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: "1",
+                    data: "",
+                }
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -431,15 +437,17 @@ const signTxTestcases = [
         expect: -11008
     },
     {
-        name: "test sign tx with invalid data 16, invalid ETH message, invalid to address",
+        name: "16 test sign tx with invalid data, invalid ETH message, invalid to address",
         input: {
             message: {
-                nonce: 11,
-                gasPrice: 100,
-                gasLimit: 1,
-                to: '034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
-                value: "1",
-                data: "",
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: "1",
+                    data: "",
+                }
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -449,15 +457,17 @@ const signTxTestcases = [
         expect: -11009
     },
     {
-        name: "test sign tx with invalid data 17, invalid ETH message, invalid value",
+        name: "17 test sign tx with invalid data, invalid ETH message, invalid value",
         input: {
             message: {
-                nonce: 11,
-                gasPrice: 100,
-                gasLimit: 1,
-                to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
-                value: -1,
-                data: "",
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: -1,
+                    data: "",
+                }
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -465,78 +475,323 @@ const signTxTestcases = [
             encryptedMasterKeySeed
         },
         expect: -11007
+    },
+    {
+        name: "21 test sign tx with only chain config, invalid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: {chain :"nonsense"}
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -12007
+    },
+    {
+        name: "22 test sign tx with only hardfork, invalid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: {hardfork :"nonsense"}
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -12007
+    },
+    {
+        name: "23 test sign tx with invalid chain and invalid hardfork, invalid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: {chain : "nonsense", hardfork :"nonsense"}
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -12007
+    },
+    {
+        name: "24 test sign tx with valid chain and invalid hardfork txConfig, invalid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: {chain : "ropsten", hardfork :"nonsense"}
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -12007
+    },
+    {
+        name: "25 test sign tx with invalid chain and valid hardfork txConfig, invalid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: {chain : "nonsense", hardfork :"byzantium"}
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -12007
+    },
+    {
+        name: "29 test sign tx with null as txConfig, invalid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: null
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -12007
+    },
+    {
+        name: "30 test sign tx with string as txConfig, invalid ETH txConfig type",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: "123123123"
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -12007
+    },
+    {
+        name: "31 test sign tx without txParams, invalid ETH txParams",
+        input: {
+            message: {
+                txConfig: undefined
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -11005
+    },
+    {
+        name: "32 test sign tx with empty message object, invalid ETH message",
+        input: {
+            message: {},
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: -11005
+    }
+];
+
+const signTxValidDataTestcases = [
+    {
+        name: "26 test sign tx with valid chain and valid hardfork txConfig with other fields, valid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: {foo : "foo", chain : "goerli", hardfork :"byzantium", abc : "123"}
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: true
+    },
+    {
+        name: "27 test sign tx without txConfig, not given ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                }
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: true
+    },
+    {
+        name: "28 test sign tx with invalid chain and valid hardfork, valid ETH txConfig",
+        input: {
+            message: {
+                txParams: {
+                    nonce: 11,
+                    gasPrice: 100,
+                    gasLimit: 1,
+                    to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                    value: 1,
+                    data: "",
+                },
+                txConfig: {chain : "goerli", hardfork :"byzantium"}
+            },
+            keyType: "ETH",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed
+        },
+        expect: true
     }
 ];
 
 describe("test sign tx", function () {
-    it("test sign tx with OLT derived key", async function () {
-        const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
-        const ismap = new Map();
-        for (let i = 0; i < 1000; i++) {
-            const data = {
-                message: messageOLT,
-                keyType: "OLT",
-                keyIndex: i,
-                password: masterKeyPassword,
-                encryptedMasterKeySeed
-            };
-            const {response} = await deriveKeyManager.signTx(data).catch(error => {
-                should.fail(error, null, "sign OLT tx should be ok but : " + error.error.message);
-            });
-            const {signature} = response;
-            ismap.set(signature, i);
-            // console.log(`${i} ${signature}`);
-        }
-        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
-    }).timeout(20000);
-    it("test sign tx with BTC derived key", async function () {
-        const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
-        const ismap = new Map();
-        for (let i = 0; i < 1000; i++) {
-            const data = {
-                message: rawTxmessageBTC,
-                keyType: "BTC",
-                keyIndex: i,
-                password: masterKeyPassword,
-                encryptedMasterKeySeed,
-                network: "BITCOIN"
-            };
-            const {response} = await deriveKeyManager.signTx(data).catch(error => {
-                should.fail(error, null, "sign BTC tx should be ok but : " + error.error.message);
-            });
-            const {signature, recovery} = response;
-            ismap.set(signature, i)
-        }
-        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
-    }).timeout(20000);
-    it("test sign tx with ETH derived key", async function () {
-        const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
-        const ismap = new Map();
-        for (let i = 0; i < 1000; i++) {
-            const data = {
-                message: txParamsETH,
-                keyType: "ETH",
-                keyIndex: i,
-                password: masterKeyPassword,
-                encryptedMasterKeySeed
-            };
-            const {response} = await deriveKeyManager.signTx(data).catch(error => {
-                should.fail(error, null, "sign ETH tx should be ok but : " + error.error.message);
-            });
-            const {signature} = response;
-            ismap.set(signature, i);
-            // console.log(`${i} ${signature}`);
-        }
-        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
-    }).timeout(20000);
-    signTxTestcases.forEach(testcase => {
+    // it("18 test sign tx with OLT derived key", async function () {
+    //     const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
+    //     const ismap = new Map();
+    //     for (let i = 0; i < 1000; i++) {
+    //         const data = {
+    //             message: messageOLT,
+    //             keyType: "OLT",
+    //             keyIndex: i,
+    //             password: masterKeyPassword,
+    //             encryptedMasterKeySeed
+    //         };
+    //         const {response} = await deriveKeyManager.signTx(data).catch(error => {
+    //             should.fail(error, null, "sign OLT tx should be ok but : " + error.error.message);
+    //         });
+    //         const {signature} = response;
+    //         ismap.set(signature, i);
+    //         // console.log(`${i} ${signature}`);
+    //     }
+    //     should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+    // }).timeout(20000);
+    // it("19 test sign tx with BTC derived key", async function () {
+    //     const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
+    //     const ismap = new Map();
+    //     for (let i = 0; i < 1000; i++) {
+    //         const data = {
+    //             message: rawTxmessageBTC,
+    //             keyType: "BTC",
+    //             keyIndex: i,
+    //             password: masterKeyPassword,
+    //             encryptedMasterKeySeed,
+    //             network: "BITCOIN"
+    //         };
+    //         const {response} = await deriveKeyManager.signTx(data).catch(error => {
+    //             should.fail(error, null, "sign BTC tx should be ok but : " + error.error.message);
+    //         });
+    //         const {signature, recovery} = response;
+    //         ismap.set(signature, i)
+    //     }
+    //     should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+    // }).timeout(20000);
+    // it("20 test sign tx with ETH derived key", async function () {
+    //     const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
+    //     const ismap = new Map();
+    //     for (let i = 0; i < 1000; i++) {
+    //         const data = {
+    //             message: {txParams: txParamsETH, txConfig: {}},
+    //             keyType: "ETH",
+    //             keyIndex: i,
+    //             password: masterKeyPassword,
+    //             encryptedMasterKeySeed
+    //         };
+    //         const {response} = await deriveKeyManager.signTx(data).catch(error => {
+    //             should.fail(error, null, "sign ETH tx should be ok but : " + error.error.message);
+    //         });
+    //         const {signature} = response;
+    //         ismap.set(signature, i);
+    //         // console.log(`${i} ${signature}`);
+    //     }
+    //     should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+    // }).timeout(20000);
+    signTxInvalidDataTestcases.forEach(testcase => {
         it(testcase.name, async function () {
             const data = testcase.input;
             const response = await deriveKeyManager.signTx(data).catch(error => {
+                console.log("resp:", error);
                 should.equal(error.error.code, testcase.expect, error.error.message)
             });
-            if (typeof response !== "undefined") should.fail(response, undefined, "sign OLT tx with invalid data should be error");
+            if (typeof response !== "undefined") should.fail(response, undefined, "sign tx with invalid data should be error");
+        })
+    });
+    signTxValidDataTestcases.forEach(testcase => {
+        it(testcase.name, async function () {
+            const data = testcase.input;
+            const response = await deriveKeyManager.signTx(data).catch(error => {
+                should.fail(error, undefined, "sign tx with valid data should be ok");
+            });
+            should.exist(response.response.signature);
         })
     })
 });
-
