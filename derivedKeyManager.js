@@ -271,10 +271,8 @@ async function signTxETH(message, keyIndex, encryptedMasterKeySeed, password) {
     if (!util.isPositiveInteger(gasLimit)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidGasLimit));
     if (!util.isValidAddress(to)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidTxReceiverAddress));
     const ethTxData = {
-        message: {
-            txParams,
-            txConfig: {chain, hardfork}
-        },
+        txParams,
+        txConfig: {chain, hardfork},
         password,
         encryptedMasterKeySeed,
         keyPath: ethereumKeyPath + keyIndex
