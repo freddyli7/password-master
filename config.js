@@ -36,25 +36,43 @@ const ethereumKeyPath = masterkey + bip44purpose + ethCoinType;
 // const ethereumKeyPath = masterkey + bip44purpose + ethCoinType + ethAccount + ethChange;
 
 const derivedKeyType = {
-    OLT : "OLT",
-    BTCP2PK : "BTCP2PK",
-    BTCP2PKH : "BTCP2PKH",
-    ETH : "ETH"
+    OLT: "OLT",
+    BTCP2PK: "BTCP2PK",
+    BTCP2PKH: "BTCP2PKH",
+    ETH: "ETH"
 };
 
 const signatureKeyType = {
-    OLT : "OLT",
-    BTC : "BTC",
-    ETH : "ETH"
+    OLT: "OLT",
+    BTC: "BTC",
+    ETH: "ETH"
 };
 
 const bitcoinNetworkType = {
-    BITCOIN : "BITCOIN",
-    TESTNET : "TESTNET",
-    REGTEST : "REGTEST"
+    BITCOIN: "BITCOIN",
+    TESTNET: "TESTNET",
+    REGTEST: "REGTEST"
 };
 
 const ed25519KeyAddrPrefix = "0x";
+const ethSignaturePrefix = "0x";
+
+const ethChainList = {
+    mainnet: "mainnet",
+    rinkeby: "rinkeby",
+    ropsten: "ropsten",
+    kovan: "kovan",
+    goerli: "goerli"
+};
+const ethHardforkList = {
+    petersburg: "petersburg",
+    constantinople: "constantinople",
+    byzantium: "byzantium"
+};
+const ethDefaultTxConfig = {
+    chain: ethChainList.mainnet,
+    hardfork: ethHardforkList.petersburg
+};
 
 module.exports = {
     oneledgerKeyPath,
@@ -64,5 +82,9 @@ module.exports = {
     derivedKeyType,
     signatureKeyType,
     bitcoinNetworkType,
-    ed25519KeyAddrPrefix
+    ed25519KeyAddrPrefix,
+    ethSignaturePrefix,
+    ethChainList,
+    ethHardforkList,
+    ethDefaultTxConfig
 };
