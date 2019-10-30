@@ -116,7 +116,7 @@ describe("test verify derived address for Ed25519", function () {
 });
 
 describe("test sign tx using Ed25519", function () {
-    it("test 1, sign tx and verify signature", function () {
+    it("test 1, sign tx and verify signature", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterkeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const data = {
             message: rawTxmessage,
@@ -124,18 +124,19 @@ describe("test sign tx using Ed25519", function () {
             encryptedMasterKeySeed,
             keyPath
         };
-        oneledger.signForSignature(data, function (error, signature) {
-            // console.log(signature);
-            if (error) should.fail(error, null, "sign for signature for OLT should be ok, but : " + error.message);
-            const masterKey = oneledger.deriveMasterKey(masterKeySeedHex);
-            const seed = oneledger.derivePrivateKeySeed(masterKey, keyPath);
-            const {publicKey, privateKey} = oneledger.deriveKeyPair(seed);
-            // console.log(publicKey);
-            // console.log(privateKey);
-            oneledger.verifySignature(rawTxmessage, signature, publicKey, function (error, result) {
-                if (error) should.fail(error, null, "verify signature for OLT should be ok, but : " + error.message);
-                should.ok(result, "signature verify should be true")
-            });
+        const signature = await oneledger.signForSignature(data).catch(error => {
+            should.fail(error, null, "sign for signature for OLT should be ok, but : " + error.message)
+        });
+        console.log("signature : ", signature);
+        should.exist(signature);
+        const masterKey = oneledger.deriveMasterKey(masterKeySeedHex);
+        const seed = oneledger.derivePrivateKeySeed(masterKey, keyPath);
+        const {publicKey, privateKey} = oneledger.deriveKeyPair(seed);
+        // console.log(publicKey);
+        // console.log(privateKey);
+        oneledger.verifySignature(rawTxmessage, signature, publicKey, function (error, result) {
+            if (error) should.fail(error, null, "verify signature for OLT should be ok, but : " + error.message);
+            should.ok(result, "signature verify should be true")
         });
     })
 });

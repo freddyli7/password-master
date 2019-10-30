@@ -54,64 +54,64 @@ describe("test derive address for ETH", function () {
 
 const addressVerifyTestcases = [
     {
-        name :"test 1, valid ETH address",
-        input : "0x39DbD379159cCEe4C3A35ECf5923aeEcBB2b003D",
-        expect : true
+        name: "test 1, valid ETH address",
+        input: "0x39DbD379159cCEe4C3A35ECf5923aeEcBB2b003D",
+        expect: true
     },
     {
-        name :"test 2, valid ETH address",
-        input : "0xcbADb227Bd71d54dB80Ec016c655b49C08ee551f",
-        expect : true
+        name: "test 2, valid ETH address",
+        input: "0xcbADb227Bd71d54dB80Ec016c655b49C08ee551f",
+        expect: true
     },
     {
-        name :"test 3, valid ETH address",
-        input : "0x45d958dF7a74F045480b6316D8776D08aA2f279C",
-        expect : true
+        name: "test 3, valid ETH address",
+        input: "0x45d958dF7a74F045480b6316D8776D08aA2f279C",
+        expect: true
     },
     {
-        name :"test 4, valid ETH address",
-        input : "0x00310547719ec79d52A735339bFf9F9CBfE9F7a7",
-        expect : true
+        name: "test 4, valid ETH address",
+        input: "0x00310547719ec79d52A735339bFf9F9CBfE9F7a7",
+        expect: true
     },
     {
-        name :"test 5, valid ETH address",
-        input : "0x246757Fa2336d8F0570767A8014789A59B069684",
-        expect : true
+        name: "test 5, valid ETH address",
+        input: "0x246757Fa2336d8F0570767A8014789A59B069684",
+        expect: true
     },
     {
-        name :"test 6, invalid ETH address",
-        input : "0x0ba158d7d2ea60a091def2c85ad2f7281533218f",
-        expect : true
+        name: "test 6, invalid ETH address",
+        input: "0x0ba158d7d2ea60a091def2c85ad2f7281533218f",
+        expect: true
     },
     {
-        name :"test 7, invalid ETH address, 0x + 39 chars",
-        input : "0x0ba158d7d2ea60a091def2c85ad2f7281533218",
-        expect : false
+        name: "test 7, invalid ETH address, 0x + 39 chars",
+        input: "0x0ba158d7d2ea60a091def2c85ad2f7281533218",
+        expect: false
     },
     {
-        name :"test 8, invalid ETH address, without 0x",
-        input : "0ba158d7d2ea60a091def2c85ad2f7281533218f",
-        expect : false
+        name: "test 8, invalid ETH address, without 0x",
+        input: "0ba158d7d2ea60a091def2c85ad2f7281533218f",
+        expect: false
     },
     {
-        name :"test 9, invalid ETH address, only 0x",
-        input : "0x",
-        expect : false
+        name: "test 9, invalid ETH address, only 0x",
+        input: "0x",
+        expect: false
     },
     {
-        name :"test 9, invalid ETH address, empty",
-        input : "",
-        expect : false
+        name: "test 9, invalid ETH address, empty",
+        input: "",
+        expect: false
     },
     {
-        name :"test 10, invalid ETH address, null",
-        input : null,
-        expect : false
+        name: "test 10, invalid ETH address, null",
+        input: null,
+        expect: false
     },
     {
-        name :"test 11, invalid ETH address, undefined",
-        input : undefined,
-        expect : false
+        name: "test 11, invalid ETH address, undefined",
+        input: undefined,
+        expect: false
     }
 ];
 
@@ -124,7 +124,7 @@ describe("test verify derived address for ETH", function () {
 });
 
 describe("test sign tx for ETH", function () {
-    it("test 1", function () {
+    it("test 1", async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const txParams = {
             nonce: 1,
@@ -140,9 +140,10 @@ describe("test sign tx for ETH", function () {
             encryptedMasterKeySeed,
             keyPath
         };
-        ethereum.signForSignature(data, function (error, signedSeralizedTx) {
+        const signedSeralizedTx = await ethereum.signForSignature(data).catch(error => {
             should.ok(error === null, "sign eth tx to get signature should be no error")
-            // console.log(signedSeralizedTx);
         });
+        console.log("signedSeralizedTx :", signedSeralizedTx);
+        should.exist(signedSeralizedTx);
     })
 });
