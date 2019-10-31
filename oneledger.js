@@ -6,6 +6,8 @@ const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
 const oltKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
 const util = require("./util");
+const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
+const {requestErrors} = ErrorType;
 
 /* *****************************   Ed25519 For Oneledger  ***************************** */
 // derive 32 bytes masterKey from masterKeySeed
@@ -58,34 +60,34 @@ function verifyAddress(address) {
 // input : encryptedMasterKeySeed is a string
 // input : keyPath is a string
 // return : promise containing error object or base64 signature
-function signForSignature({message, password, encryptedMasterKeySeed, keyPath}) {
-    return new Promise((resolve, reject) => {
-        masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
-            if (error) reject(error);
-            const masterKey = deriveMasterKey(decryptedMasterKeySeed);
-            const derivedPrivateKeySeed = derivePrivateKeySeed(masterKey, keyPath);
-            const {privateKey, publicKey} = deriveKeyPair(derivedPrivateKeySeed);
-            const signature = nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), nacl.util.decodeBase64(privateKey)));
-            resolve(signature)
-        })
-    })
+async function signForSignature({message, password, encryptedMasterKeySeed, keyPath}) {
+    const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
+        return Promise.reject(error)
+    });
+    const masterKey = deriveMasterKey(decryptedMasterKeySeed);
+    const derivedPrivateKeySeed = derivePrivateKeySeed(masterKey, keyPath);
+    const {privateKey, publicKey} = deriveKeyPair(derivedPrivateKeySeed);
+    const signature = nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), nacl.util.decodeBase64(privateKey)));
+    return Promise.resolve(signature)
 }
 
 // verify OLT tx signature
 // input : message, signature and publicKey are all base64 string
-// return : callback function containing error object and verifyResult (true || false)
-function verifySignature(message, signature, publicKey, callback) {
-    let verifyResult;
-    try {
-        verifyResult = nacl.sign.detached.verify(
-            Uint8Array.from(nacl.util.decodeBase64(message)),
-            nacl.util.decodeBase64(signature),
-            nacl.util.decodeBase64(publicKey)
-        );
-    } catch (err) {
-        return callback(err);
-    }
-    callback(null, verifyResult);
+// return : promise containing error object or verifyResult (true || false)
+function verifySignature(message, signature, publicKey) {
+    return new Promise((resolve, reject) => {
+        let verifyResult;
+        try {
+            verifyResult = nacl.sign.detached.verify(
+                Uint8Array.from(nacl.util.decodeBase64(message)),
+                nacl.util.decodeBase64(signature),
+                nacl.util.decodeBase64(publicKey)
+            )
+        } catch (err) {
+            reject(ErrorUtil.errorWrap(requestErrors.InvalidOLTSignature));
+        }
+        resolve(verifyResult);
+    })
 }
 
 module.exports = {

@@ -7,7 +7,6 @@ const typeConverter = require("./typeConverter");
 const {signatureKeyType, derivedKeyType} = require("./config");
 const {ErrorType, errorHandler, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
-const sysUtil = require('util');
 const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
 
 // expose this function to UI
@@ -21,8 +20,7 @@ const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = requi
 async function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}) {
     if (!util.isNonNegativeInteger(keyIndex)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidKeyIndex));
     if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
-    const masterSeedDecryption = sysUtil.promisify(masterKeySeed.masterKeySeedDecryption);
-    const decryptedMasterKeySeed = await masterSeedDecryption(password, encryptedMasterKeySeed).catch(error => {
+    const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
         return Promise.reject(ErrorUtil.errorWrap(requestErrors.WrongPassword))
     });
     let result;

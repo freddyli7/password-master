@@ -134,19 +134,51 @@ describe("test sign tx using Ed25519", function () {
         const {publicKey, privateKey} = oneledger.deriveKeyPair(seed);
         // console.log(publicKey);
         // console.log(privateKey);
-        oneledger.verifySignature(rawTxmessage, signature, publicKey, function (error, result) {
-            if (error) should.fail(error, null, "verify signature for OLT should be ok, but : " + error.message);
-            should.ok(result, "signature verify should be true")
+        const result = await oneledger.verifySignature(rawTxmessage, signature, publicKey).catch(error => {
+            should.fail(error, undefined, "verify signature for OLT should be ok, but : " + error.message);
         });
+        should.ok(result, "signature verify should be true")
     })
 });
 
+const validEd25519SignatureVerifyTestcases = [
+    {
+        name: "test 1, valid signature",
+        input1_rawTxmessage: rawTxmessage,
+        input2_signature: "BU5Ln408zXshIgyKRprOLU2R0oVY398+hMOpM6sumTq6ElGH+uiocKeCvQOPd345Y4VxB9lu0fJrM8Z8xWP7Cw==",
+        input3_pubkey: "X1VcXi+DXSkPbmIkleAaNYVOfW19ZV3lztXSmdlCkR8=",
+        expect: true
+    }
+];
+
+const invalidEd25519SignatureVerifyTestcases = [
+    {
+        name: "test 1, invalid signature",
+        input1_rawTxmessage: rawTxmessage,
+        input2_signature: "BU5Ln408zXshIgyKRprOLU2R0oVY398+hMOpM6sumTq6ElGH+uiocKeCvQOPd345Y4VxB9lu0fJrM8Z8xWP7Cw==",
+        input3_pubkey: "X1VcXi+DXSkPbmIkleAaNYVOfW19ZV3lztXSmdlCkR0=",
+        expect: false
+    }
+];
+
 describe("test verify signature Ed25519", function () {
-    it("test 1", function () {
-        const signature = "BU5Ln408zXshIgyKRprOLU2R0oVY398+hMOpM6sumTq6ElGH+uiocKeCvQOPd345Y4VxB9lu0fJrM8Z8xWP7Cw==";
-        oneledger.verifySignature(rawTxmessage, signature, "X1VcXi+DXSkPbmIkleAaNYVOfW19ZV3lztXSmdlCkR8=", function (error, result) {
-            if (error) should.fail(error, null, "verify signature for OLT should be ok, but : " + error.message);
+    validEd25519SignatureVerifyTestcases.forEach(testcase => {
+        it(testcase.name, async function () {
+            const result = await oneledger.verifySignature(testcase.input1_rawTxmessage, testcase.input2_signature, testcase.input3_pubkey).catch(error => {
+                console.log("error: ", error);
+                should.equal(error, undefined, "verify signature for OLT should be ok, but : " + error.message);
+            });
             should.ok(result, "signature verify should be true")
-        });
+        })
+    });
+    invalidEd25519SignatureVerifyTestcases.forEach(testcase => {
+        it(testcase.name, async function () {
+            const result = await oneledger.verifySignature(testcase.input1_rawTxmessage, testcase.input2_signature, testcase.input3_pubkey).catch(error => {
+                console.log("error: ", error);
+                should.equal(error, undefined, "verify invalid signature for OLT should be error")
+            });
+            console.log("result: ", result);
+            should.ok(!result, " invalid signature verify should be false")
+        })
     })
 });
