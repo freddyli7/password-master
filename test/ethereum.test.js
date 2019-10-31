@@ -8,6 +8,7 @@ const keyPath = "m/44'/60'/0'/0/0";
 
 const masterKeySeedHex = "292f9928f54d671f16dc89462297465ff4eb9bfa05b16e5595f599ed81336e291ad5ca9a3a7d50754e2c28f91ac3f46e92fbb3459267b24c781fd2896e0dfb45";
 const masterKeyPassword = "123456";
+const wrongMasterKeyPassword = "1234567890";
 
 describe("test derive privateKey for ETH", function () {
     it("test 1", function () {
@@ -123,27 +124,66 @@ describe("test verify derived address for ETH", function () {
     })
 });
 
-describe("test sign tx for ETH", function () {
-    it("test 1", async function () {
-        const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
-        const txParams = {
-            nonce: 1,
-            gasPrice: 1,
-            gasLimit: 100,
-            to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
-            value: 1,
-            data: '0x7f4e616d65526567000000000000000000000000000000000000000000000000003057307f4e616d6552656700000000000000000000000000000000000000000000000000573360455760415160566000396000f20036602259604556330e0f600f5933ff33560f601e5960003356576000335700604158600035560f602b590033560f60365960003356573360003557600035335700',
-        };
-        const data = {
-            txParams,
+const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
+const signETHTxValidTestcases = [
+    {
+        name: "test 1 sign with valid tx",
+        input: {
+            txParams: {
+                nonce: 1,
+                gasPrice: 1,
+                gasLimit: 100,
+                to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                value: 1,
+                data: '0x7f4e616d65526567000000000000000000000000000000000000000000000000003057307f4e616d6552656700000000000000000000000000000000000000000000000000573360455760415160566000396000f20036602259604556330e0f600f5933ff33560f601e5960003356576000335700604158600035560f602b590033560f60365960003356573360003557600035335700',
+            },
             password: masterKeyPassword,
             encryptedMasterKeySeed,
             keyPath
-        };
-        const signedSeralizedTx = await ethereum.signForSignature(data).catch(error => {
-            should.ok(error === null, "sign eth tx to get signature should be no error")
-        });
-        console.log("signedSeralizedTx :", signedSeralizedTx);
-        should.exist(signedSeralizedTx);
+        },
+        expect: true
+    }
+];
+
+const signETHTxInvalidTestcases = [
+    {
+        name: "test 1 sign with invalid tx, wrong password",
+        input: {
+            txParams: {
+                nonce: 1,
+                gasPrice: 1,
+                gasLimit: 100,
+                to: '0x034ca1740f01ae3e7fa6a2fc6b2afde39324f282',
+                value: 1,
+                data: '0x7f4e616d65526567000000000000000000000000000000000000000000000000003057307f4e616d6552656700000000000000000000000000000000000000000000000000573360455760415160566000396000f20036602259604556330e0f600f5933ff33560f601e5960003356576000335700604158600035560f602b590033560f60365960003356573360003557600035335700',
+            },
+            password: wrongMasterKeyPassword,
+            encryptedMasterKeySeed,
+            keyPath
+        },
+        expect: -11000
+    }
+];
+
+describe("test sign tx for ETH", function () {
+    signETHTxValidTestcases.forEach(testcase => {
+        it(testcase.name, async function () {
+            const signedSeralizedTx = await ethereum.signForSignature(testcase.input).catch(error => {
+                console.log("error :", error);
+                should.fail(error, undefined, "sign eth tx to get signature should be no error")
+            });
+            console.log("signedSeralizedTx :", signedSeralizedTx);
+            should.exist(signedSeralizedTx);
+        })
+    });
+    signETHTxInvalidTestcases.forEach(testcase => {
+        it(testcase.name, async function () {
+            const signedSeralizedTx = await ethereum.signForSignature(testcase.input).catch(error => {
+                console.log("error :", error);
+                should.equal(error.error.code, testcase.expect, "sign eth tx to get signature should be no error")
+            });
+            console.log("signedSeralizedTx :", signedSeralizedTx);
+            should.equal(signedSeralizedTx, undefined, "sign eth tx with invalid tx data, should get error")
+        })
     })
 });

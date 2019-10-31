@@ -66,7 +66,7 @@ function signForSignature({txParams, txConfig, password, encryptedMasterKeySeed,
             const derivedPrivateKey = derivePrivateKey(decryptedMasterKeySeed, keyPath);
             const tx = new EthereumTx(txParams, txConfig);
             tx.sign(derivedPrivateKey);
-            if (!tx.verifySignature()) return callback(ErrorUtil.errorWrap(requestErrors.InvalidETHSignature));
+            if (!tx.verifySignature()) reject(ErrorUtil.errorWrap(requestErrors.InvalidETHSignature));
             resolve(`${ethSignaturePrefix}${tx.serialize().toString('hex')}`)
         })
     })
