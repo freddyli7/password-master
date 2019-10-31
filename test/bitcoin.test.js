@@ -16,18 +16,20 @@ const rawTxmessageBTC = "072a8543e388c4155ccbcd325f129000214095725598721cea986fc
 /* *****************************   Secp256k1 For BTC  ***************************** */
 
 describe("test derive privateKey from masterKeySeed for BTC", function () {
-    it("test with wrong BitCoin network", function () {
-        bitcoin.derivePrivateKey(typeConverter.hexStrToBuffer(masterKeySeedHex), keyPath, "BITCOIN111", (error, derivedPriKey) => {
-            // console.log(error);
+    it("test with wrong BitCoin network", async function () {
+        const derivedPriKey = await bitcoin.derivePrivateKey(typeConverter.hexStrToBuffer(masterKeySeedHex), keyPath, "BITCOIN111").catch(error => {
+            console.log(error);
             should.equal(error.error.code, "-11012");
         });
+        if (typeof derivedPriKey !== "undefined") should.fail(derivedPriKey, undefined, "derivedPriKey should be undefined")
     });
-    it("test with valid BitCoin network", function () {
-        bitcoin.derivePrivateKey(typeConverter.hexStrToBuffer(masterKeySeedHex), keyPath, "BITCOIN", (error, derivedPriKey) => {
-            // console.log(derivedPriKey.length);
-            // console.log(typeConverter.bufferToHexStr(derivedPriKey));
-            should.ok(bitcoin.verifyPrivateKey(derivedPriKey));
+    it("test with valid BitCoin network", async function () {
+        const derivedPriKey = await bitcoin.derivePrivateKey(typeConverter.hexStrToBuffer(masterKeySeedHex), keyPath, "BITCOIN").catch(error => {
+            should.fail(error, undefined, "derive preive key with valid BTC network, should not get error")
         });
+        // console.log(derivedPriKey.length);
+        // console.log(typeConverter.bufferToHexStr(derivedPriKey));
+        should.ok(bitcoin.verifyPrivateKey(derivedPriKey));
     });
 });
 
@@ -226,7 +228,7 @@ describe("test verify derived public key for P2PK of BTC", function () {
 });
 
 describe("test sign tx for BTC", function () {
-    it("test 1", function () {
+    it("test 1",async function () {
         const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterkeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
         const data = {
             message: rawTxmessageBTC,
@@ -235,20 +237,20 @@ describe("test sign tx for BTC", function () {
             keyPath,
             network: "BITCOIN"
         };
-        bitcoin.signForSignature(data, function (error, result) {
-            if (error) should.fail(error, null, "sign tx should be ok, but : " + error);
-            const {signature, recovery} = result;
-            // console.log(signature);
-            // console.log(typeConverter.bufferToHexStr(signature));
-            // console.log(recovery);
-            // verify signature
-            bitcoin.derivePrivateKey(typeConverter.hexStrToBuffer(masterKeySeedHex), keyPath, "BITCOIN", (error, prikey) => {
-                if (error) should.fail(error, null, "derive private key error : " + error.message);
-                const pubKey = bitcoin.derivePublicKey(prikey);
-                const ok = bitcoin.verifySignature(rawTxmessageBTC, signature, pubKey);
-                should.ok(ok, "verify signature should be true")
-            })
+        const result = await bitcoin.signForSignature(data).catch(error => {
+            should.fail(error, null, "sign tx should be ok, but : " + error)
         });
+        const {signature, recovery} = result;
+        console.log(signature);
+        console.log(typeConverter.bufferToHexStr(signature));
+        console.log(recovery);
+        // verify signature
+        const prikey = await bitcoin.derivePrivateKey(typeConverter.hexStrToBuffer(masterKeySeedHex), keyPath, "BITCOIN").catch(error => {
+          should.fail(error, undefined, "derive private key error : " + error.message);
+        });
+        const pubKey = bitcoin.derivePublicKey(prikey);
+        const ok = bitcoin.verifySignature(rawTxmessageBTC, signature, pubKey);
+        should.ok(ok, "verify signature should be true")
     })
 });
 

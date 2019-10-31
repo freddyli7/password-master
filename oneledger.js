@@ -57,16 +57,18 @@ function verifyAddress(address) {
 // input : password is plaintext
 // input : encryptedMasterKeySeed is a string
 // input : keyPath is a string
-// return : callback function containing error object and base64 signature
-function signForSignature({message, password, encryptedMasterKeySeed, keyPath}, callback) {
-    return masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
-        if (error) return callback(error);
-        const masterKey = deriveMasterKey(decryptedMasterKeySeed);
-        const derivedPrivateKeySeed = derivePrivateKeySeed(masterKey, keyPath);
-        const {privateKey, publicKey} = deriveKeyPair(derivedPrivateKeySeed);
-        const signature = nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), nacl.util.decodeBase64(privateKey)));
-        callback(null, signature);
-    });
+// return : promise containing error object or base64 signature
+function signForSignature({message, password, encryptedMasterKeySeed, keyPath}) {
+    return new Promise((resolve, reject) => {
+        masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
+            if (error) reject(error);
+            const masterKey = deriveMasterKey(decryptedMasterKeySeed);
+            const derivedPrivateKeySeed = derivePrivateKeySeed(masterKey, keyPath);
+            const {privateKey, publicKey} = deriveKeyPair(derivedPrivateKeySeed);
+            const signature = nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), nacl.util.decodeBase64(privateKey)));
+            resolve(signature)
+        })
+    })
 }
 
 // verify OLT tx signature

@@ -49,7 +49,7 @@ const deriveNewKeyTestcases = [
         expect: -11002
     },
     {
-        name: "test derive new oneledger account with invalid data 5, invalid keyIndex",
+        name: "test derive new BTCP2PK account with invalid data 5, invalid keyIndex",
         input: {
             keyType: "BTCP2PK",
             keyIndex: -11,
@@ -59,17 +59,17 @@ const deriveNewKeyTestcases = [
         expect: -11001
     },
     {
-        name: "test derive new oneledger account with invalid data 6, wrong password",
+        name: "test derive new BTCP2PK account with invalid data 6, wrong password",
         input: {
             keyType: "BTCP2PK",
             keyIndex: 2,
             password: "masterKeyPassword",
-            encryptedMasterKeySeed
+            encryptedMasterKeySeed,
         },
         expect: -11000
     },
     {
-        name: "test derive new oneledger account with invalid data 7, invalid encryptedMasterKeySeed",
+        name: "test derive new BTCP2PK account with invalid data 7, invalid encryptedMasterKeySeed",
         input: {
             keyType: "BTCP2PK",
             keyIndex: 2,
@@ -79,7 +79,7 @@ const deriveNewKeyTestcases = [
         expect: -11002
     },
     {
-        name: "test derive new oneledger account with invalid data 8, invalid keyIndex",
+        name: "test derive new BTCP2PKH account with invalid data 8, invalid keyIndex",
         input: {
             keyType: "BTCP2PKH",
             keyIndex: -11,
@@ -89,7 +89,7 @@ const deriveNewKeyTestcases = [
         expect: -11001
     },
     {
-        name: "test derive new oneledger account with invalid data 9, wrong password",
+        name: "test derive new BTCP2PKH account with invalid data 9, wrong password",
         input: {
             keyType: "BTCP2PKH",
             keyIndex: 2,
@@ -99,7 +99,7 @@ const deriveNewKeyTestcases = [
         expect: -11000
     },
     {
-        name: "test derive new oneledger account with invalid data 10, invalid encryptedMasterKeySeed",
+        name: "test derive new BTCP2PKH account with invalid data 10, invalid encryptedMasterKeySeed",
         input: {
             keyType: "BTCP2PKH",
             keyIndex: 2,
@@ -109,7 +109,7 @@ const deriveNewKeyTestcases = [
         expect: -11002
     },
     {
-        name: "test derive new oneledger account with invalid data 11, invalid keyIndex",
+        name: "test derive new ETH account with invalid data 11, invalid keyIndex",
         input: {
             keyType: "ETH",
             keyIndex: -11,
@@ -119,7 +119,7 @@ const deriveNewKeyTestcases = [
         expect: -11001
     },
     {
-        name: "test derive new oneledger account with invalid data 12, wrong password",
+        name: "test derive new ETH account with invalid data 12, wrong password",
         input: {
             keyType: "ETH",
             keyIndex: 2,
@@ -129,7 +129,7 @@ const deriveNewKeyTestcases = [
         expect: -11000
     },
     {
-        name: "test derive new oneledger account with invalid data 13, invalid encryptedMasterKeySeed",
+        name: "test derive new ETH account with invalid data 13, invalid encryptedMasterKeySeed",
         input: {
             keyType: "ETH",
             keyIndex: 2,
@@ -152,9 +152,10 @@ describe("test derive new key", function () {
                 encryptedMasterKeySeed
             };
             const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
-                console.log("ERR :", error);
+                console.log("error :", error);
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            console.log("response:", response);
             const {keyIndex, address, publicKey} = response;
             kamap.set(address, keyIndex);
             // console.log(`${keyIndex} ${address}`);
@@ -173,9 +174,10 @@ describe("test derive new key", function () {
                 network: "BITCOIN"
             };
             const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
-                // console.log(error);
+                console.log("error: ", error);
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            console.log("response:", response);
             const {keyIndex, address, publicKey} = response;
             kamap.set(publicKey, keyIndex);
             // console.log(`${keyIndex} ${publicKey}`);
@@ -194,8 +196,10 @@ describe("test derive new key", function () {
                 network: "BITCOIN"
             };
             const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
+                console.log("error: ", error);
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            console.log("response:", response);
             const {keyIndex, address, publicKey} = response;
             kamap.set(address, keyIndex);
             // console.log(`${keyIndex} ${address}`);
@@ -213,8 +217,10 @@ describe("test derive new key", function () {
                 encryptedMasterKeySeed
             };
             const {response} = await deriveKeyManager.deriveNewKeyPair(data).catch(error => {
+                console.log("error: ", error);
                 should.fail(error, null, "derive new keyPair should be ok but : " + error.error.message);
             });
+            console.log("response:", response);
             const {keyIndex, address, publicKey} = response;
             kamap.set(address, keyIndex);
             // console.log(`${keyIndex} ${address}`);
@@ -224,9 +230,10 @@ describe("test derive new key", function () {
     deriveNewKeyTestcases.forEach(testcase => {
         it(testcase.name, async function () {
             const response = await deriveKeyManager.deriveNewKeyPair(testcase.input).catch(error => {
-                // console.log("ERR :", error);
+                console.log("error :", error);
                 should.equal(error.error.code, testcase.expect, error.error.message);
             });
+            console.log("response: ", response);
             if (typeof response !== "undefined") should.fail(response, undefined, "derive new keyPair with invalid data should be error");
         })
     })
@@ -488,7 +495,7 @@ const signTxInvalidDataTestcases = [
                     value: 1,
                     data: "",
                 },
-                txConfig: {chain :"nonsense"}
+                txConfig: {chain: "nonsense"}
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -509,7 +516,7 @@ const signTxInvalidDataTestcases = [
                     value: 1,
                     data: "",
                 },
-                txConfig: {hardfork :"nonsense"}
+                txConfig: {hardfork: "nonsense"}
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -530,7 +537,7 @@ const signTxInvalidDataTestcases = [
                     value: 1,
                     data: "",
                 },
-                txConfig: {chain : "nonsense", hardfork :"nonsense"}
+                txConfig: {chain: "nonsense", hardfork: "nonsense"}
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -551,7 +558,7 @@ const signTxInvalidDataTestcases = [
                     value: 1,
                     data: "",
                 },
-                txConfig: {chain : "ropsten", hardfork :"nonsense"}
+                txConfig: {chain: "ropsten", hardfork: "nonsense"}
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -572,7 +579,7 @@ const signTxInvalidDataTestcases = [
                     value: 1,
                     data: "",
                 },
-                txConfig: {chain : "nonsense", hardfork :"byzantium"}
+                txConfig: {chain: "nonsense", hardfork: "byzantium"}
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -646,7 +653,19 @@ const signTxInvalidDataTestcases = [
             encryptedMasterKeySeed
         },
         expect: -11005
-    }
+    },
+    {
+        name: "33 test sign tx with invalid data, invalid BTC network",
+        input: {
+            message: rawTxmessageBTC,
+            keyType: "BTC",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed,
+            network: "ABC"
+        },
+        expect: -11012
+    },
 ];
 
 const signTxValidDataTestcases = [
@@ -662,7 +681,7 @@ const signTxValidDataTestcases = [
                     value: 1,
                     data: "",
                 },
-                txConfig: {foo : "foo", chain : "goerli", hardfork :"byzantium", abc : "123"}
+                txConfig: {foo: "foo", chain: "goerli", hardfork: "byzantium", abc: "123"}
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -703,7 +722,7 @@ const signTxValidDataTestcases = [
                     value: 1,
                     data: "",
                 },
-                txConfig: {chain : "goerli", hardfork :"byzantium"}
+                txConfig: {chain: "goerli", hardfork: "byzantium"}
             },
             keyType: "ETH",
             keyIndex: 1,
@@ -711,77 +730,92 @@ const signTxValidDataTestcases = [
             encryptedMasterKeySeed
         },
         expect: true
-    }
+    },
+    {
+        name: "34 test sign tx with valid data, valid BTC network",
+        input: {
+            message: rawTxmessageBTC,
+            keyType: "BTC",
+            keyIndex: 1,
+            password: masterKeyPassword,
+            encryptedMasterKeySeed,
+            network: "TESTNET"
+        },
+        expect: true
+    },
 ];
 
 describe("test sign tx", function () {
-    // it("18 test sign tx with OLT derived key", async function () {
-    //     const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
-    //     const ismap = new Map();
-    //     for (let i = 0; i < 1000; i++) {
-    //         const data = {
-    //             message: messageOLT,
-    //             keyType: "OLT",
-    //             keyIndex: i,
-    //             password: masterKeyPassword,
-    //             encryptedMasterKeySeed
-    //         };
-    //         const {response} = await deriveKeyManager.signTx(data).catch(error => {
-    //             should.fail(error, null, "sign OLT tx should be ok but : " + error.error.message);
-    //         });
-    //         const {signature} = response;
-    //         ismap.set(signature, i);
-    //         // console.log(`${i} ${signature}`);
-    //     }
-    //     should.equal(ismap.size, 1000, "should generate 1000 different signatures")
-    // }).timeout(20000);
-    // it("19 test sign tx with BTC derived key", async function () {
-    //     const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
-    //     const ismap = new Map();
-    //     for (let i = 0; i < 1000; i++) {
-    //         const data = {
-    //             message: rawTxmessageBTC,
-    //             keyType: "BTC",
-    //             keyIndex: i,
-    //             password: masterKeyPassword,
-    //             encryptedMasterKeySeed,
-    //             network: "BITCOIN"
-    //         };
-    //         const {response} = await deriveKeyManager.signTx(data).catch(error => {
-    //             should.fail(error, null, "sign BTC tx should be ok but : " + error.error.message);
-    //         });
-    //         const {signature, recovery} = response;
-    //         ismap.set(signature, i)
-    //     }
-    //     should.equal(ismap.size, 1000, "should generate 1000 different signatures")
-    // }).timeout(20000);
-    // it("20 test sign tx with ETH derived key", async function () {
-    //     const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
-    //     const ismap = new Map();
-    //     for (let i = 0; i < 1000; i++) {
-    //         const data = {
-    //             message: {txParams: txParamsETH, txConfig: {}},
-    //             keyType: "ETH",
-    //             keyIndex: i,
-    //             password: masterKeyPassword,
-    //             encryptedMasterKeySeed
-    //         };
-    //         const {response} = await deriveKeyManager.signTx(data).catch(error => {
-    //             should.fail(error, null, "sign ETH tx should be ok but : " + error.error.message);
-    //         });
-    //         const {signature} = response;
-    //         ismap.set(signature, i);
-    //         // console.log(`${i} ${signature}`);
-    //     }
-    //     should.equal(ismap.size, 1000, "should generate 1000 different signatures")
-    // }).timeout(20000);
+    it("18 test sign tx with OLT derived key", async function () {
+        const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
+        const ismap = new Map();
+        for (let i = 0; i < 1000; i++) {
+            const data = {
+                message: messageOLT,
+                keyType: "OLT",
+                keyIndex: i,
+                password: masterKeyPassword,
+                encryptedMasterKeySeed
+            };
+            const {response} = await deriveKeyManager.signTx(data).catch(error => {
+                should.fail(error, null, "sign OLT tx should be ok but : " + error.error.message);
+            });
+            const {signature} = response;
+            ismap.set(signature, i);
+            // console.log(`${i} ${signature}`);
+        }
+        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+    }).timeout(20000);
+    it("19 test sign tx with BTC derived key", async function () {
+        const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
+        const ismap = new Map();
+        for (let i = 0; i < 1000; i++) {
+            const data = {
+                message: rawTxmessageBTC,
+                keyType: "BTC",
+                keyIndex: i,
+                password: masterKeyPassword,
+                encryptedMasterKeySeed,
+                network: "BITCOIN"
+            };
+            const {response} = await deriveKeyManager.signTx(data).catch(error => {
+                console.log("error: ", error);
+                should.fail(error, null, "sign BTC tx should be ok but : " + error.error.message);
+            });
+            const {signature, recovery} = response;
+            console.log("signature : ", signature);
+            ismap.set(signature, i)
+        }
+        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+    }).timeout(20000);
+    it("20 test sign tx with ETH derived key", async function () {
+        const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
+        const ismap = new Map();
+        for (let i = 0; i < 1000; i++) {
+            const data = {
+                message: {txParams: txParamsETH, txConfig: {}},
+                keyType: "ETH",
+                keyIndex: i,
+                password: masterKeyPassword,
+                encryptedMasterKeySeed
+            };
+            const {response} = await deriveKeyManager.signTx(data).catch(error => {
+                should.fail(error, null, "sign ETH tx should be ok but : " + error.error.message);
+            });
+            const {signature} = response;
+            ismap.set(signature, i);
+            // console.log(`${i} ${signature}`);
+        }
+        should.equal(ismap.size, 1000, "should generate 1000 different signatures")
+    }).timeout(20000);
     signTxInvalidDataTestcases.forEach(testcase => {
         it(testcase.name, async function () {
             const data = testcase.input;
             const response = await deriveKeyManager.signTx(data).catch(error => {
-                console.log("resp:", error);
+                console.log("error:", error);
                 should.equal(error.error.code, testcase.expect, error.error.message)
             });
+            console.log("response:", response);
             if (typeof response !== "undefined") should.fail(response, undefined, "sign tx with invalid data should be error");
         })
     });
@@ -791,6 +825,7 @@ describe("test sign tx", function () {
             const response = await deriveKeyManager.signTx(data).catch(error => {
                 should.fail(error, undefined, "sign tx with valid data should be ok");
             });
+            console.log("resp:", response);
             should.exist(response.response.signature);
         })
     })

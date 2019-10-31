@@ -58,16 +58,18 @@ function verifyAddress(address) {
 // input : encryptedMasterKeySeed is a string
 // input : keyPath is a string
 // input : password is plaintext
-// return : callback function containing error object and serialized tx as hex string
-function signForSignature({txParams, txConfig, password, encryptedMasterKeySeed, keyPath}, callback) {
-    return masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
-        if (error) return callback(error);
-        const derivedPrivateKey = derivePrivateKey(decryptedMasterKeySeed, keyPath);
-        const tx = new EthereumTx(txParams, txConfig);
-        tx.sign(derivedPrivateKey);
-        if (!tx.verifySignature()) return callback(ErrorUtil.errorWrap(requestErrors.InvalidETHSignature));
-        callback(null, `${ethSignaturePrefix}${tx.serialize().toString('hex')}`);
-    });
+// return : promise containing error object or serialized tx as hex string
+function signForSignature({txParams, txConfig, password, encryptedMasterKeySeed, keyPath}) {
+    return new Promise((resolve, reject) => {
+        masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
+            if (error) reject(error);
+            const derivedPrivateKey = derivePrivateKey(decryptedMasterKeySeed, keyPath);
+            const tx = new EthereumTx(txParams, txConfig);
+            tx.sign(derivedPrivateKey);
+            if (!tx.verifySignature()) reject(ErrorUtil.errorWrap(requestErrors.InvalidETHSignature));
+            resolve(`${ethSignaturePrefix}${tx.serialize().toString('hex')}`)
+        })
+    })
 }
 
 module.exports = {
