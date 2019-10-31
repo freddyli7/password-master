@@ -7,7 +7,6 @@ const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
 const typeConverter = require("./typeConverter");
 const masterSeedKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
-const util = require("./util");
 
 /* *****************************   Master key  ***************************** */
 // generate 24 mnemonic before creating a new master key
@@ -71,15 +70,17 @@ function masterKeySeedEncryption(password, masterKeySeed) {
 // decrypt masterKeySeed with password
 // input : password is plaintext
 // input : encryptedMasterKey is string
-// return : callback function containing error object and decrypted masterKeySeed which is a 64 bytes buffer
-function masterKeySeedDecryption(password, encryptedMasterKeySeed, callback) {
-    let decryptedMasterKeySeed;
-    try {
-        decryptedMasterKeySeed = sjcl.decrypt(password, encryptedMasterKeySeed)
-    } catch (err) {
-        return callback(ErrorUtil.errorWrap(requestErrors.WrongPassword))
-    }
-    callback(null, typeConverter.uint8ArrayToBuffer(nacl.util.decodeBase64(decryptedMasterKeySeed)))
+// return : promise containing error object or decrypted masterKeySeed which is a 64 bytes buffer
+function masterKeySeedDecryption(password, encryptedMasterKeySeed) {
+    return new Promise((resolve, reject) => {
+        let decryptedMasterKeySeed;
+        try {
+            decryptedMasterKeySeed = sjcl.decrypt(password, encryptedMasterKeySeed)
+        } catch (err) {
+            reject(ErrorUtil.errorWrap(requestErrors.WrongPassword))
+        }
+        resolve(typeConverter.uint8ArrayToBuffer(nacl.util.decodeBase64(decryptedMasterKeySeed)))
+    })
 }
 
 // derive masterKeySeed's public key
@@ -117,18 +118,12 @@ function getMasterKeySeedAddressForRecovery(mnemonicArray) {
 // input : password is plaintext
 // input : encryptedMasterKeySeed is string
 // return : promise
-function unlockMasterKeySeed(password, encryptedMasterKeySeed) {
-    let receiver;
-    masterKeySeedDecryption(password, encryptedMasterKeySeed, function (error, unlockResult) {
-        if (error) {
-            receiver = Promise.reject(error);
-            return receiver
-        } else if (typeof unlockResult !== "undefined") {
-            receiver = Promise.resolve(ErrorUtil.responseWrap(true));
-            return receiver
-        }
+async function unlockMasterKeySeed(password, encryptedMasterKeySeed) {
+    const unlockResult = await masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
+        return Promise.reject(error)
     });
-    return receiver
+    if (typeof unlockResult == "undefined") return Promise.reject(ErrorUtil.errorWrap(requestErrors.UnableUnlockMasterSeed));
+    else return Promise.resolve(ErrorUtil.responseWrap(true))
 }
 
 module.exports = {

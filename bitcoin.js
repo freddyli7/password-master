@@ -8,7 +8,6 @@ const {bitcoinNetworkType} = require("./config");
 const bip32 = require("bip32");
 const walletValidator = require('wallet-address-validator');
 const util = require('./util');
-const sysUtil = require('util');
 const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
 
@@ -116,8 +115,7 @@ function deriveP2MSAddress(publicKey) {
 // input : network should be one of "BTCOIN", "TESTNET" or "REGTEST"
 // return : promise containing error object or signature which is a 64 bytes buffer and recovery which is a number
 async function signForSignature({message, password, encryptedMasterKeySeed, keyPath, network}) {
-    const masterSeedDecryption = sysUtil.promisify(masterKeySeed.masterKeySeedDecryption);
-    const decryptedMasterKeySeed = await masterSeedDecryption(password, encryptedMasterKeySeed).catch(error => {
+    const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
         return Promise.reject(error)
     });
     const derivedPrivateKey = await derivePrivateKey(decryptedMasterKeySeed, keyPath, network).catch(error => {

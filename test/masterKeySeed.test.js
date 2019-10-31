@@ -50,22 +50,24 @@ const masterkeyPassword = "123456";
 const wrongPassword = "123sdxf123123";
 
 describe("test encrypt and decrypt master key seed", function () {
-    it("encrypted master key seed and decrypt it", function () {
+    it("encrypted master key seed and decrypt it", async function () {
         for (let i = 0; i < 1000; i++) {
             // console.log(typeConverter.hexStrToBuffer(masterKeySeedHex));
             const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterkeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
             // console.log(encryptedMasterKeySeed);
-            masterKeySeed.masterKeySeedDecryption(wrongPassword, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
+            const decryptedMasterKeySeedWrongPassword = await masterKeySeed.masterKeySeedDecryption(wrongPassword, encryptedMasterKeySeed).catch(error => {
                 // console.log(error.message());
-                should.equal(decryptedMasterKeySeed, null);
-                should.equal(error.error.message, "Wrong password");
+                should.equal(error.error.code, -11000);
+                should.equal(error.error.message, "Wrong password")
             });
-            masterKeySeed.masterKeySeedDecryption(masterkeyPassword, encryptedMasterKeySeed, function (error, decryptedMasterKeySeed) {
+            should.equal(decryptedMasterKeySeedWrongPassword, undefined, "decrypt with wrong password should get undefined");
+
+            const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(masterkeyPassword, encryptedMasterKeySeed).catch(error => {
                 // console.log(decryptedMasterKeySeed);
                 // console.log(typeConverter.hexStrToBuffer(masterKeySeedHex));
-                should.equal(error, null);
-                should.deepEqual(decryptedMasterKeySeed, typeConverter.hexStrToBuffer(masterKeySeedHex));
+                should.fail(error, "decrypt with correct password should not get error, but : ", error);
             });
+            should.deepEqual(decryptedMasterKeySeed, typeConverter.hexStrToBuffer(masterKeySeedHex));
         }
     }).timeout(20000);
 });
@@ -110,9 +112,11 @@ describe("test unlock master key seed", function () {
         }
     });
     it("test 2, correct password, should get true", async function () {
-        const unlockResult = masterKeySeed.unlockMasterKeySeed(masterkeyPassword, encryptedMasterKeySeed).catch(err => {
+        const unlockResult = await masterKeySeed.unlockMasterKeySeed(masterkeyPassword, encryptedMasterKeySeed).catch(err => {
+            console.log("error : ", err);
             should.fail(err, undefined, "correct password should be able to unlock successfully")
         });
+        console.log("unlockResult : ", unlockResult);
         should.ok(unlockResult)
     });
 });
