@@ -13,3 +13,7 @@ const {verify} = require("./addressVerifier");
 exports.address = {
     verify
 };
+const {derivedKeyType} = require("./config");
+exports.CONSTANT = {
+    KeyType: derivedKeyType
+};
