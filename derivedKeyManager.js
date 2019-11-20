@@ -277,7 +277,7 @@ function deriveKeyErrFilter(err) {
     if (code === requestErrors.InvalidBTCNetworkType.code) {
         return err
     }
-    return ErrorUtil.errorWrap(requestErrors.FailedToDeriveNewKeyError)
+    return ErrorUtil.errorWrap(requestErrors.FailedToDeriveNewKey)
 }
 
 module.exports = {
