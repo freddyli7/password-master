@@ -37,11 +37,11 @@ function isValidString(str) {
     return !(typeof str === "undefined" || str === "" || str === "<nil>" || str === null)
 }
 
-/**
- * @description Validate txConfig of ETH tx message type.
+/*
+ * description Validate txConfig of ETH tx message type.
  * If txConfig type is not object, return error
  * If txConfig type is null, return error
- * @return {Promise} if resolve, return txConfig object, if reject, return error.
+ * return {Promise} if resolve, return txConfig object, if reject, return error.
  */
 function validETHtxConfigType(txConfig) {
     const notObjButUndefined = typeof txConfig !== 'object' && typeof txConfig !== 'undefined';
@@ -52,21 +52,21 @@ function validETHtxConfigType(txConfig) {
     return Promise.resolve(txConfig);
 }
 
-/**
- * @description Merge txConfig into default chain and hardfork config object.
+/*
+ * description Merge txConfig into default chain and hardfork config object.
  * If txConfig is undefined, replace with default param which is an empty object, then merge it to default txConfig object.
- * @return {object} returned object contains chain and hardfork fields
+ * return {object} returned object contains chain and hardfork fields
  */
 function mergeETHTxConfigToDefault(txConfig = {}) {
     return {...ethDefaultTxConfig, ...txConfig}
 }
 
-/**
- * @description Check if txConfig object includes valid chain and hardfork value.
- * @param {object} txConfig - Object of eth txConfig object, must include chain and hardfork fields.
- * @param {string} txConfig.chain - Indicate which ETH network to use (should be one of mainnet, rinkeby, ropsten, kovan, goerli)
- * @param {string} txConfig.hardfork - Indicate which ETH hardfork to use (should be one of petersburg, constantinople, byzantium)
- * @returns {boolean} If valid chain and hardfork are provided inside txConfig object, return true, otherwise return false
+/*
+ * description Check if txConfig object includes valid chain and hardfork value.
+ * param {object} txConfig - Object of eth txConfig object, must include chain and hardfork fields.
+ * param {string} txConfig.chain - Indicate which ETH network to use (should be one of mainnet, rinkeby, ropsten, kovan, goerli)
+ * param {string} txConfig.hardfork - Indicate which ETH hardfork to use (should be one of petersburg, constantinople, byzantium)
+ * returns {boolean} If valid chain and hardfork are provided inside txConfig object, return true, otherwise return false
  */
 function validETHtxConfigValue(txConfig) {
     const {chain, hardfork} = txConfig;
