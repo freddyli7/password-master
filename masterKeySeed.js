@@ -37,7 +37,7 @@ function mnemonicStrToArray(mnemonicStr) {
 }
 
 // convert array mnemonic to string
-// internal use onlynpm
+// internal use only
 // input : mnemonic array
 // return : mnemonic string
 function mnemonicArrayToStr(mnemonicArray) {
