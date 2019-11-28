@@ -1,25 +1,34 @@
 const masterKeySeed = require("./masterKeySeed");
 
 class MasterKeySeedManager {
-    // create a new masterKeySeed
-    // input : password is string,
-    // input : mnemonicArray is an array with {index:number, word:string} as each element
+    /**
+     * @class
+     * @description Create a new master key seed.
+     * @param mnemonicArray {Object[]} mnemonic words array with {index:number, word:string} as each element
+     * @param mnemonicArray[].index {Number} word index, starting from 1
+     * @param mnemonicArray[].word {string} mnemonic word
+     * @param password {string} password to encrypt the master key seed
+     */
     constructor(mnemonicArray, password) {
         const derivedMasterKeySeed = masterKeySeed.masterKeySeedGenerator(mnemonicArray);
         this.encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(password, derivedMasterKeySeed);
         this.masterKeySeedAddress = masterKeySeed.getMasterKeySeedAddress(masterKeySeed.getMasterKeySeedPublicKey(derivedMasterKeySeed))
     }
 
-    // export masterKeySeed info for persisting at local file system
-    // should be called only when creating new masterKeySeed OR when after user recovery with correct mnemonic words and encrypted the masterKeySeed with new password
-    // return : object containing encryptedMasterKeySeed and masterKeySeedAddress
+    /**
+     * @description Export master key seed info for persisting into local file system.
+     * This function should be called only after creating new masterKeySeed OR  after user recovery with correct mnemonic words and encrypted the masterKeySeed with new password
+     * @return {Object} Object contains encryptedMasterKeySeed and masterKeySeedAddress
+     */
     getMasterKeySeedInfo() {
         return {encryptedMasterKeySeed: this.encryptedMasterKeySeed, masterKeySeedAddress: this.masterKeySeedAddress}
     }
 
-    // check masterKeySeed encryption password
-    // input : password is string
-    // return : promise
+    /**
+     * @description Check if master key seed encryption password is correct
+     * @param password {string} password
+     * @return {Promise<boolean|error>} Promise.reject returns error, Promise.solve returns unlock result
+     */
     unlockMasterKeySeed(password) {
         return masterKeySeed.unlockMasterKeySeed(password, this.encryptedMasterKeySeed)
     }

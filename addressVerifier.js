@@ -6,6 +6,12 @@ const util = require("./util");
 const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
 
+/**
+ * @description Verify address based on address type
+ * @param address {string} address to be verified.
+ * @param addressType {string} address type which is the same as key type, it should be string of either "OLT", "BTCP2PK", "BTCP2PKH", "ETH".
+ * @return {Promise<boolean|error>} promise.reject returns error object, promise.resolve returns verification result.
+ */
 async function verify(address, addressType) {
     if (!util.isValidString(address) || !util.isValidString(addressType)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidInputData));
     switch (addressType) {
