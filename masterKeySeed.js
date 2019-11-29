@@ -46,6 +46,19 @@ function mnemonicArrayToStr(mnemonicArray) {
     }).join(' ')
 }
 
+/**
+ * @description Verify mnemonic words
+ * We don't accept other language word list for now, the default word list is english.
+ * Developer should call this function to verify mnemonic words that user input before calling getMasterKeySeedAddressForRecovery when the master seed file is stored on local storage(user forget password scenario);
+ * When user is doing recovery from a new device(no master seed file is stored on local storage), only call this function to verify the mnemonic words, then generating the master seed based on what user input. Please note that if this is the case,
+ * it is possible that user still input valid mnemonic words BUT NOT THE ONES for his original wallet, therefore it could be a totally different wallet.
+ * @param mnemonicArray {Object[]} An mnemonic array with {index:number, word:string} as each element
+ * @return {boolean} verify result
+ */
+function verifyMnemonic(mnemonicArray) {
+    return bip39.validateMnemonic(mnemonicArrayToStr(mnemonicArray), bip39.wordlists.english)
+}
+
 // derive masterKeySeed from 12 or 24 mnemonic words mnemonicArray
 // input : mnemonic array
 // return : masterKeySeed which is a 64 bytes buffer
@@ -148,5 +161,6 @@ module.exports = {
     getMasterKeySeedAddressForRecovery,
     unlockMasterKeySeed,
     mnemonicStrToArray,
-    mnemonicArrayToStr
+    mnemonicArrayToStr,
+    verifyMnemonic
 };

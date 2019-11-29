@@ -45,8 +45,21 @@ describe("examples of how to use HD-vault", async function () {
         const {encryptedMasterKeySeed, masterKeySeedAddress} = mm.getMasterKeySeedInfo();
         console.log("get masterKeySeed info: ", encryptedMasterKeySeed, masterKeySeedAddress);
 
-        // when user recovery masterKeySeed, get the masterAddress based on provided mnemonic for comparison
-        console.log("recovery address: " + HDVault.masterKeySeedUtil.getMasterKeySeedAddressForRecovery(mnemonicArray));
+        // if user forget password (master seed file is on local storage):
+        const verifyResult = HDVault.mnemonicUtil.verifyMnemonic(mnemonicArray);
+        if (verifyResult) {
+            // get the masterAddress based on provided mnemonic for comparison
+            console.log("recovery address: " + HDVault.masterKeySeedUtil.getMasterKeySeedAddressForRecovery(mnemonicArray));
+        }
+
+        // if user is trying to recover on a new device(no master seed file is on local storage)
+        const verifyResult2 = HDVault.mnemonicUtil.verifyMnemonic(mnemonicArray);
+        if (verifyResult2) {
+            // generate masterKeySeed with mnemonic and new password
+            const new_mm = new HDVault.MasterKeySeedManager(mnemonicArray, "654321");
+            // write to local master seed file
+            new_mm.getMasterKeySeedInfo()
+        }
 
         // derive new key with different keyType : OLT, BTCP2PK, BTCP2PKH, ETH
         // return new key's address and keyIndex to store locally
@@ -82,7 +95,9 @@ describe("examples of how to use HD-vault", async function () {
         console.log("get signature: ", signature);
 
         // verify address
-        const addreVerifyResult = HDVault.address.verify("1BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg", "BTCP2PKH");
+        const addreVerifyResult = await HDVault.address.verify("1BRpDq7Px6X4k5hN4Q6jFkBypFMizf64Yg", "BTCP2PKH").catch(err => {
+            console.error("ERR : ", err.error);
+        });
         console.log(addreVerifyResult);
     })
 });
