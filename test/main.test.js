@@ -56,7 +56,7 @@ describe("examples of how to use HD-vault", async function () {
         const verifyResult2 = HDVault.mnemonicUtil.verifyMnemonic(mnemonicArray);
         if (verifyResult2) {
             // generate masterKeySeed with mnemonic and new password
-            const new_mm = new HDVault.MasterKeySeedManager(words, "654321");
+            const new_mm = new HDVault.MasterKeySeedManager(mnemonicArray, "654321");
             // write to local master seed file
             new_mm.getMasterKeySeedInfo()
         }
