@@ -13,7 +13,7 @@ const {requestErrors} = ErrorType;
  * @return {Promise<boolean|error>} promise.reject returns error object, promise.resolve returns verification result.
  */
 async function verify(address, addressType) {
-    if (!util.isValidString(address) || !util.isValidString(addressType)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidInputData));
+    if (!util.isValidString(address) || !util.isValidString(addressType)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidAddressVerifyData));
     switch (addressType) {
         case derivedKeyType.OLT:
             return Promise.resolve(oneledger.verifyAddress(address));
