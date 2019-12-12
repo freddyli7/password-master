@@ -11,20 +11,28 @@ import MasterKeySeedManager = require("./masterKeySeedManager");
 import derivedKeyManager = require("./derivedKeyManager");
 
 export declare namespace masterKeySeedUtil {
-    function unlockMasterKeySeed(password: string, encryptedMasterKeySeed: string)
-    function getMasterKeySeedAddressForRecovery(mnemonicArray: array<{index: number, word: string}>)
+    function unlockMasterKeySeed(password: string, encryptedMasterKeySeed: string): Promise<boolean | Object>
+
+    function getMasterKeySeedAddressForRecovery(mnemonicArray: array<{ index: number, word: string }>): string
 }
 
 export declare namespace mnemonicUtil {
-    function verifyMnemonic()
+    function verifyMnemonic(mnemonicArray: array<{ index: number, word: string }>): boolean
 
-    function mnemonicGenerator12()
+    function mnemonicGenerator12(): array<{ index: number, word: string }>
 
-    function mnemonicGenerator24()
+    function mnemonicGenerator24(): array<{ index: number, word: string }>
+}
+
+enum derivedKeyType {
+    OLT = "OLT",
+    BTCP2PK = "BTCP2PK",
+    BTCP2PKH = "BTCP2PKH",
+    ETH = "ETH"
 }
 
 export declare namespace address {
-    function verify()
+    function verify(address: string, addressType: derivedKeyType): Promise<boolean | error>
 }
 
 declare namespace CONSTANT {
@@ -33,11 +41,24 @@ declare namespace CONSTANT {
     }
 }
 
-export function MasterKeySeedManager();
+export class MasterKeySeedManager {
+}
+
+enum BitCoinNetwork {
+    BTCOIN = "BTCOIN",
+    TESTNET = "TESTNET",
+    REGTEST = "REGTEST"
+}
+
+enum txSignKeyType {
+    OLT = "OLT",
+    BTC = "BTC ",
+    ETH = "ETH"
+}
 
 export module derivedKeyManager {
-    function deriveNewKeyPair()
+    function deriveNewKeyPair({keyType: derivedKeyType, keyIndex: number, password: string, encryptedMasterKeySeed: string, network: BitCoinNetwork}): Promise<response | error>
 
-    function signTx()
+    function signTx({message, keyType: txSignKeyType, keyIndex: number, password: string, encryptedMasterKeySeed: string, network: BitCoinNetwork}): Promise<response | error>
 }
 
