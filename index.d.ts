@@ -11,27 +11,23 @@ import MasterKeySeedManager = require("./masterKeySeedManager");
 import derivedKeyManager = require("./derivedKeyManager");
 
 export declare namespace masterKeySeedUtil {
-    export {
-        unlockMasterKeySeed,
-        getMasterKeySeedAddressForRecovery
-    }
+    function unlockMasterKeySeed(password: string, encryptedMasterKeySeed: string)
+    function getMasterKeySeedAddressForRecovery(mnemonicArray: array<{index: number, word: string}>)
 }
 
 export declare namespace mnemonicUtil {
-    export {
-        verifyMnemonic,
-        mnemonicGenerator12,
-        mnemonicGenerator24
-    }
+    function verifyMnemonic()
+
+    function mnemonicGenerator12()
+
+    function mnemonicGenerator24()
 }
 
 export declare namespace address {
-    export {
-        verify
-    }
+    function verify()
 }
 
-export declare namespace CONSTANT {
+declare namespace CONSTANT {
     export {
         derivedKeyType as KeyType
     }
@@ -40,7 +36,8 @@ export declare namespace CONSTANT {
 export function MasterKeySeedManager();
 
 export module derivedKeyManager {
-    export function deriveNewKeyPair()
-    export function signTx()
+    function deriveNewKeyPair()
+
+    function signTx()
 }
 
