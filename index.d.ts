@@ -24,7 +24,7 @@ export declare namespace mnemonicUtil {
     function mnemonicGenerator24(): array<{ index: number, word: string }>
 }
 
-enum derivedKeyType {
+export enum derivedKeyType {
     OLT = "OLT",
     BTCP2PK = "BTCP2PK",
     BTCP2PKH = "BTCP2PKH",
@@ -44,13 +44,13 @@ declare namespace CONSTANT {
 export class MasterKeySeedManager {
 }
 
-enum BitCoinNetwork {
+export enum BitCoinNetwork {
     BTCOIN = "BTCOIN",
     TESTNET = "TESTNET",
     REGTEST = "REGTEST"
 }
 
-enum txSignKeyType {
+export enum txSignKeyType {
     OLT = "OLT",
     BTC = "BTC ",
     ETH = "ETH"
