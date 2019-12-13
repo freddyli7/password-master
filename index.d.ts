@@ -45,7 +45,7 @@ export class MasterKeySeedManager {
     encryptedMasterKeySeed: string;
     masterKeySeedAddress: string;
 
-    constructor(mnemonicArray: array<{ index: number, word: string }>, password: string) {
+    constructor(mnemonicArray: Array<{ index: number, word: string }>, password: string) {
     }
 }
 
