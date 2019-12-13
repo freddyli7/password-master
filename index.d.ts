@@ -24,7 +24,7 @@ export declare namespace mnemonicUtil {
     function mnemonicGenerator24(): array<{ index: number, word: string }>
 }
 
-export enum derivedKeyType {
+export declare enum derivedKeyType {
     OLT = "OLT",
     BTCP2PK = "BTCP2PK",
     BTCP2PKH = "BTCP2PKH",
@@ -42,23 +42,45 @@ declare namespace CONSTANT {
 }
 
 export class MasterKeySeedManager {
+    encryptedMasterKeySeed: string;
+    masterKeySeedAddress: string;
+
+    constructor(mnemonicArray: array<{ index: number, word: string }>, password: string) {
+    }
 }
 
-export enum BitCoinNetwork {
+export declare enum BitCoinNetwork {
     BTCOIN = "BTCOIN",
     TESTNET = "TESTNET",
     REGTEST = "REGTEST"
 }
 
-export enum txSignKeyType {
+export declare enum txSignKeyType {
     OLT = "OLT",
     BTC = "BTC ",
     ETH = "ETH"
 }
 
-export module derivedKeyManager {
-    function deriveNewKeyPair({keyType: derivedKeyType, keyIndex: number, password: string, encryptedMasterKeySeed: string, network: BitCoinNetwork}): Promise<response | error>
+export declare namespace derivedKeyManager {
+    export interface deriveKeyParamsInterface {
+        keyType: derivedKeyType,
+        keyIndex: number,
+        password: string,
+        encryptedMasterKeySeed: string,
+        network?: BitCoinNetwork
+    }
 
-    function signTx({message, keyType: txSignKeyType, keyIndex: number, password: string, encryptedMasterKeySeed: string, network: BitCoinNetwork}): Promise<response | error>
+    export interface signTxInterface {
+        message: Object | string,
+        keyType: txSignKeyType,
+        keyIndex: number,
+        password: string,
+        encryptedMasterKeySeed: string,
+        network?: BitCoinNetwork
+    }
+
+    function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}: deriveKeyParamsInterface): Promise<response | error>;
+
+    function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, network}: signTxInterface): Promise<response | error>;
 }
 
