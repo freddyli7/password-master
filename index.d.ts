@@ -56,9 +56,9 @@ export declare module derivedKeyManager {
         network?: BitCoinNetwork
     }
 
-    function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}: deriveKeyParamsInterface): Promise<response | error>;
+    function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}: deriveKeyParamsInterface): Promise<Object>;
 
-    function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, network}: signTxInterface): Promise<response | error>;
+    function signTx({message, keyType, keyIndex, password, encryptedMasterKeySeed, network}: signTxInterface): Promise<Object>;
 }
 
 export declare module masterKeySeedUtil {
