@@ -5,7 +5,7 @@
   "types": "index.d.ts",
   "main": "main.js",
   "scripts": {
-    "test": "nyc mocha"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,11 @@
     "chai": "^4.2.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
-    "should": "^13.2.3"
+    "should": "^13.2.3",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.3",
+    "@types/chai": "^4.2.6",
+    "@types/jest": "^24.0.23"
   }
 }
