@@ -3,6 +3,8 @@ const should = require("should");
 const masterKeySeed = require("../masterKeySeed");
 const typeConverter = require("../typeConverter");
 
+// This file is only used for bitcoin lock and redeem tx integration test
+
 const masterKeySeedHex = "292f9928f54d671f16dc89462297465ff4eb9bfa05b16e5595f599ed81336e291ad5ca9a3a7d50754e2c28f91ac3f46e92fbb3459267b24c781fd2896e0dfb45";
 const masterKeyPassword = "123456";
 const encryptedMasterKeySeed = masterKeySeed.masterKeySeedEncryption(masterKeyPassword, typeConverter.hexStrToBuffer(masterKeySeedHex));
