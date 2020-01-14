@@ -4,7 +4,6 @@ const secp256k1 = require('secp256k1');
 const bitcoinjs = require('bitcoinjs-lib');
 const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
-const {bitcoinNetworkType} = require("./config");
 const bip32 = require("bip32");
 const walletValidator = require('wallet-address-validator');
 const util = require('./util');
@@ -15,28 +14,18 @@ const {requestErrors} = ErrorType;
 // derive private key from masterKeySeed
 // input : masterKeySeed is a 64 bytes buffer
 // input : keyPath is a string
-// input : network should be one of "BTCOIN", "TESTNET" or "REGTEST"
+// input : network should be the network object of one of "BTCOIN", "TESTNET" or "REGTEST"
 // return : promise containing error object or derivedPrivateKey which is a 32 bytes buffer
 function derivePrivateKey(masterKeySeed, keyPath, network) {
     return new Promise((resolve, reject) => {
-        let networkDetermined;
-        switch (network) {
-            case bitcoinNetworkType.BITCOIN :
-                networkDetermined = bitcoinjs.networks.bitcoin;
-                break;
-            case bitcoinNetworkType.TESTNET:
-                networkDetermined = bitcoinjs.networks.testnet;
-                break;
-            case bitcoinNetworkType.REGTEST:
-                networkDetermined = bitcoinjs.networks.regtest;
-                break;
-            default:
-                reject(ErrorUtil.errorWrap(requestErrors.InvalidBTCNetworkType))
-        }
         // derive BitCoin master key node from masterKeySeed
-        const masterNode = bip32.fromSeed(masterKeySeed, networkDetermined);
-        const keyPair = masterNode.derivePath(keyPath);
-        resolve(keyPair.privateKey)
+        try {
+            const masterNode = bip32.fromSeed(masterKeySeed, network);
+            const keyPair = masterNode.derivePath(keyPath);
+            resolve(keyPair)
+        } catch (err) {
+            reject(ErrorUtil.errorWrap(requestErrors.FailedToDeriveNewKey))
+        }
     })
 }
 
@@ -50,16 +39,16 @@ function verifyPrivateKey(privateKey) {
 // derive publicKey from privateKey
 // input : privateKey should be 32 bytes buffer
 // return : derived privateKey's publicKey which is a 33 bytes hex string with chain prefix 0x02 or 0x03
-function derivePublicKey(privateKey) {
-    return typeConverter.bufferToHexStr(secp256k1.publicKeyCreate(privateKey))
+function derivePublicKey(keyPair) {
+    return typeConverter.bufferToHexStr(keyPair.publicKey)
 }
 
 // derive P2PKH address
 // input : publicKey should be a 33 bytes hex string with chain prefix
 // return : 34 chars length base58 encoding P2PKH address
-function deriveP2PKHAddress(publicKey) {
+function deriveP2PKHAddress(publicKey, network) {
     const pubkey = typeConverter.hexStrToBuffer(publicKey);
-    return bitcoinjs.payments.p2pkh({pubkey}).address
+    return bitcoinjs.payments.p2pkh({pubkey, network}).address
 }
 
 // verify P2PKH or P2SH address
@@ -110,19 +99,26 @@ function deriveP2MSAddress(publicKey) {
 // sign BitCoin tx
 // input : encryptedMasterKeySeed is a string
 // input : keyPath is a string
-// input : message should be a 32 bytes hex string
+// input : message should be a hex string
 // input : password is plaintext
-// input : network should be one of "BTCOIN", "TESTNET" or "REGTEST"
-// return : promise containing error object or signature which is a 64 bytes buffer and recovery which is a number
+// input : network should be the network object of one of "BTCOIN", "TESTNET" or "REGTEST"
+// return : promise containing error object or signature which is a hex string
 async function signForSignature({message, password, encryptedMasterKeySeed, keyPath, network}) {
     const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
         return Promise.reject(error)
     });
-    const derivedPrivateKey = await derivePrivateKey(decryptedMasterKeySeed, keyPath, network).catch(error => {
+    const derivedKeyPair = await derivePrivateKey(decryptedMasterKeySeed, keyPath, network).catch(error => {
         return Promise.reject(error)
     });
-    const {signature, recovery} = secp256k1.sign(typeConverter.hexStrToBuffer(message), derivedPrivateKey);
-    return Promise.resolve({signature, recovery})
+    // use WIF to sign, not private key itself
+    const signer = bitcoinjs.ECPair.fromWIF(derivedKeyPair.toWIF(), network);
+
+    const tx = bitcoinjs.Transaction.fromHex(message);
+    const txBuilder = bitcoinjs.TransactionBuilder.fromTransaction(tx, network);
+    txBuilder.sign(0, signer);
+    const signedTx = txBuilder.build();
+    const sigScript = signedTx.ins[0].script;
+    return Promise.resolve({signature: typeConverter.bufferToHexStr(sigScript)})
 }
 
 // verify BTC tx signature
@@ -130,6 +126,10 @@ async function signForSignature({message, password, encryptedMasterKeySeed, keyP
 // input : signature 64 bytes hex string
 // input : publicKey 33 bytes hex string
 // return : verifyResult (true || false)
+/**
+ * @deprecated need to update with proper signature verify function
+ * // TODO : this function needs to be updated with a proper with to verify the signature, once it's done, update testcases as well
+ */
 function verifySignature(message, signature, publicKey) {
     return secp256k1.verify(typeConverter.hexStrToBuffer(message), typeConverter.hexStrToBuffer(signature), typeConverter.hexStrToBuffer(publicKey))
 }

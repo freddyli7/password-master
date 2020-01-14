@@ -12,7 +12,7 @@
   "dependencies": {
     "bip32": "2.0.4",
     "bip39": "3.0.2",
-    "bitcoinjs-lib": "5.1.6",
+    "bitcoinjs-lib": "5.1.7",
     "crypto": "1.0.1",
     "ed25519-hd-key": "1.0.0",
     "ethereum-hdwallet": "0.0.21",

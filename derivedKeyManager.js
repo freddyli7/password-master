@@ -1,9 +1,11 @@
 const oneledger = require("./oneledger");
 const bitcoin = require("./bitcoin");
+const bitcoinjs = require('bitcoinjs-lib');
 const ethereum = require("./ethereum");
 const masterKeySeed = require("./masterKeySeed");
 const util = require("./util");
 const typeConverter = require("./typeConverter");
+const {bitcoinNetworkType} = require("./config");
 const {signatureKeyType, derivedKeyType} = require("./config");
 const {ErrorType, errorHandler, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
@@ -69,24 +71,43 @@ function deriveNewKeyPairOLT(masterKeySeed, keyIndex) {
 }
 
 async function deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network) {
-    const bitcoinDerivedPriKeyP2PK = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network).catch(error => {
+    const networkDetermined = await networkDeterminator(network).catch(err => {
+        return Promise.reject(err)
+    });
+    const bitcoinDerivedKeyPairP2PK = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, networkDetermined).catch(error => {
         throw(error);
     });
-    const bitcoinDerivedPubkeyP2PK = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PK);
+    const bitcoinDerivedPubkeyP2PK = bitcoin.derivePublicKey(bitcoinDerivedKeyPairP2PK);
     const bitcoinDerivedP2PKPubkey = bitcoin.deriveP2PKPubKey(bitcoinDerivedPubkeyP2PK);
     return {keyIndex, publicKey: bitcoinDerivedP2PKPubkey}
 }
 
 async function deriveNewKeyPairBTCP2PKH(masterKeySeed, keyIndex, network) {
-    const bitcoinDerivedPriKeyP2PKH = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, network).catch(error => {
+    const networkDetermined = await networkDeterminator(network).catch(err => {
+        return Promise.reject(err)
+    });
+    const bitcoinDerivedKeyPairP2PKH = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, networkDetermined).catch(error => {
         throw(error);
     });
-    const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKey(bitcoinDerivedPriKeyP2PKH);
-    const bitcoinDerivedP2PKHAddress = bitcoin.deriveP2PKHAddress(bitcoinDerivedPubkeyP2PKH);
+    const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKey(bitcoinDerivedKeyPairP2PKH);
+    const bitcoinDerivedP2PKHAddress = bitcoin.deriveP2PKHAddress(bitcoinDerivedPubkeyP2PKH, networkDetermined);
     return {
         keyIndex,
         address: bitcoinDerivedP2PKHAddress,
         publicKey: bitcoinDerivedPubkeyP2PKH
+    }
+}
+
+async function networkDeterminator(network = bitcoinNetworkType.BITCOIN) {
+    switch (network) {
+        case bitcoinNetworkType.BITCOIN :
+            return Promise.resolve(bitcoinjs.networks.bitcoin);
+        case bitcoinNetworkType.TESTNET:
+            return Promise.resolve(bitcoinjs.networks.testnet);
+        case bitcoinNetworkType.REGTEST:
+            return Promise.resolve(bitcoinjs.networks.regtest);
+        default:
+            return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidBTCNetworkType))
     }
 }
 
@@ -225,18 +246,22 @@ async function signTxOLT(message, keyIndex, encryptedMasterKeySeed, password) {
 }
 
 async function signTxBTC(message, keyIndex, encryptedMasterKeySeed, password, network) {
-    if (!util.validBTCTxMessage(message)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidBTCtxMessage));
+    const networkDetermined = await networkDeterminator(network).catch(err => {
+        return Promise.reject(err)
+    });
+    // TODO : how to verify btc unsigned tx message?
+    // if (!util.validBTCTxMessage(message)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidBTCtxMessage));
     const btcTxData = {
         message,
         keyPath: bitcoinKeyPath + keyIndex,
-        network,
+        network: networkDetermined,
         password,
         encryptedMasterKeySeed
     };
-    const {signature, recovery} = await bitcoin.signForSignature(btcTxData).catch(error => {
+    const {signature} = await bitcoin.signForSignature(btcTxData).catch(error => {
         return Promise.reject(error)
     });
-    return Promise.resolve(ErrorUtil.responseWrap({signature, recovery}))
+    return Promise.resolve(ErrorUtil.responseWrap(signature))
 }
 
 async function signTxETH(message, keyIndex, encryptedMasterKeySeed, password) {

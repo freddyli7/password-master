@@ -2,6 +2,7 @@ const deriveKeyManager = require("../derivedKeyManager");
 const should = require("should");
 const masterKeySeed = require("../masterKeySeed");
 const typeConverter = require("../typeConverter");
+const bitcoinjs = require('bitcoinjs-lib');
 
 const masterKeySeedHex = "292f9928f54d671f16dc89462297465ff4eb9bfa05b16e5595f599ed81336e291ad5ca9a3a7d50754e2c28f91ac3f46e92fbb3459267b24c781fd2896e0dfb45";
 const masterKeyPassword = "123456";
@@ -240,7 +241,7 @@ describe("test derive new key", function () {
 });
 
 const messageOLT = 'eyJ0eF90eXBlIjoyLCJ0eF9kYXRhIjoiZXlKUGQyNWxjaUk2SWpCNE1qZ3dabVkxT0dNMk5UYzNaRGhrWkRBeE5XVmlNelkzTUdRMU1UY3paVFl4WVRnNE1HWmxZU0lzSWtGalkyOTFiblFpT2lJd2VESTRNR1ptTlRoak5qVTNOMlE0WkdRd01UVmxZak0yTnpCa05URTNNMlUyTVdFNE9EQm1aV0VpTENKT1lXMWxJam9pZEdWemRHUnZiV0ZwYmpFeElpd2lVSEpwWTJVaU9uc2lZM1Z5Y21WdVkza2lPaUpQVEZRaUxDSjJZV3gxWlNJNklqRXdNREF3TURBd01EQXdNREF3TURBd01EQXdNREFpZlgwPSIsImZlZSI6eyJQcmljZSI6eyJjdXJyZW5jeSI6Ik9MVCIsInZhbHVlIjoiMTAwMDAwMDAwMDAwMDAwMDAwMCJ9LCJHYXMiOjF9LCJtZW1vIjoiNGM1MzQ4ZTctYWNjOS0xMWU5LTlhN2MtNDIwMTBhMGEwMDA5In0=';
-const rawTxmessageBTC = "072a8543e388c4155ccbcd325f129000214095725598721cea986fcd0fc38d6a";
+const rawTxmessageBTC = "0100000001d377a30edf12890d15b8d5f028883755fcaf716025aa7bac7158f19febe3059b0000000000ffffffff0100a60e000000000017a914a14b3f8033269125671306c7b6a5b0dbb3d88a318700000000";
 const txParamsETH = {
     nonce: 0,
     gasPrice: 1.1,
@@ -371,17 +372,6 @@ const signTxInvalidDataTestcases = [
             encryptedMasterKeySeed
         },
         expect: -11003
-    },
-    {
-        name: "12 test sign tx with invalid data, invalid BTC message",
-        input: {
-            message: "rawTxmessageBTC",
-            keyType: "BTC",
-            keyIndex: 1,
-            password: masterKeyPassword,
-            encryptedMasterKeySeed
-        },
-        expect: -11004
     },
     {
         name: "13 test sign tx with invalid data, invalid ETH message, invalid nonce",
@@ -782,9 +772,8 @@ describe("test sign tx", function () {
                 console.log("error: ", error);
                 should.fail(error, null, "sign BTC tx should be ok but : " + error.error.message);
             });
-            const {signature, recovery} = response;
-            console.log("signature : ", signature);
-            ismap.set(signature, i)
+            console.log("signature : ", response);
+            ismap.set(response, i)
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
     }).timeout(20000);
@@ -804,7 +793,7 @@ describe("test sign tx", function () {
             });
             const {signature} = response;
             ismap.set(signature, i);
-            // console.log(`${i} ${signature}`);
+            console.log(`${i} ${signature}`);
         }
         should.equal(ismap.size, 1000, "should generate 1000 different signatures")
     }).timeout(20000);
@@ -813,6 +802,7 @@ describe("test sign tx", function () {
             const data = testcase.input;
             const response = await deriveKeyManager.signTx(data).catch(error => {
                 console.log("error:", error);
+                console.log("error:", data);
                 should.equal(error.error.code, testcase.expect, error.error.message)
             });
             console.log("response:", response);
@@ -826,7 +816,7 @@ describe("test sign tx", function () {
                 should.fail(error, undefined, "sign tx with valid data should be ok");
             });
             console.log("resp:", response);
-            should.exist(response.response.signature);
+            should.exist(response.response);
         })
     })
 });
