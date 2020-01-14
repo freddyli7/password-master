@@ -112,8 +112,12 @@ async function signForSignature({message, password, encryptedMasterKeySeed, keyP
     });
     // use WIF to sign, not private key itself
     const signer = bitcoinjs.ECPair.fromWIF(derivedKeyPair.toWIF(), network);
-
-    const tx = bitcoinjs.Transaction.fromHex(message);
+    let tx;
+    try {
+        tx = bitcoinjs.Transaction.fromHex(message);
+    } catch (err) {
+        return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidBTCtxMessage))
+    }
     const txBuilder = bitcoinjs.TransactionBuilder.fromTransaction(tx, network);
     txBuilder.sign(0, signer);
     const signedTx = txBuilder.build();

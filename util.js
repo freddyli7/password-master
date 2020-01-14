@@ -6,10 +6,6 @@ function validateBase64(s) {
     return /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(s);
 }
 
-function validBTCTxMessage(s) {
-    return Buffer.from(s).length === 64;
-}
-
 // check if input is a non negative Integer
 function isNonNegativeInteger(num) {
     return !!(Number(num) === 0 || isPositiveInteger(num));
@@ -77,7 +73,6 @@ function validETHtxConfigValue(txConfig) {
 
 module.exports = {
     validateBase64,
-    validBTCTxMessage,
     isNonNegativeInteger,
     isPositiveInteger,
     isNonNegativeNumber,

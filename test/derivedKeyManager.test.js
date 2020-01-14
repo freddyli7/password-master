@@ -813,7 +813,8 @@ describe("test sign tx", function () {
         it(testcase.name, async function () {
             const data = testcase.input;
             const response = await deriveKeyManager.signTx(data).catch(error => {
-                should.fail(error, undefined, "sign tx with valid data should be ok");
+                console.log("error: ", error);
+                should.fail(error, undefined, "sign tx with valid data should be ok but : ", error);
             });
             console.log("resp:", response);
             should.exist(response.response);

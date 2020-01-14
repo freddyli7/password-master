@@ -249,8 +249,6 @@ async function signTxBTC(message, keyIndex, encryptedMasterKeySeed, password, ne
     const networkDetermined = await networkDeterminator(network).catch(err => {
         return Promise.reject(err)
     });
-    // TODO : how to verify btc unsigned tx message?
-    // if (!util.validBTCTxMessage(message)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidBTCtxMessage));
     const btcTxData = {
         message,
         keyPath: bitcoinKeyPath + keyIndex,
