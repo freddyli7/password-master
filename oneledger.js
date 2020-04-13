@@ -64,10 +64,12 @@ async function signForSignature({message, password, encryptedMasterKeySeed, keyP
     const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
         return Promise.reject(error)
     });
-    const masterKey = deriveMasterKey(decryptedMasterKeySeed);
-    const derivedPrivateKeySeed = derivePrivateKeySeed(masterKey, keyPath);
+    let masterKey = deriveMasterKey(decryptedMasterKeySeed);
+    let derivedPrivateKeySeed = derivePrivateKeySeed(masterKey, keyPath);
     const {privateKey, publicKey} = deriveKeyPair(derivedPrivateKeySeed);
     const signature = nacl.util.encodeBase64(nacl.sign.detached(Uint8Array.from(nacl.util.decodeBase64(message)), nacl.util.decodeBase64(privateKey)));
+    masterKey = null;
+    derivedPrivateKeySeed = null;
     return Promise.resolve(signature)
 }
 

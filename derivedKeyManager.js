@@ -24,7 +24,7 @@ const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = requi
 async function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKeySeed, network}) {
     if (!util.isNonNegativeInteger(keyIndex)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidKeyIndex));
     if (typeof encryptedMasterKeySeed !== "string") return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidEncryptedMasterKeySeed));
-    const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
+    let decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
         return Promise.reject(ErrorUtil.errorWrap(requestErrors.WrongPassword))
     });
     let result;
@@ -35,6 +35,7 @@ async function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKey
             } catch (error) {
                 return errorHandler(deriveKeyErrFilter(error));
             }
+            decryptedMasterKeySeed = null;
             return Promise.resolve(ErrorUtil.responseWrap(result));
         case derivedKeyType.BTCP2PK:
             try {
@@ -42,6 +43,7 @@ async function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKey
             } catch (error) {
                 return errorHandler(deriveKeyErrFilter(error))
             }
+            decryptedMasterKeySeed = null;
             return Promise.resolve(ErrorUtil.responseWrap(result));
         case derivedKeyType.BTCP2PKH:
             try {
@@ -49,6 +51,7 @@ async function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKey
             } catch (error) {
                 return errorHandler(deriveKeyErrFilter(error))
             }
+            decryptedMasterKeySeed = null;
             return Promise.resolve(ErrorUtil.responseWrap(result));
         case derivedKeyType.ETH:
             try {
@@ -56,6 +59,7 @@ async function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKey
             } catch (error) {
                 return errorHandler(deriveKeyErrFilter(error))
             }
+            decryptedMasterKeySeed = null;
             return Promise.resolve(ErrorUtil.responseWrap(result));
         default:
             return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidDerivedKeyType))
@@ -63,10 +67,12 @@ async function deriveNewKeyPair({keyType, keyIndex, password, encryptedMasterKey
 }
 
 function deriveNewKeyPairOLT(masterKeySeed, keyIndex) {
-    const oneledgerMasterKey = oneledger.deriveMasterKey(typeConverter.bufferToHexStr(masterKeySeed));
-    const oneledgerPrivateKeySeed = oneledger.derivePrivateKeySeed(oneledgerMasterKey, oneledgerKeyPath + keyIndex + keyPathSuffix);
+    let oneledgerMasterKey = oneledger.deriveMasterKey(typeConverter.bufferToHexStr(masterKeySeed));
+    let oneledgerPrivateKeySeed = oneledger.derivePrivateKeySeed(oneledgerMasterKey, oneledgerKeyPath + keyIndex + keyPathSuffix);
     const {publicKey} = oneledger.deriveKeyPair(oneledgerPrivateKeySeed);
     const oneledgerAddress = oneledger.deriveAddress(publicKey);
+    oneledgerMasterKey = null;
+    oneledgerPrivateKeySeed = null;
     return {keyIndex, address: oneledgerAddress, publicKey}
 }
 
@@ -74,11 +80,12 @@ async function deriveNewKeyPairBTCP2PK(masterKeySeed, keyIndex, network) {
     const networkDetermined = await networkDeterminator(network).catch(err => {
         return Promise.reject(err)
     });
-    const bitcoinDerivedKeyPairP2PK = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, networkDetermined).catch(error => {
-        throw(error);
+    let bitcoinDerivedKeyPairP2PK = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, networkDetermined).catch(error => {
+        throw(error)
     });
     const bitcoinDerivedPubkeyP2PK = bitcoin.derivePublicKey(bitcoinDerivedKeyPairP2PK);
     const bitcoinDerivedP2PKPubkey = bitcoin.deriveP2PKPubKey(bitcoinDerivedPubkeyP2PK);
+    bitcoinDerivedKeyPairP2PK = null;
     return {keyIndex, publicKey: bitcoinDerivedP2PKPubkey}
 }
 
@@ -86,11 +93,12 @@ async function deriveNewKeyPairBTCP2PKH(masterKeySeed, keyIndex, network) {
     const networkDetermined = await networkDeterminator(network).catch(err => {
         return Promise.reject(err)
     });
-    const bitcoinDerivedKeyPairP2PKH = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, networkDetermined).catch(error => {
-        throw(error);
+    let bitcoinDerivedKeyPairP2PKH = await bitcoin.derivePrivateKey(masterKeySeed, bitcoinKeyPath + keyIndex, networkDetermined).catch(error => {
+        throw(error)
     });
     const bitcoinDerivedPubkeyP2PKH = bitcoin.derivePublicKey(bitcoinDerivedKeyPairP2PKH);
     const bitcoinDerivedP2PKHAddress = bitcoin.deriveP2PKHAddress(bitcoinDerivedPubkeyP2PKH, networkDetermined);
+    bitcoinDerivedKeyPairP2PKH = null;
     return {
         keyIndex,
         address: bitcoinDerivedP2PKHAddress,
@@ -113,9 +121,10 @@ async function networkDeterminator(network = bitcoinNetworkType.BITCOIN) {
 
 function deriveNewKeyPairETH(masterKeySeed, keyIndex) {
     // console.log(ethereumKeyPath + keyIndex);
-    const ethereumDerivedPriKey = ethereum.derivePrivateKey(masterKeySeed, ethereumKeyPath + keyIndex);
+    let ethereumDerivedPriKey = ethereum.derivePrivateKey(masterKeySeed, ethereumKeyPath + keyIndex);
     const ethereumDerivedPubkey = ethereum.derivePublicKey(ethereumDerivedPriKey);
     const ethereumDerivedAddress = ethereum.deriveAddress(ethereumDerivedPubkey);
+    ethereumDerivedPriKey = null;
     return {keyIndex, address: ethereumDerivedAddress, publicKey: ethereumDerivedPubkey}
 }
 
