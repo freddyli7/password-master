@@ -104,10 +104,10 @@ function deriveP2MSAddress(publicKey) {
 // input : network should be the network object of one of "BTCOIN", "TESTNET" or "REGTEST"
 // return : promise containing error object or signature which is a hex string
 async function signForSignature({message, password, encryptedMasterKeySeed, keyPath, network}) {
-    const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
+    let decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
         return Promise.reject(error)
     });
-    const derivedKeyPair = await derivePrivateKey(decryptedMasterKeySeed, keyPath, network).catch(error => {
+    let derivedKeyPair = await derivePrivateKey(decryptedMasterKeySeed, keyPath, network).catch(error => {
         return Promise.reject(error)
     });
     // use WIF to sign, not private key itself
@@ -122,6 +122,8 @@ async function signForSignature({message, password, encryptedMasterKeySeed, keyP
     txBuilder.sign(0, signer);
     const signedTx = txBuilder.build();
     const sigScript = signedTx.ins[0].script;
+    decryptedMasterKeySeed = null;
+    derivedKeyPair = null;
     return Promise.resolve({signature: typeConverter.bufferToHexStr(sigScript)})
 }
 

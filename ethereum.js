@@ -60,13 +60,15 @@ function verifyAddress(address) {
 // input : password is plaintext
 // return : promise containing error object or serialized tx as hex string
 async function signForSignature({txParams, txConfig, password, encryptedMasterKeySeed, keyPath}) {
-    const decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
+    let decryptedMasterKeySeed = await masterKeySeed.masterKeySeedDecryption(password, encryptedMasterKeySeed).catch(error => {
         return Promise.reject(error);
     });
-    const derivedPrivateKey = derivePrivateKey(decryptedMasterKeySeed, keyPath);
+    let derivedPrivateKey = derivePrivateKey(decryptedMasterKeySeed, keyPath);
     const tx = new EthereumTx(txParams, txConfig);
     tx.sign(derivedPrivateKey);
     if (!tx.verifySignature()) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidETHSignature));
+    decryptedMasterKeySeed = null;
+    derivedPrivateKey = null;
     return Promise.resolve(`${ethSignaturePrefix}${tx.serialize().toString('hex')}`)
 }
 
