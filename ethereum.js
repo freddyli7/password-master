@@ -9,7 +9,7 @@ const HDWallet = require('ethereum-hdwallet');
 const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
 const walletValidator = require('wallet-address-validator');
-const {ethSignaturePrefix} = require("./config");
+const {ethAddrPrefix} = require("./config");
 
 /* *****************************   Secp256k1 For ETH  ***************************** */
 // derive privateKey from masterKeySeed
@@ -69,7 +69,7 @@ async function signForSignature({txParams, txConfig, password, encryptedMasterKe
     if (!tx.verifySignature()) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidETHSignature));
     decryptedMasterKeySeed = null;
     derivedPrivateKey = null;
-    return Promise.resolve(`${ethSignaturePrefix}${tx.serialize().toString('hex')}`)
+    return Promise.resolve(`${ethAddrPrefix}${tx.serialize().toString('hex')}`)
 }
 
 module.exports = {

@@ -289,7 +289,7 @@ async function signTxETH(message, keyIndex, encryptedMasterKeySeed, password) {
     if (!util.isNonNegativeNumber(gasPrice)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidGasPrice));
     if (!util.isNonNegativeNumber(value)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidTxValue));
     if (!util.isPositiveInteger(gasLimit)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidGasLimit));
-    if (!util.isValidAddress(to)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidTxReceiverAddress));
+    if (!util.isValidETHAddress(to)) return Promise.reject(ErrorUtil.errorWrap(requestErrors.InvalidTxReceiverAddress));
     const ethTxData = {
         txParams,
         txConfig: {chain, hardfork},

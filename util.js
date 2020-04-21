@@ -1,4 +1,4 @@
-const {ethChainList, ethHardforkList, ethDefaultTxConfig} = require("./config");
+const {ethChainList, ethHardforkList, ethDefaultTxConfig, oltAddrPrefix, ethAddrPrefix} = require("./config");
 const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
 
@@ -23,9 +23,14 @@ function isNonNegativeNumber(str) {
     return !!(!isNaN(Number(str)) && Number(str) >= 0);
 }
 
-// check if address is valid, if so, return true
-function isValidAddress(addr) {
-    return !(!isValidString(addr) || !addr.startsWith("0x") || addr.length !== 42);
+// check if OLT address is valid, if so, return true
+function isValidOLTAddress(addr) {
+    return !(!isValidString(addr) || !addr.startsWith(oltAddrPrefix) || addr.length !== 43);
+}
+
+// check if ETH address is valid, if so, return true
+function isValidETHAddress(addr) {
+    return !(!isValidString(addr) || !addr.startsWith(ethAddrPrefix) || addr.length !== 42);
 }
 
 // check if a string is either undefined, "", null or "<nil>", if so return false
@@ -76,7 +81,8 @@ module.exports = {
     isNonNegativeInteger,
     isPositiveInteger,
     isNonNegativeNumber,
-    isValidAddress,
+    isValidETHAddress,
+    isValidOLTAddress,
     isValidString,
     validETHtxConfigValue,
     validETHtxConfigType,
