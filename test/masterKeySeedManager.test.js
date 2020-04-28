@@ -35,8 +35,8 @@ describe("test new master key", function () {
         // console.log(masterKeySeedObj);
         const masterkeySeed = JSON.parse(masterKeySeedObj.encryptedMasterKeySeed);
         should.equal(masterkeySeed.ct.length, 128, "encrypted masterkeySeed ct part should be 128 chars");
-        should.equal(masterKeySeedObj.masterKeySeedAddress.length, 42, "masterkeyseed address should be 42 chars");
-        should.equal(masterKeySeedObj.masterKeySeedAddress.substring(0, 2), "0x", "masterkeyseed address should start with 0x")
+        should.equal(masterKeySeedObj.masterKeySeedAddress.length, 43, "masterkeyseed address should be 43 chars since we use olt address format");
+        should.equal(masterKeySeedObj.masterKeySeedAddress.substring(0, 3), "0lt", "masterkeyseed address should start with 0lt")
     })
 });
 

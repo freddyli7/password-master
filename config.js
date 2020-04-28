@@ -54,8 +54,8 @@ const bitcoinNetworkType = {
     REGTEST: "REGTEST"
 };
 
-const ed25519KeyAddrPrefix = "0x";
-const ethSignaturePrefix = "0x";
+const oltAddrPrefix = "0lt";
+const ethAddrPrefix = "0x";
 
 const ethChainList = {
     mainnet: "mainnet",
@@ -82,8 +82,8 @@ module.exports = {
     derivedKeyType,
     signatureKeyType,
     bitcoinNetworkType,
-    ed25519KeyAddrPrefix,
-    ethSignaturePrefix,
+    oltAddrPrefix,
+    ethAddrPrefix,
     ethChainList,
     ethHardforkList,
     ethDefaultTxConfig

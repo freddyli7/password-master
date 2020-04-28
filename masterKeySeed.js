@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
 const typeConverter = require("./typeConverter");
-const masterSeedKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
+const masterSeedKeyAddrPrefix = require("./config").oltAddrPrefix;
 
 /* *****************************   Master key  ***************************** */
 
@@ -113,7 +113,7 @@ function getMasterKeySeedPublicKey(masterKeySeed) {
 // store master address locally to verify mnemonic word when user wants to recovery
 // same algorithm as Ed25519 OneLedger key
 // input : masterPublicKey should be a 32 bytes base64 string
-// return : 0x prefix + 20 bytes hex string address
+// return : 0lt prefix + 20 bytes hex string address
 function getMasterKeySeedAddress(masterKeySeedPublicKey) {
     let base64PublicKey = sjcl.codec.base64.toBits(masterKeySeedPublicKey);
     let hash = new sjcl.hash.sha256();

@@ -85,8 +85,8 @@ describe("test masterKeySeed address", function () {
         const masterPublicKey = "GtXKmjp9UHVOLCj5GsP0bpL7s0WSZ7JMeB/SiW4N+0U=";
         const masterAddress = masterKeySeed.getMasterKeySeedAddress(masterPublicKey);
         console.log(masterAddress);
-        should.equal(masterAddress.length, 42, "master seed address should be 42 chars long");
-        should.equal(masterAddress.substring(0,2), "0x", "master seed address should start with 0x")
+        should.equal(masterAddress.length, 43, "master seed address should be 43 chars long since we using olt address format");
+        should.equal(masterAddress.substring(0,3), "0lt", "master seed address should start with 0lt")
     })
 });
 

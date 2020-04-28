@@ -4,7 +4,7 @@ const should = require("should");
 const addrVerfyTestcases =[
     {
         name:"test1, valid olt address with valid olt keytype",
-        input1: "0xcf9b8639c14bfb313fac151186b4e3a8b4b51361",
+        input1: "0ltcf9b8639c14bfb313fac151186b4e3a8b4b51361",
         input2: "OLT",
         expect: true
     },
@@ -16,13 +16,13 @@ const addrVerfyTestcases =[
     },
     {
         name:"test3, valid olt address but invalid olt keytype",
-        input1: "0xcf9b8639c14bfb313fac151186b4e3a8b4b51361",
+        input1: "0ltcf9b8639c14bfb313fac151186b4e3a8b4b51361",
         input2: "OLTT",
         expect: -11014
     },
     {
         name:"test4, valid olt address but valid other keytype",
-        input1: "0xcf9b8639c14bfb313fac151186b4e3a8b4b51361",
+        input1: "0ltcf9b8639c14bfb313fac151186b4e3a8b4b51361",
         input2: "BTCP2PK",
         expect: false
     },

@@ -4,7 +4,7 @@ nacl.util = require("tweetnacl-util");
 const sjcl = require("sjcl");
 const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
-const oltKeyAddrPrefix = require("./config").ed25519KeyAddrPrefix;
+const {oltAddrPrefix} = require("./config");
 const util = require("./util");
 const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
 const {requestErrors} = ErrorType;
@@ -38,7 +38,7 @@ function deriveKeyPair(privateKeySeed) {
 
 // derive the address of the new keyPair
 // input : publicKey should be a 32 bytes base64 string
-// return : address from public key based on SHA256, return 0x prefix and first 40 chars length address
+// return : address from public key based on SHA256, return 0lt prefix and first 40 chars length address
 function deriveAddress(publicKey) {
     let base64PublicKey = sjcl.codec.base64.toBits(publicKey);
     let hash = new sjcl.hash.sha256();
@@ -46,12 +46,12 @@ function deriveAddress(publicKey) {
     let hashResult = hash.finalize();
     let hashedData = sjcl.codec.hex.fromBits(hashResult);
     hash.reset();
-    return `${oltKeyAddrPrefix}${hashedData.substring(0, 40)}`
+    return `${oltAddrPrefix}${hashedData.substring(0, 40)}`
 }
 
 // verify OLT address
 function verifyAddress(address) {
-    return util.isValidAddress(address)
+    return util.isValidOLTAddress(address)
 }
 
 // sign OLT tx
