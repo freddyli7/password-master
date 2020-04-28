@@ -1,6 +1,6 @@
 {
   "name": "hd-vault",
-  "version": "1.0.0",
+  "version": "1.0.0-beta",
   "description": "Oneledger SDK - HD wallet. Currently support OneLedger, BitCoin and Ethereum",
   "types": "index.d.ts",
   "main": "main.js",
