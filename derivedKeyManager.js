@@ -7,7 +7,7 @@ const util = require("./util");
 const typeConverter = require("./typeConverter");
 const {bitcoinNetworkType} = require("./config");
 const {signatureKeyType, derivedKeyType} = require("./config");
-const {ErrorType, errorHandler, ErrorUtil} = require("./middle_utility").TierError;
+const {ErrorType, errorHandler, ErrorUtil} = require("middle_utility").TierError;
 const {requestErrors} = ErrorType;
 const {oneledgerKeyPath, bitcoinKeyPath, ethereumKeyPath, keyPathSuffix} = require("./config");
 

@@ -6,7 +6,7 @@ const typeConverter = require("./typeConverter");
 const masterKeySeed = require("./masterKeySeed");
 const {oltAddrPrefix} = require("./config");
 const util = require("./util");
-const {ErrorType, ErrorUtil} = require("./middle_utility").TierError;
+const {ErrorType, ErrorUtil} = require("middle_utility").TierError;
 const {requestErrors} = ErrorType;
 
 /* *****************************   Ed25519 For Oneledger  ***************************** */
