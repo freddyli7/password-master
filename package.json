@@ -23,7 +23,7 @@
     "tweetnacl": "1.0.1",
     "tweetnacl-util": "0.15.0",
     "wallet-address-validator": "0.2.4",
-    "middle_utility": "./middle_utility"
+    "middle_utility": "file:/middle_utility"
   },
   "devDependencies": {
     "chai": "^4.2.0",
