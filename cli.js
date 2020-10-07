@@ -8,3 +8,6 @@ if (process.env.Func == 'Password') {
     local.passwordGenerator()
 }
 
+if (process.env.Func == 'Retrieve') {
+    local.getPassword()
+}

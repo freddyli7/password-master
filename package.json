@@ -6,8 +6,9 @@
   "main": "main.js",
   "scripts": {
     "test": "nyc mocha",
-    "new-wallet": "Func=Wallet node cli.js",
-    "new-password": "Func=Password node cli.js"
+    "wallet": "Func=Wallet node cli.js",
+    "password": "Func=Password node cli.js",
+    "retrieve": "Func=Retrieve node cli.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "bip32": "2.0.4",
     "bip39": "3.0.2",
     "bitcoinjs-lib": "5.1.7",
+    "dotenv": "^8.2.0",
     "ed25519-hd-key": "1.0.0",
     "ethereum-hdwallet": "0.0.21",
     "ethereumjs-tx": "2.1.1",
