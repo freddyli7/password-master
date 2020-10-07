@@ -1,11 +1,13 @@
 {
-  "name": "hd-vault",
+  "name": "password-master",
   "version": "1.0.0-beta",
-  "description": "Oneledger SDK - HD wallet. Currently support OneLedger, BitCoin and Ethereum",
+  "description": "Pure offline personal password manager leveraged by Hierarchical Deterministic(HD) Wallet",
   "types": "index.d.ts",
   "main": "main.js",
   "scripts": {
-    "test": "nyc mocha"
+    "test": "nyc mocha",
+    "new-wallet": "Func=Wallet node cli.js",
+    "new-password": "Func=Password node cli.js"
   },
   "author": "",
   "license": "ISC",
