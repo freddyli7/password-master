@@ -1,18 +1,19 @@
 const {mnemonicGenerator24, unlockMasterKeySeed, getMasterKeySeedAddressForRecovery, mnemonicArrayToStr} = require("./masterKeySeed");
 const MasterKeySeedManager = require("./masterKeySeedManager");
 const derivedKeyManager = require("./derivedKeyManager");
-
 const fs = require('fs');
 const path = require("path");
 
 const walletPath = path.join(process.env.HOME, "password-master-appdata");
 const walletFilePath = path.join(walletPath, "wallet.json");
 const passwordFilePath = path.join(walletPath, "data.json");
+const readmeFilePath = path.join(walletPath, "README.txt");
 
+const readmeFile = "This is the data folder for password master app, DO NOT modify or remove any of them";
 const keyTypeInUse = "BTCP2PKH";
 const initPasswordData = {
     data : []
-}
+};
 
 async function newWallet() {
     if (fs.existsSync(walletPath) || fs.existsSync(walletFilePath)) {
@@ -40,6 +41,7 @@ async function newWallet() {
         fs.mkdirSync(walletPath);
         fs.writeFileSync(walletFilePath, JSON.stringify(data))
         fs.writeFileSync(passwordFilePath, JSON.stringify(initPasswordData))
+        fs.writeFileSync(readmeFilePath, readmeFile)
     } catch (err) {
         console.error("failed to init a wallet: ", err);
         return
