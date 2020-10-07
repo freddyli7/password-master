@@ -17,7 +17,7 @@ const initPasswordData = {
     data: []
 };
 const masterPasswordMinLength = 8;
-
+const passwordDefaultFormat = {length: 20, number: true, upper: true, lower:true, special:true};
 /**
  * @description new a local wallet
  * @example npm run wallet {your_master_password}
@@ -112,7 +112,7 @@ async function passwordGenerator() {
         return
     }
 
-    console.log(publicKey)
+    console.log(passwordFormatter(publicKey, passwordDefaultFormat))
 }
 
 async function getPassword() {
@@ -146,7 +146,26 @@ async function getPassword() {
         return
     }
 
-    console.log(key)
+    console.log(passwordFormatter(key, passwordDefaultFormat))
+}
+
+// passwordFormatter is for modify password format according to different requirement
+function passwordFormatter(key, {length, number, upper, lower, special}) {
+    if (length < 20) length = 20;
+    let a = key.substr(0, length);
+    if (upper) {
+        a = a.substr(0,length/2).toUpperCase() + a.substr(length/2)
+    }
+    if (lower) {
+        a = a.substr(0,length/2) + a.substr(length/2).toLowerCase()
+    }
+    if (special) { // TODO: how to handler special char
+        // const specials = ["!", "@", "#", "$", "%", "^", "/", "?"]
+        // let random = Math.floor(Math.random() * specials.length);
+        // a += specials[random]
+        a += "&"
+    }
+    return a
 }
 
 // readWalletData load wallet and passwords data from file system
