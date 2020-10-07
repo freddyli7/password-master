@@ -1,9 +1,8 @@
-# HD-Vault
+# Password Master
 
-Core module of Oneledger HD wallet.  
 Currently, we support **OneLedger**, **BitCoin** and **Ethereum** key derivation.
 
-Oneledger HD vault provides functionalities to derive master key, Oneledger key, BitCoin key and Ethereum key, it also provides functionalities to sign Oneledger, BitCoin and Ethereum txs.
+Password Master provides functionalities to derive master key, Oneledger key, BitCoin key and Ethereum key, it also provides functionalities to sign Oneledger, BitCoin and Ethereum txs.
 
 ## Usage
 

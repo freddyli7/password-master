@@ -64,15 +64,15 @@ export declare module derivedKeyManager {
 export declare module masterKeySeedUtil {
     function unlockMasterKeySeed(password: string, encryptedMasterKeySeed: string): Promise<boolean | Object>
 
-    function getMasterKeySeedAddressForRecovery(mnemonicArray: array<{ index: number, word: string }>): string
+    function getMasterKeySeedAddressForRecovery(mnemonicArray: Array<{ index: number, word: string }>): string
 }
 
 export declare module mnemonicUtil {
-    function verifyMnemonic(mnemonicArray: array<{ index: number, word: string }>): boolean
+    function verifyMnemonic(mnemonicArray: Array<{ index: number, word: string }>): boolean
 
-    function mnemonicGenerator12(): array<{ index: number, word: string }>
+    function mnemonicGenerator12(): Array<{ index: number, word: string }>
 
-    function mnemonicGenerator24(): array<{ index: number, word: string }>
+    function mnemonicGenerator24(): Array<{ index: number, word: string }>
 }
 
 export declare module address {
