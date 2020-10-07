@@ -1,4 +1,0 @@
-[submodule "middle_utility"]
-	path = middle_utility
-	url = git@github.com:Oneledger/middle_utility.git
-	branch = master

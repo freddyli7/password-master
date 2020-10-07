@@ -1,11 +1,12 @@
-# HD-Vault
+# Password Master
 
-Core module of Oneledger HD wallet.  
-Currently, we support **OneLedger**, **BitCoin** and **Ethereum** key derivation.
+Password Master is a pure local(offline) personal password manager app writing in Nodejs, it is leveraged by Hierarchical Deterministic(HD) Wallet.
 
-Oneledger HD vault provides functionalities to derive master key, Oneledger key, BitCoin key and Ethereum key, it also provides functionalities to sign Oneledger, BitCoin and Ethereum txs.
+Password Master supports two way of usage:
+1. integrate as a npm dependency
+2. CLI tool
 
-## Usage
+## Usage for Integrate as npm dependency
 
 import
 ```javascript

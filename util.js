@@ -1,5 +1,5 @@
 const {ethChainList, ethHardforkList, ethDefaultTxConfig, oltAddrPrefix, ethAddrPrefix} = require("./config");
-const {ErrorType, ErrorUtil} = require("middle_utility").TierError;
+const {ErrorType, ErrorUtil} = require("./middle_utility/main").TierError;
 const {requestErrors} = ErrorType;
 
 function validateBase64(s) {
