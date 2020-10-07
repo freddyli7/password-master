@@ -9,7 +9,7 @@ Oneledger HD vault provides functionalities to derive master key, Oneledger key,
 
 import
 ```javascript
-    const HDVault = require('hd-vault');
+    const HDVault = require('password-master');
 ```
 
 #### Master Key Derivation
