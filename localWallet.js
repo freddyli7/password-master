@@ -16,8 +16,9 @@ const keyTypeInUse = "BTCP2PKH";
 const initPasswordData = {
     data: []
 };
+const passwordDefaultLength = 20
 const masterPasswordMinLength = 8;
-const passwordDefaultFormat = {length: 20, number: true, upper: true, lower:true, special:true};
+const passwordDefaultFormat = {length: passwordDefaultLength, number: true, upper: true, lower:true, special:true};
 /**
  * @description new a local wallet
  * @example npm run wallet {your_master_password}
@@ -133,11 +134,11 @@ async function getPassword() {
     for (const keyItem of passwordData.data) {
         const {keyName, keyIndex, keyType} = keyItem;
         if (keyName === accountName) {
-            const publicKey = await calculateKey(walletData, keyType, keyIndex, masterPassword).catch(err => {
+            const generatedKey = await calculateKey(walletData, keyType, keyIndex, masterPassword).catch(err => {
                 console.error(err)
             })
-            if (!publicKey) break;
-            key = publicKey
+            if (!generatedKey) break;
+            key = generatedKey
             break
         }
     }
@@ -151,20 +152,11 @@ async function getPassword() {
 
 // passwordFormatter is for modify password format according to different requirement
 function passwordFormatter(key, {length, number, upper, lower, special}) {
-    if (length < 20) length = 20;
+    if (length < passwordDefaultLength) length = passwordDefaultLength;
     let a = key.substr(0, length);
-    if (upper) {
-        a = a.substr(0,length/2).toUpperCase() + a.substr(length/2)
-    }
-    if (lower) {
-        a = a.substr(0,length/2) + a.substr(length/2).toLowerCase()
-    }
-    if (special) { // TODO: how to handler special char
-        // const specials = ["!", "@", "#", "$", "%", "^", "/", "?"]
-        // let random = Math.floor(Math.random() * specials.length);
-        // a += specials[random]
-        a += "&"
-    }
+    if (upper) a = a.substr(0,length/2).toUpperCase() + a.substr(length/2);
+    if (lower) a = a.substr(0,length/2) + a.substr(length/2).toLowerCase();
+    if (special) a = `#${a}`;
     return a
 }
 
@@ -195,13 +187,14 @@ async function calculateKey(walletData, keyTypeInUse, keyIndex, masterPassword) 
         console.debug(err);
         return Promise.reject("failed to generate new password")
     });
-    const {publicKey} = re.response;
+    const {address} = re.response;
 
-    return Promise.resolve(publicKey)
+    return Promise.resolve(address)
 }
 
 module.exports = {
     newWallet,
     passwordGenerator,
-    getPassword
+    getPassword,
+    passwordDefaultFormat
 }

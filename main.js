@@ -1,20 +1,14 @@
-const {verifyMnemonic, mnemonicGenerator12, mnemonicGenerator24, unlockMasterKeySeed, getMasterKeySeedAddressForRecovery} = require("./masterKeySeed");
-exports.MasterKeySeedManager = require("./masterKeySeedManager");
-exports.derivedKeyManager = require("./derivedKeyManager");
-exports.masterKeySeedUtil = {
-    unlockMasterKeySeed,
-    getMasterKeySeedAddressForRecovery
+const {newWallet, passwordGenerator, getPassword, passwordDefaultFormat} = require("./localWallet");
+
+exports.wallet = {
+    newWallet
 };
-exports.mnemonicUtil = {
-    verifyMnemonic,
-    mnemonicGenerator12,
-    mnemonicGenerator24
+
+exports.password = {
+    passwordGenerator,
+    getPassword
 };
-const {verify} = require("./addressVerifier");
-exports.address = {
-    verify
-};
-const {derivedKeyType} = require("./config");
+
 exports.CONSTANT = {
-    KeyType: derivedKeyType
+    PasswordGenerationConfig: passwordDefaultFormat
 };
