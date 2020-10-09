@@ -1,15 +1,15 @@
 import {newWallet, passwordGenerator, getPassword, passwordDefaultFormat} from "./localWallet";
 
-export declare module Wallet {
+export namespace Wallet {
     function newWallet(): string;
 }
 
-export declare module Password {
+export namespace Password {
     function passwordGenerator(): string;
 
     function getPassword(): string;
 }
 
 export const Config = {
-    passwordDefaultFormat
+    PasswordGenerationConfig: passwordDefaultFormat
 }

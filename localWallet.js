@@ -18,21 +18,20 @@ const initPasswordData = {
 };
 const passwordDefaultLength = 20
 const masterPasswordMinLength = 8;
-const passwordDefaultFormat = {length: passwordDefaultLength, number: true, upper: true, lower:true, special:true};
+const passwordDefaultFormat = {length: passwordDefaultLength, number: true, upper: true, lower: true, special: true};
+
 /**
  * @description new a local wallet
  * @example npm run wallet {your_master_password}
  */
 async function newWallet() {
     if (fs.existsSync(walletPath) || fs.existsSync(walletFilePath)) {
-        console.log("wallet already exists");
-        return
+        return Promise.reject({error: "wallet already exists"})
     }
 
     const [a1, a2, masterPassword] = process.argv;
     if (!masterPassword || masterPassword.length <= masterPasswordMinLength) {
-        console.error("master password should be 9 chars at least");
-        return
+        return Promise.reject({error: "master password should be 9 chars at least"})
     }
 
     let mnemonicWords = mnemonicGenerator24();
@@ -49,14 +48,12 @@ async function newWallet() {
         fs.writeFileSync(passwordFilePath, JSON.stringify(initPasswordData))
         fs.writeFileSync(readmeFilePath, readmeFile)
     } catch (err) {
-        console.error("failed to init a wallet: ", err);
-        return
+        return Promise.reject({error: "failed to init a wallet: " + err})
     }
 
     const words = mnemonicArrayToStr(mnemonicWords);
-    console.log(words);
 
-    return words
+    return Promise.resolve(words)
 }
 
 /**
@@ -66,14 +63,12 @@ async function newWallet() {
 async function passwordGenerator() {
     const [a1, a2, masterPassword, accountName] = process.argv;
     if (!masterPassword || !accountName) {
-        console.error("invalid masterPassword or accountName");
-        return
+        return Promise.reject({error: "invalid masterPassword or accountName"})
     }
 
     const wd = await readWalletData().catch(err => {
-        console.error(err)
+        return Promise.reject({error: err.toString()})
     })
-    if (!wd) return;
 
     const {walletData, passwordData} = wd;
 
@@ -91,12 +86,11 @@ async function passwordGenerator() {
         }
     }
     if (isKeyExist) {
-        console.error("account already exists");
-        return
+        return Promise.reject({error: "account already exists"})
     }
 
     const publicKey = await calculateKey(walletData, keyTypeInUse, keyIndex, masterPassword).catch(err => {
-        console.error(err)
+        return Promise.reject({error: err})
     })
     if (!publicKey) return;
 
@@ -109,27 +103,23 @@ async function passwordGenerator() {
         passwordData.data.push(data);
         fs.writeFileSync(passwordFilePath, JSON.stringify(passwordData))
     } catch (err) {
-        console.error("failed to persist new password into wallet: ", err);
-        return
+        return Promise.reject({error: "failed to persist new password into wallet: " + err})
     }
 
     const key = passwordFormatter(publicKey, passwordDefaultFormat);
-    console.log(key);
 
-    return key
+    return Promise.resolve({response: key})
 }
 
 async function getPassword() {
     const [a1, a2, masterPassword, accountName] = process.argv;
     if (!masterPassword || !accountName) {
-        console.error("invalid masterPassword or accountName");
-        return
+        return Promise.reject({error: "invalid masterPassword or accountName"})
     }
 
     const wd = await readWalletData().catch(err => {
-        console.error(err)
+        return Promise.reject({error: err})
     })
-    if (!wd) return;
 
     const {walletData, passwordData} = wd;
 
@@ -138,7 +128,7 @@ async function getPassword() {
         const {keyName, keyIndex, keyType} = keyItem;
         if (keyName === accountName) {
             const generatedKey = await calculateKey(walletData, keyType, keyIndex, masterPassword).catch(err => {
-                console.error(err)
+                return Promise.reject({error: err})
             })
             if (!generatedKey) break;
             key = generatedKey
@@ -146,22 +136,20 @@ async function getPassword() {
         }
     }
     if (!key) {
-        console.error("account not found");
-        return
+        return Promise.reject({error: "account not found"})
     }
 
     const returnKey = passwordFormatter(key, passwordDefaultFormat);
-    console.log(returnKey);
 
-    return returnKey
+    return Promise.resolve({response: returnKey})
 }
 
 // passwordFormatter is for modify password format according to different requirement
 function passwordFormatter(key, {length, number, upper, lower, special}) {
     if (length < passwordDefaultLength) length = passwordDefaultLength;
     let a = key.substr(0, length);
-    if (upper) a = a.substr(0,length/2).toUpperCase() + a.substr(length/2);
-    if (lower) a = a.substr(0,length/2) + a.substr(length/2).toLowerCase();
+    if (upper) a = a.substr(0, length / 2).toUpperCase() + a.substr(length / 2);
+    if (lower) a = a.substr(0, length / 2) + a.substr(length / 2).toLowerCase();
     if (special) a = `#${a}`;
     return a
 }
