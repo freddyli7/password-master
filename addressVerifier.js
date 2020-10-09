@@ -3,7 +3,7 @@ const ethereum = require("./ethereum");
 const oneledger = require("./oneledger");
 const {derivedKeyType} = require("./config");
 const util = require("./util");
-const {ErrorType, ErrorUtil} = require("./middle_utility/main").TierError;
+const {ErrorType, ErrorUtil} = require("./middleUtility/main").TierError;
 const {requestErrors} = ErrorType;
 
 /**
