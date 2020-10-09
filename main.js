@@ -9,6 +9,6 @@ exports.password = {
     getPassword
 };
 
-exports.CONSTANT = {
+exports.Config = {
     PasswordGenerationConfig: passwordDefaultFormat
 };

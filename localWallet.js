@@ -53,10 +53,10 @@ async function newWallet() {
         return
     }
 
-    console.log(mnemonicArrayToStr(mnemonicWords));
+    const words = mnemonicArrayToStr(mnemonicWords);
+    console.log(words);
 
-    mnemonicWords = undefined;
-    masterKey = undefined
+    return words
 }
 
 /**
@@ -113,7 +113,10 @@ async function passwordGenerator() {
         return
     }
 
-    console.log(passwordFormatter(publicKey, passwordDefaultFormat))
+    const key = passwordFormatter(publicKey, passwordDefaultFormat);
+    console.log(key);
+
+    return key
 }
 
 async function getPassword() {
@@ -147,7 +150,10 @@ async function getPassword() {
         return
     }
 
-    console.log(passwordFormatter(key, passwordDefaultFormat))
+    const returnKey = passwordFormatter(key, passwordDefaultFormat);
+    console.log(returnKey);
+
+    return returnKey
 }
 
 // passwordFormatter is for modify password format according to different requirement
