@@ -24,13 +24,16 @@ const passwordDefaultFormat = {length: passwordDefaultLength, number: true, uppe
  * @description new a local wallet
  * @example npm run wallet {your_master_password}
  */
-async function newWallet() {
+async function newWallet(password) {
     if (fs.existsSync(walletPath) || fs.existsSync(walletFilePath)) {
         return Promise.reject({error: "wallet already exists"})
     }
 
-    const [a1, a2, masterPassword] = process.argv;
-    if (!masterPassword || masterPassword.length <= masterPasswordMinLength) {
+    if (!password) {
+        const [a1, a2, passwordCLI] = process.argv;
+        password = passwordCLI
+    }
+    if (!password || password.length <= masterPasswordMinLength) {
         return Promise.reject({error: "master password should be 9 chars at least"})
     }
 
@@ -60,9 +63,13 @@ async function newWallet() {
  * @description generate new password
  * @example npm run password {your_master_password} {account_name}
  */
-async function passwordGenerator() {
-    const [a1, a2, masterPassword, accountName] = process.argv;
-    if (!masterPassword || !accountName) {
+async function passwordGenerator(password, account) {
+    if (!password) {
+        const [a1, a2, passwordCLI, accountName] = process.argv;
+        password = passwordCLI;
+        account = accountName
+    }
+    if (!password || !account) {
         return Promise.reject({error: "invalid masterPassword or accountName"})
     }
 
@@ -80,7 +87,7 @@ async function passwordGenerator() {
     let isKeyExist = false;
     for (const keyItem of passwordData.data) {
         const {keyName} = keyItem;
-        if (keyName === accountName) {
+        if (keyName === account) {
             isKeyExist = true;
             break
         }
@@ -89,13 +96,13 @@ async function passwordGenerator() {
         return Promise.reject({error: "account already exists"})
     }
 
-    const publicKey = await calculateKey(walletData, keyTypeInUse, keyIndex, masterPassword).catch(err => {
+    const publicKey = await calculateKey(walletData, keyTypeInUse, keyIndex, password).catch(err => {
         return Promise.reject({error: err})
     })
     if (!publicKey) return;
 
     const data = {
-        keyName: accountName,
+        keyName: account,
         keyIndex,
         keyType: keyTypeInUse,
     }
@@ -111,9 +118,13 @@ async function passwordGenerator() {
     return Promise.resolve({response: key})
 }
 
-async function getPassword() {
-    const [a1, a2, masterPassword, accountName] = process.argv;
-    if (!masterPassword || !accountName) {
+async function getPassword(password, account) {
+    if (!password) {
+        const [a1, a2, passwordCLI, accountName] = process.argv;
+        password = passwordCLI;
+        account = accountName
+    }
+    if (!password || !account) {
         return Promise.reject({error: "invalid masterPassword or accountName"})
     }
 
@@ -126,8 +137,8 @@ async function getPassword() {
     let key;
     for (const keyItem of passwordData.data) {
         const {keyName, keyIndex, keyType} = keyItem;
-        if (keyName === accountName) {
-            const generatedKey = await calculateKey(walletData, keyType, keyIndex, masterPassword).catch(err => {
+        if (keyName === account) {
+            const generatedKey = await calculateKey(walletData, keyType, keyIndex, password).catch(err => {
                 return Promise.reject({error: err})
             })
             if (!generatedKey) break;
@@ -163,8 +174,7 @@ async function readWalletData() {
         const passwordContent = fs.readFileSync(passwordFilePath);
         passwordData = JSON.parse(passwordContent)
     } catch (err) {
-        console.debug(err);
-        return Promise.reject("failed to decode wallet meta data")
+        return Promise.reject("failed to decode wallet meta data: " + err.toString())
     }
     return Promise.resolve({walletData, passwordData})
 }
@@ -178,8 +188,7 @@ async function calculateKey(walletData, keyTypeInUse, keyIndex, masterPassword) 
         encryptedMasterKeySeed: encryptedMasterKeySeed
     };
     const re = await derivedKeyManager.deriveNewKeyPair(derivedKeyData).catch(err => {
-        console.debug(err);
-        return Promise.reject("failed to generate new password")
+        return Promise.reject("failed to generate new password: " + err.toString())
     });
     const {address} = re.response;
 
