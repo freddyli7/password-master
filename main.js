@@ -1,10 +1,10 @@
 const {newWallet, passwordGenerator, getPassword, passwordDefaultFormat} = require("./localWallet");
 
-exports.wallet = {
+exports.Wallet = {
     newWallet
 };
 
-exports.password = {
+exports.Password = {
     passwordGenerator,
     getPassword
 };

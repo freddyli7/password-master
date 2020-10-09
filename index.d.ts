@@ -1,4 +1,4 @@
-import {passwordDefaultFormat} from "./localWallet";
+import {newWallet, passwordGenerator, getPassword, passwordDefaultFormat} from "./localWallet";
 
 export declare module Wallet {
     function newWallet(): string;
