@@ -29,7 +29,6 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ruins777/password-master
-          tags: type=ref,event=tag
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
