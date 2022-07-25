@@ -27,13 +27,13 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-            DOCKER_IMAGE=ruins777/password-master
+          DOCKER_IMAGE=ruins777/password-master
           
-            # creates local variable of commit hash that triggered workflow
-            COMMIT_HASH=$(echo $GITHUB_SHA | head -c7)
+          # creates local variable of commit hash that triggered workflow
+          COMMIT_HASH=$(echo $GITHUB_SHA | head -c7)
             
-            # creates local variable to hold docker images
-            TAGS="${DOCKER_IMAGE}:${COMMIT_HASH},${DOCKER_IMAGE}:latest"
+          # creates local variable to hold docker images
+          TAGS="${DOCKER_IMAGE}:${COMMIT_HASH},${DOCKER_IMAGE}:latest"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
