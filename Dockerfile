@@ -3,3 +3,4 @@ WORKDIR /app
 RUN mkdir -p /passwordMaster
 WORKDIR /app/passwordMaster
 COPY . .
+
