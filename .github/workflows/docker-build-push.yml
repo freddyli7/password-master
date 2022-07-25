@@ -24,11 +24,16 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ruins777/password-master
+      - name: Prepare
+        id: prep
+        run: |
+            DOCKER_IMAGE=ruins777/password-master
+          
+            # creates local variable of commit hash that triggered workflow
+            COMMIT_HASH=$(echo $GITHUB_SHA | head -c7)
+            
+            # creates local variable to hold docker images
+            TAGS="${DOCKER_IMAGE}:${COMMIT_HASH}:latest"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
