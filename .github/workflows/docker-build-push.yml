@@ -33,7 +33,7 @@ jobs:
             COMMIT_HASH=$(echo $GITHUB_SHA | head -c7)
             
             # creates local variable to hold docker images
-            TAGS="${DOCKER_IMAGE}:${COMMIT_HASH}:latest"
+            TAGS="${DOCKER_IMAGE}:${COMMIT_HASH},${DOCKER_IMAGE}:latest"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
