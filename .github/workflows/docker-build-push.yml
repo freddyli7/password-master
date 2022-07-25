@@ -28,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: freddyli7/password-master
+          images: ruins777/password-master
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
