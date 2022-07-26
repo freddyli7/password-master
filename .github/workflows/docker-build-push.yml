@@ -22,7 +22,7 @@ jobs:
         id: prep
         run: |
           # creates local variable of docker image
-          DOCKER_IMAGE=ruins777/password-master
+          DOCKER_IMAGE=ruins777/password-masters
           
           # creates local variable of commit hash that triggered workflow
           COMMIT_HASH=$(echo $GITHUB_SHA | head -c7)
